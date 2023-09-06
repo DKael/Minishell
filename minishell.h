@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/06 21:53:50 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 00:33:21 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,17 +35,28 @@
 
 typedef int t_bool;
 
+typedef struct s_instr_info
+{
+	int	redir_cnt;
+	int	heredoc_cnt;
+	char	**heredoc_names;
+	t_bool instr_flag;
+	t_bool logic_flag;
+}	t_instr_info;
+
 typedef struct s_data
 {
 	char ***instr;
-	int pipe_cnt;
+	int instr_cnt;
 	int wstatus;
 	pid_t *pid_table;
+	t_instr_info *instr_infos;
+	char *program_name;
 } t_data;
 
 t_bool check_special_char_syntax(char **input_ptr);
 char *ft_strjoin(char const *s1, char const *s2);
-char ***split_instr(t_data *data, char *instr);
+void split_instr(t_data *data, char *instr);
 size_t ft_strlen(const char *s);
 t_bool ft_isdecimal(char *str);
 char *ft_strndup(char *src, size_t n);

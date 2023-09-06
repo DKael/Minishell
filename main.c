@@ -3,56 +3,88 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/06 22:29:55 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 00:05:01 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	data_init(t_data *data)
+void data_init(t_data *data)
 {
 	data->instr = T_NULL;
-	data->pipe_cnt = 0;
+	data->instr_cnt = 0;
 	data->pid_table = T_NULL;
+	data->instr_infos = T_NULL;
 }
 
-int main(void)
+t_bool check_quote(const char *instr)
 {
-	t_data	data;
-	char *buffer;
-	
+	int idx;
+	char	tmp;
+
+	idx = -1;
+	while (instr[++idx] != '\0')
+	{
+		if (instr[idx] == '\"' || instr[idx] == '\'')
+		{
+			tmp = instr[idx];
+			while (instr[++idx] != tmp && instr[idx] != '\0')
+				;
+			if (instr[idx] == '\0')
+				return (FALSE);
+		}
+	}
+	return (TRUE);
+}
+
+int main(int argc, char **argv)
+{
+	t_data data;
+	char *instr;
+
+	data.program_name = argv[0];
+	if (argc != 1)
+	{
+		printf("%s don't support file read or need any other inputs\n", argv[0]);
+		return (1);
+	}
 	data.wstatus = 0;
 	while (1)
 	{
 		data_init(&data);
-		buffer = readline("minishell$ ");
-		if (buffer == T_NULL)
+		instr = readline("minishell$ ");
+		if (instr == T_NULL)
 		{
 			printf("exit\n");
 			return (0);
 		}
-		else if (buffer[0] == '\0')
+		else if (instr[0] == '\0')
 		{
-			data.wstatus = 1;
-			free(buffer);
+			free(instr);
 			continue;
 		}
-		if (check_special_char_syntax(&buffer) == FALSE)
+		if (check_quote(instr) == FALSE)
+		{
+			printf("%s: syntax error, unclosed quote\n", data.program_name);
+			free(instr);
+			continue;
+		}
+		if (check_special_char_syntax(&instr) == FALSE)
 		{
 			data.wstatus = 258;
-			free(buffer);
+			free(instr);
 			continue;
 		}
-		data.instr = split_instr(&data, buffer);
+		split_instr(&data, instr);
 		// if (data.instr == T_NULL)
 		// {
 		// 	free(buffer);
 		// 	return (1);
 		// }
-		free(buffer);
+		free(instr);
 		printf("syntax ok\n");
 
 		// printf("\n\n----------------------------------------\n\n");
@@ -60,4 +92,3 @@ int main(void)
 		// printf("\n\n----------------------------------------\n\n");
 	}
 }
-

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_special_char_syntax.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/06 15:33:11 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/06 23:55:53 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
