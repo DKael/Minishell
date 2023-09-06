@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/04 18:11:29 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/06 15:33:11 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,13 @@ static t_bool case_pipe_and_or(char **input_ptr, int *idx);
 static t_bool wait_for_additional_input(char **input_ptr, char *input);
 static t_bool case_lts_gts(char *input, int *idx);
 
-t_bool check_special_char_syntax(char *input)
+t_bool check_special_char_syntax(char **input_ptr)
 {
+	char *input;
 	int idx;
-
+	int	save_idx;
+	
+	input = *input_ptr;
 	idx = 0;
 	while ((9 <= input[idx] && input[idx] <= 13) || input[idx] == ' ')
 		idx++;
@@ -37,11 +40,17 @@ t_bool check_special_char_syntax(char *input)
 	{
 		if (input[idx] == '|' || (input[idx] == '&' && input[idx + 1] == '&'))
 		{
+			save_idx = idx;
 			if ((input[idx] == '&' && input[idx + 1] == '&')
 			|| (input[idx] == '|' && input[idx + 1] == '|'))
 				idx++;
-			if (case_pipe_and_or(&input, &idx) == FALSE)
+			if (case_pipe_and_or(input_ptr, &idx) == FALSE)
 				return (FALSE);
+			if (*input_ptr != input)
+			{
+				input = *input_ptr;
+				idx = save_idx;
+			}
 		}
 		else if (input[idx] == '<' || input[idx] == '>')
 		{
@@ -101,15 +110,11 @@ static t_bool wait_for_additional_input(char **input_ptr, char *input)
 			continue;
 		}
 		temp = ft_strjoin(input, buffer);
-		if (temp == T_NULL)
-		{
-			free(buffer);
-			free(input);
-			exit(1);
-		}
-		*input_ptr = temp;
 		free(buffer);
 		free(input);
+		*input_ptr = temp;
+		if (temp == T_NULL)
+			exit(1);
 		break;
 	}
 	return (TRUE);

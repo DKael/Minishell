@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/04 20:53:37 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/06 21:53:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+# include <limits.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <dirent.h>
@@ -42,10 +43,11 @@ typedef struct s_data
 	pid_t *pid_table;
 } t_data;
 
-t_bool check_special_char_syntax(char *input);
+t_bool check_special_char_syntax(char **input_ptr);
 char *ft_strjoin(char const *s1, char const *s2);
-char ***parsing(t_data *data, char *instr);
+char ***split_instr(t_data *data, char *instr);
 size_t ft_strlen(const char *s);
 t_bool ft_isdecimal(char *str);
 char *ft_strndup(char *src, size_t n);
+void	*ft_calloc(size_t count, size_t size);
 #endif

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/04 16:27:31 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/06 21:53:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,4 +84,29 @@ char	*ft_strndup(char *src, size_t n)
 	}
 	replica[index] = '\0';
 	return (replica);
+}
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	size_t	index;
+	size_t	total_size;
+	void	*result;
+	char	*temp_ptr;
+
+	index = 0;
+	if (count == 0 || size == 0)
+		return (malloc(0));
+	total_size = count * size;
+	if (ULLONG_MAX / size < count)
+		return ((T_NULL));
+	result = malloc(total_size);
+	if (result == T_NULL)
+		return (T_NULL);
+	temp_ptr = (char *)result;
+	while (index < total_size)
+	{
+		temp_ptr[index] = 0;
+		index++;
+	}
+	return (result);
 }
