@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/07 11:22:07 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/07 17:08:10 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,12 +25,9 @@ CFLAGS = -Wall -Wextra -Werror
 
 NAME = minishell
 
-READLINE_PATH = lib
+INCLUDE = -I.
 
-LDFLAGS = -L./${READLINE_PATH}/lib -lhistory -lreadline
-
-INCLUDE = -I. -I./${READLINE_PATH}/include/readline
-
+LDFLAGS = -lreadline
 
 ${NAME} : ${TOTAL_OBJS}
 	${CC} ${CFLAGS} ${TOTAL_OBJS} ${INCLUDE} ${LDFLAGS} -o $@
@@ -40,15 +37,10 @@ ${NAME} : ${TOTAL_OBJS}
 
 all : ${NAME}
 
-readline : 
-	make -C ${READLINE_PATH}
-
 clean:
-	make -C ${READLINE_PATH} clean
 	rm -f ${OBJS}
 
 fclean: 
-	make -C ${READLINE_PATH} fclean
 	rm -rf ${OBJS} ${NAME}
 
 re: 

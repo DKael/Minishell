@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 09:32:39 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 17:08:55 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include "./lib/include/readline/readline.h"
-#include "./lib/include/readline/history.h"
+#include <readline/history.h>
+#include <readline/readline.h>
 
 #if !defined(TRUE) && !defined(FALSE)
 #define TRUE 1
