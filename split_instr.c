@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 17:42:03 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 22:04:24 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,34 @@ void split_instr(t_data *data, char *instr)
 				data->instr_infos[instr_idx].redir_cnt++;
 				if (tmp_ptr[idx + 1] == '<')
 					data->instr_infos[instr_idx].heredoc_cnt++;
+			}
+		}
+	}
+
+	int redir_idx;
+	int idx2;
+
+	instr_idx = -1;
+	while (++instr_idx < data->instr_cnt)
+	{
+		data->instr[instr_idx] = (char **)ft_calloc(data->instr_infos[instr_idx].redir_cnt + 1, sizeof(char *));
+		if (data->instr[instr_idx] = T_NULL)
+		{
+			free_2d_array(&tmp, data->instr_cnt);
+			idx = -1;
+			while (++idx < instr_idx)
+				free_2d_array(&data->instr[idx], data->instr_infos[idx].redir_cnt + 1);
+			free(data->instr);
+			free(instr);
+			exit(1);
+		}
+		tmp_ptr = tmp[instr_idx];
+		idx = -1;
+		redir_idx = -1;
+		while (tmp_ptr[++idx] != '\0')
+		{
+			if (tmp_ptr[idx] == '<' || tmp_ptr[idx] == '>')
+			{
 				front = idx;
 				while (--front >= 0 && '0' <= tmp_ptr[front] && tmp_ptr[front] < '9' && tmp_ptr[front] != ' ')
 					;
@@ -144,14 +172,39 @@ void split_instr(t_data *data, char *instr)
 				else
 					front++;
 				back = idx;
+				if (tmp_ptr[idx + 1] == '<' || tmp_ptr[idx + 1] == '>')
+					back++;
 				blank = 0;
 				while ((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ')
 					blank++;
-				while (!((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ')
-					&& tmp_ptr[back] != '<' && tmp_ptr[back] != '>')
+				while (!((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ') && tmp_ptr[back] != '<' && tmp_ptr[back] != '>' && tmp_ptr[back] != '\0')
 					;
-				
+				data->instr[instr_idx][++redir_idx] = (char *)ft_calloc(back - front - blank + 1, sizeof(char));
+				if (data->instr[instr_idx][redir_idx] == T_NULL)
+				{
+					free_2d_array(&tmp, data->instr_cnt);
+					idx = -1;
+					while (++idx < instr_idx + 1)
+						free_2d_array(&data->instr[idx], data->instr_infos[idx].redir_cnt + 1);
+					free(data->instr);
+					free(instr);
+					exit(1);
+				}
+				idx2 = -1;
+				while (front < back)
+				{
+					if (!((9 <= tmp_ptr[front] && tmp_ptr[front] <= 13) || tmp_ptr[front] == ' '))
+					{
+						data->instr[instr_idx][redir_idx][++idx2] = tmp_ptr[front];
+						tmp_ptr[front] = ' ';
+					}
+					front++;
+				}
+				redir_idx++;
+				idx = back - 1;
 			}
 		}
+		// after doing all above action, in tmp_ptr string, only command, options, parameters are remain.
+		
 	}
 }
