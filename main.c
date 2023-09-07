@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 17:23:15 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 23:14:19 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,11 +97,14 @@ int main(int argc, char **argv)
 			continue;
 		}
 		split_instr(&data, instr);
-		// if (data.instr == T_NULL)
-		// {
-		// 	free(buffer);
-		// 	return (1);
-		// }
+		for (int i = 0; i < data.instr_cnt; i++)
+		{
+			printf("<%d instruction set>\n", i+1);
+			for (int j = 0; j < data.instr_infos[i].redir_cnt + 1; j++)
+			{
+				printf("%s\n", data.instr[i][j]);
+			}
+		}
 		free(instr);
 		printf("syntax ok\n");
 

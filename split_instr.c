@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 22:04:24 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 23:38:32 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,7 @@ void split_instr(t_data *data, char *instr)
 	while (++instr_idx < data->instr_cnt)
 	{
 		tmp_ptr = tmp[instr_idx];
+		printf("instruction : %s\n", tmp_ptr);
 		idx = -1;
 		while (tmp_ptr[++idx] != '\0')
 		{
@@ -136,7 +137,15 @@ void split_instr(t_data *data, char *instr)
 				data->instr_infos[instr_idx].redir_cnt++;
 				if (tmp_ptr[idx + 1] == '<')
 					data->instr_infos[instr_idx].heredoc_cnt++;
+				if (tmp_ptr[idx + 1] == '<' || tmp_ptr[idx + 1] == '>')
+					idx++;
 			}
+			else if (tmp_ptr[idx] == '\"')
+				while (tmp_ptr[++idx] != '\"')
+					;
+			else if (tmp_ptr[idx] == '\'')
+				while (tmp_ptr[++idx] != '\'')
+					;
 		}
 	}
 
@@ -147,7 +156,7 @@ void split_instr(t_data *data, char *instr)
 	while (++instr_idx < data->instr_cnt)
 	{
 		data->instr[instr_idx] = (char **)ft_calloc(data->instr_infos[instr_idx].redir_cnt + 1, sizeof(char *));
-		if (data->instr[instr_idx] = T_NULL)
+		if (data->instr[instr_idx] == T_NULL)
 		{
 			free_2d_array(&tmp, data->instr_cnt);
 			idx = -1;
@@ -159,15 +168,15 @@ void split_instr(t_data *data, char *instr)
 		}
 		tmp_ptr = tmp[instr_idx];
 		idx = -1;
-		redir_idx = -1;
+		redir_idx = 0;
 		while (tmp_ptr[++idx] != '\0')
 		{
 			if (tmp_ptr[idx] == '<' || tmp_ptr[idx] == '>')
 			{
 				front = idx;
-				while (--front >= 0 && '0' <= tmp_ptr[front] && tmp_ptr[front] < '9' && tmp_ptr[front] != ' ')
+				while (--front >= 0 && ('0' <= tmp_ptr[front] && tmp_ptr[front] < '9') && tmp_ptr[front] != ' ')
 					;
-				if (!('0' <= tmp_ptr[front] && tmp_ptr[front] < '9'))
+				if (front != -1 && tmp_ptr[front] != ' ')
 					front = idx;
 				else
 					front++;
@@ -179,7 +188,7 @@ void split_instr(t_data *data, char *instr)
 					blank++;
 				while (!((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ') && tmp_ptr[back] != '<' && tmp_ptr[back] != '>' && tmp_ptr[back] != '\0')
 					;
-				data->instr[instr_idx][++redir_idx] = (char *)ft_calloc(back - front - blank + 1, sizeof(char));
+				data->instr[instr_idx][redir_idx] = (char *)ft_calloc(back - front - blank + 1, sizeof(char));
 				if (data->instr[instr_idx][redir_idx] == T_NULL)
 				{
 					free_2d_array(&tmp, data->instr_cnt);
@@ -203,8 +212,15 @@ void split_instr(t_data *data, char *instr)
 				redir_idx++;
 				idx = back - 1;
 			}
+			else if (tmp_ptr[idx] == '\"')
+				while (tmp_ptr[++idx] != '\"')
+					;
+			else if (tmp_ptr[idx] == '\'')
+				while (tmp_ptr[++idx] != '\'')
+					;
 		}
 		// after doing all above action, in tmp_ptr string, only command, options, parameters are remain.
-		
+		data->instr[instr_idx][redir_idx] = tmp_ptr;
 	}
+	free(tmp);
 }
