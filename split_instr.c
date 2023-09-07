@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_instr.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 00:27:54 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 17:42:03 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,9 +118,11 @@ void split_instr(t_data *data, char *instr)
 		exit(1);
 	}
 
-
 	// redirection check
-	char	*tmp_ptr;
+	char *tmp_ptr;
+	int front;
+	int back;
+	int blank;
 
 	instr_idx = -1;
 	while (++instr_idx < data->instr_cnt)
@@ -132,9 +134,24 @@ void split_instr(t_data *data, char *instr)
 			if (tmp_ptr[idx] == '<' || tmp_ptr[idx] == '>')
 			{
 				data->instr_infos[instr_idx].redir_cnt++;
+				if (tmp_ptr[idx + 1] == '<')
+					data->instr_infos[instr_idx].heredoc_cnt++;
+				front = idx;
+				while (--front >= 0 && '0' <= tmp_ptr[front] && tmp_ptr[front] < '9' && tmp_ptr[front] != ' ')
+					;
+				if (!('0' <= tmp_ptr[front] && tmp_ptr[front] < '9'))
+					front = idx;
+				else
+					front++;
+				back = idx;
+				blank = 0;
+				while ((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ')
+					blank++;
+				while (!((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ')
+					&& tmp_ptr[back] != '<' && tmp_ptr[back] != '>')
+					;
+				
 			}
 		}
 	}
-
-
 }

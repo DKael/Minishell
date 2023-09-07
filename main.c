@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 16:01:21 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 17:23:15 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 {
 	t_data data;
 	char *instr;
+	int	idx;
 
 	data.program_name = argv[0];
 	if (argc != 1)
@@ -67,7 +68,22 @@ int main(int argc, char **argv)
 			continue;
 		}
 		else
+		{
+			idx = -1;
+			while (instr[++idx] != '\0')
+			{
+				if (instr[idx] == '\n')
+				{
+					printf("%s: syntax error, multiple lines input\n", data.program_name);
+					free(instr);
+					break;
+				}
+			}
+			if (instr[idx] == '\n')
+				continue;
 			add_history(instr);
+		}
+			
 		if (check_quote(instr) == FALSE)
 		{
 			printf("%s: syntax error, unclosed quote\n", data.program_name);
