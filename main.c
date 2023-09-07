@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 00:05:01 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 10:06:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ int main(int argc, char **argv)
 			free(instr);
 			continue;
 		}
+		else
+			add_history(instr);
 		if (check_quote(instr) == FALSE)
 		{
 			printf("%s: syntax error, unclosed quote\n", data.program_name);

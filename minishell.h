@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 00:33:21 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/07 09:32:39 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@
 #include <unistd.h>
 #include <stdlib.h>
 # include <limits.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 #include <dirent.h>
 #include <term.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include "./lib/include/readline/readline.h"
+#include "./lib/include/readline/history.h"
 
 #if !defined(TRUE) && !defined(FALSE)
 #define TRUE 1
