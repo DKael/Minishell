@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/07 11:00:57 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/07 11:22:07 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,21 +25,15 @@ CFLAGS = -Wall -Wextra -Werror
 
 NAME = minishell
 
-ADDRESS_CHECK = 0
-
 READLINE_PATH = lib
 
 LDFLAGS = -L./${READLINE_PATH}/lib -lhistory -lreadline
 
 INCLUDE = -I. -I./${READLINE_PATH}/include/readline
 
-ifeq ($(ADDRESS_CHECK),1)
-${NAME} : readline ${TOTAL_OBJS}
-	${CC} ${CFLAGS} ${TOTAL_OBJS} ${INCLUDE} ${LDFLAGS} -g -fsanitize=address -o $@
-else
-${NAME} : readline ${TOTAL_OBJS}
+
+${NAME} : ${TOTAL_OBJS}
 	${CC} ${CFLAGS} ${TOTAL_OBJS} ${INCLUDE} ${LDFLAGS} -o $@
-endif
 
 %.o :%.c
 	${CC} ${CFLAGS} -c -I. $< -o $@
@@ -48,10 +42,6 @@ all : ${NAME}
 
 readline : 
 	make -C ${READLINE_PATH}
-
-address_check : 
-	make -C ${READLINE_PATH}
-	@make ADDRESS_CHECK=1
 
 clean:
 	make -C ${READLINE_PATH} clean
