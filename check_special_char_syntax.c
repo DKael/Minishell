@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/06 23:55:53 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/08 00:54:53 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,9 @@ t_bool check_special_char_syntax(char **input_ptr)
 {
 	char *input;
 	int idx;
-	int	save_idx;
-	
+	int save_idx;
+	char	tmp;
+
 	input = *input_ptr;
 	idx = 0;
 	while ((9 <= input[idx] && input[idx] <= 13) || input[idx] == ' ')
@@ -41,8 +42,7 @@ t_bool check_special_char_syntax(char **input_ptr)
 		if (input[idx] == '|' || (input[idx] == '&' && input[idx + 1] == '&'))
 		{
 			save_idx = idx;
-			if ((input[idx] == '&' && input[idx + 1] == '&')
-			|| (input[idx] == '|' && input[idx + 1] == '|'))
+			if ((input[idx] == '&' && input[idx + 1] == '&') || (input[idx] == '|' && input[idx + 1] == '|'))
 				idx++;
 			if (case_pipe_and_or(input_ptr, &idx) == FALSE)
 				return (FALSE);
@@ -50,15 +50,26 @@ t_bool check_special_char_syntax(char **input_ptr)
 			{
 				input = *input_ptr;
 				idx = save_idx;
+				if (check_quote(&input[idx]) == FALSE)
+				{
+					printf("minishell: syntax error, unclosed quote\n");
+					return (FALSE);
+				}
 			}
 		}
 		else if (input[idx] == '<' || input[idx] == '>')
 		{
-			if ((input[idx] == '<' && input[idx + 1] == '<')
-				|| (input[idx] == '>' && input[idx + 1] == '>'))
+			if ((input[idx] == '<' && input[idx + 1] == '<') || (input[idx] == '>' && input[idx + 1] == '>'))
 				idx++;
 			if (case_lts_gts(input, &idx) == FALSE)
 				return (FALSE);
+		}
+		else if (input[idx] == '\"' || input[idx] == '\'')
+		{
+			tmp = input[idx];
+			while (input[++idx] != tmp)
+				;
+			idx++;
 		}
 		else
 			idx++;
@@ -144,10 +155,7 @@ static t_bool case_lts_gts(char *input, int *idx)
 	else if (input[(*idx)] == '\0')
 		return (syntax_error_print("newline"));
 	check = (*idx)++;
-	while (input[(*idx)] != '<' && input[(*idx)] != '>'
-		&& input[(*idx)] != '\0' && input[(*idx)] != '|'
-		&& !(input[(*idx)] == '&' && input[(*idx) + 1] == '&')
-		&& !((9 <= input[(*idx)] && input[(*idx)] <= 13) || input[(*idx)] == ' '))
+	while (input[(*idx)] != '<' && input[(*idx)] != '>' && input[(*idx)] != '\0' && input[(*idx)] != '|' && !(input[(*idx)] == '&' && input[(*idx) + 1] == '&') && !((9 <= input[(*idx)] && input[(*idx)] <= 13) || input[(*idx)] == ' '))
 		(*idx)++;
 	if (input[(*idx)] == '<' || input[(*idx)] == '>')
 	{

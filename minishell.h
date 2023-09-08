@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 17:08:55 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/08 11:40:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,12 @@ typedef int t_bool;
 
 typedef struct s_instr_info
 {
+	int	size;
 	int	redir_cnt;
 	int	heredoc_cnt;
 	char	**heredoc_names;
 	t_bool instr_flag;
+	int		ip_cnt;
 	t_bool logic_flag;
 }	t_instr_info;
 
@@ -54,6 +56,7 @@ typedef struct s_data
 	char *program_name;
 } t_data;
 
+t_bool check_quote(const char *instr);
 t_bool check_special_char_syntax(char **input_ptr);
 char *ft_strjoin(char const *s1, char const *s2);
 void split_instr(t_data *data, char *instr);

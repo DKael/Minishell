@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_instr.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/07 23:38:32 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/08 13:15:29 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,22 +32,25 @@ void split_instr(t_data *data, char *instr)
 {
 	int idx;
 	int idx_chk;
+	char char_tmp;
 
-	idx = -1;
-	while (instr[++idx] != '\0')
+	idx = 0;
+	while (instr[idx] != '\0')
 	{
 		if (instr[idx] == '|')
 		{
 			if (instr[idx + 1] != '|')
 				data->instr_cnt++;
-			idx++;
+			else if (instr[idx + 1] == '|')
+				idx++;
 		}
-		else if (instr[idx] == '\"')
-			while (instr[++idx] != '\"')
+		else if (instr[idx] == '\"' || instr[idx] == '\'')
+		{
+			char_tmp = instr[idx];
+			while (instr[++idx] != char_tmp)
 				;
-		else if (instr[idx] == '\'')
-			while (instr[++idx] != '\'')
-				;
+		}
+		idx++;
 	}
 	data->instr_cnt++;
 
@@ -62,14 +65,14 @@ void split_instr(t_data *data, char *instr)
 	}
 	idx_chk = 0;
 	instr_idx = 0;
-	idx = -1;
-	while (instr[++idx] != '\0')
+	idx = 0;
+	while (instr[idx] != '\0')
 	{
 		if (instr[idx] == '|')
 		{
 			if (instr[idx + 1] == '|')
 			{
-				idx++;
+				idx += 2;
 				continue;
 			}
 			tmp[instr_idx] = ft_strndup(&instr[idx_chk], idx - idx_chk);
@@ -82,12 +85,13 @@ void split_instr(t_data *data, char *instr)
 			idx_chk = idx + 1;
 			instr_idx++;
 		}
-		else if (instr[idx] == '\"')
-			while (instr[++idx] != '\"')
+		else if (instr[idx] == '\"' || instr[idx] == '\'')
+		{
+			char_tmp = instr[idx];
+			while (instr[++idx] != char_tmp)
 				;
-		else if (instr[idx] == '\'')
-			while (instr[++idx] != '\'')
-				;
+		}
+		idx++;
 	}
 	tmp[instr_idx] = ft_strndup(&instr[idx_chk], idx - idx_chk);
 	if (tmp[instr_idx] == T_NULL)
@@ -96,11 +100,6 @@ void split_instr(t_data *data, char *instr)
 		free(instr);
 		exit(1);
 	}
-
-	// for (int i = 0; i < data->pipe_cnt + 1; i++)
-	// 	printf("%s\n", tmp[i]);
-
-	// free_2d_array(&tmp, data->pipe_cnt + 1);
 
 	data->instr = (char ***)ft_calloc(data->instr_cnt, sizeof(char **));
 	if (data->instr == T_NULL)
@@ -128,9 +127,8 @@ void split_instr(t_data *data, char *instr)
 	while (++instr_idx < data->instr_cnt)
 	{
 		tmp_ptr = tmp[instr_idx];
-		printf("instruction : %s\n", tmp_ptr);
-		idx = -1;
-		while (tmp_ptr[++idx] != '\0')
+		idx = 0;
+		while (tmp_ptr[idx] != '\0')
 		{
 			if (tmp_ptr[idx] == '<' || tmp_ptr[idx] == '>')
 			{
@@ -140,36 +138,38 @@ void split_instr(t_data *data, char *instr)
 				if (tmp_ptr[idx + 1] == '<' || tmp_ptr[idx + 1] == '>')
 					idx++;
 			}
-			else if (tmp_ptr[idx] == '\"')
-				while (tmp_ptr[++idx] != '\"')
+			else if (tmp_ptr[idx] == '\"' || tmp_ptr[idx] == '\'')
+			{
+				char_tmp = tmp_ptr[idx];
+				while (tmp_ptr[++idx] != char_tmp)
 					;
-			else if (tmp_ptr[idx] == '\'')
-				while (tmp_ptr[++idx] != '\'')
-					;
+			}
+			idx++;
 		}
 	}
 
 	int redir_idx;
 	int idx2;
+	int quote_cnt;
 
 	instr_idx = -1;
 	while (++instr_idx < data->instr_cnt)
 	{
-		data->instr[instr_idx] = (char **)ft_calloc(data->instr_infos[instr_idx].redir_cnt + 1, sizeof(char *));
+		data->instr[instr_idx] = (char **)ft_calloc(data->instr_infos[instr_idx].redir_cnt, sizeof(char *));
 		if (data->instr[instr_idx] == T_NULL)
 		{
 			free_2d_array(&tmp, data->instr_cnt);
 			idx = -1;
 			while (++idx < instr_idx)
-				free_2d_array(&data->instr[idx], data->instr_infos[idx].redir_cnt + 1);
+				free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
 			free(data->instr);
 			free(instr);
 			exit(1);
 		}
 		tmp_ptr = tmp[instr_idx];
-		idx = -1;
+		idx = 0;
 		redir_idx = 0;
-		while (tmp_ptr[++idx] != '\0')
+		while (tmp_ptr[idx] != '\0')
 		{
 			if (tmp_ptr[idx] == '<' || tmp_ptr[idx] == '>')
 			{
@@ -184,17 +184,30 @@ void split_instr(t_data *data, char *instr)
 				if (tmp_ptr[idx + 1] == '<' || tmp_ptr[idx + 1] == '>')
 					back++;
 				blank = 0;
+				quote_cnt = 0;
 				while ((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ')
 					blank++;
-				while (!((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ') && tmp_ptr[back] != '<' && tmp_ptr[back] != '>' && tmp_ptr[back] != '\0')
-					;
-				data->instr[instr_idx][redir_idx] = (char *)ft_calloc(back - front - blank + 1, sizeof(char));
+				while (tmp_ptr[back] != '\0')
+				{
+					if (((9 <= tmp_ptr[back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ') || tmp_ptr[back] == '<' || tmp_ptr[back] == '>')
+						break;
+					else if (tmp_ptr[back] == '\"' || tmp_ptr[back] == '\'')
+					{
+						quote_cnt += 2;
+						char_tmp = tmp_ptr[back];
+						while (tmp_ptr[++back] != char_tmp)
+							;
+					}
+					back++;
+				}
+				data->instr[instr_idx][redir_idx] = (char *)ft_calloc(back - front - blank - quote_cnt + 2, sizeof(char));
 				if (data->instr[instr_idx][redir_idx] == T_NULL)
 				{
 					free_2d_array(&tmp, data->instr_cnt);
+					free_2d_array(&data->instr[instr_idx], redir_idx);
 					idx = -1;
-					while (++idx < instr_idx + 1)
-						free_2d_array(&data->instr[idx], data->instr_infos[idx].redir_cnt + 1);
+					while (++idx < instr_idx)
+						free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
 					free(data->instr);
 					free(instr);
 					exit(1);
@@ -202,25 +215,134 @@ void split_instr(t_data *data, char *instr)
 				idx2 = -1;
 				while (front < back)
 				{
-					if (!((9 <= tmp_ptr[front] && tmp_ptr[front] <= 13) || tmp_ptr[front] == ' '))
+					if (tmp_ptr[front] == '\"' || tmp_ptr[front] == '\'')
+					{
+						char_tmp = tmp_ptr[front];
+						tmp_ptr[front] = ' ';
+						while (tmp_ptr[++front] != char_tmp)
+							data->instr[instr_idx][redir_idx][++idx2] = tmp_ptr[front];
+						tmp_ptr[front] = ' ';
+					}
+					else if (!((9 <= tmp_ptr[front] && tmp_ptr[front] <= 13) || tmp_ptr[front] == ' '))
 					{
 						data->instr[instr_idx][redir_idx][++idx2] = tmp_ptr[front];
-						tmp_ptr[front] = ' ';
+						if (tmp_ptr[front] == '<' || tmp_ptr[front] == '>')
+						{
+							tmp_ptr[front] = ' ';
+							if (tmp_ptr[front + 1] == '<' || tmp_ptr[front + 1] == '>')
+							{
+								data->instr[instr_idx][redir_idx][++idx2] = tmp_ptr[++front];
+								tmp_ptr[front] = ' ';
+							}
+							data->instr[instr_idx][redir_idx][++idx2] = ' ';
+						}
+						else
+							tmp_ptr[front] = ' ';
 					}
 					front++;
 				}
 				redir_idx++;
 				idx = back - 1;
 			}
-			else if (tmp_ptr[idx] == '\"')
-				while (tmp_ptr[++idx] != '\"')
+			else if (tmp_ptr[idx] == '\"' || tmp_ptr[idx] == '\'')
+			{
+				char_tmp = tmp_ptr[idx];
+				while (tmp_ptr[++idx] != char_tmp)
 					;
-			else if (tmp_ptr[idx] == '\'')
-				while (tmp_ptr[++idx] != '\'')
-					;
+			}
+			idx++;
 		}
 		// after doing all above action, in tmp_ptr string, only command, options, parameters are remain.
-		data->instr[instr_idx][redir_idx] = tmp_ptr;
+
+		char **temp_2d;
+
+		idx = 0;
+		while (tmp_ptr[idx] != '\0')
+		{
+			if (!((9 <= tmp_ptr[idx] && tmp_ptr[idx] <= 13) || tmp_ptr[idx] == ' '))
+			{
+				data->instr_infos[instr_idx].ip_cnt++;
+				while (!((9 <= tmp_ptr[idx] && tmp_ptr[idx] <= 13) || tmp_ptr[idx] == ' ') && tmp_ptr[idx] != '\0')
+				{
+					if (tmp_ptr[idx] == '\"' || tmp_ptr[idx] == '\'')
+					{
+						char_tmp = tmp_ptr[idx];
+						while (tmp_ptr[++idx] != char_tmp)
+							;
+					}
+					idx++;
+				}
+				if (tmp_ptr[idx] == '\0')
+					break;
+			}
+			idx++;
+		}
+		data->instr_infos[instr_idx].size = data->instr_infos[instr_idx].redir_cnt + data->instr_infos[instr_idx].ip_cnt;
+		temp_2d = (char **)ft_calloc(data->instr_infos[instr_idx].size, sizeof(char *));
+		if (temp_2d == T_NULL)
+		{
+			free_2d_array(&tmp, data->instr_cnt);
+			idx = -1;
+			while (++idx < instr_idx)
+				free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
+			free_2d_array(&data->instr[instr_idx], data->instr_infos[idx].redir_cnt);
+			free(data->instr);
+			free(instr);
+			exit(1);
+		}
+		idx = -1;
+		while (++idx < data->instr_infos[instr_idx].redir_cnt)
+			temp_2d[idx] = data->instr[instr_idx][idx];
+		free(data->instr[instr_idx]);
+		data->instr[instr_idx] = temp_2d;
+
+		int ip_idx;
+		int idx_chk;
+
+		ip_idx = data->instr_infos[instr_idx].redir_cnt;
+		idx = 0;
+		while (tmp_ptr[idx] != '\0')
+		{
+			if (!((9 <= tmp_ptr[idx] && tmp_ptr[idx] <= 13) || tmp_ptr[idx] == ' '))
+			{
+				quote_cnt = 0;
+				idx_chk = idx;
+				while (!((9 <= tmp_ptr[idx] && tmp_ptr[idx] <= 13) || tmp_ptr[idx] == ' ') && tmp_ptr[idx] != '\0')
+				{
+					if (tmp_ptr[idx] == '\"' || tmp_ptr[idx] == '\'')
+					{
+						quote_cnt += 2;
+						char_tmp = tmp_ptr[idx];
+						while (tmp_ptr[++idx] != char_tmp)
+							;
+					}
+					idx++;
+				}
+				data->instr[instr_idx][ip_idx] = (char *)ft_calloc(idx - idx_chk - quote_cnt + 1,sizeof(char));
+				if (data->instr[instr_idx][ip_idx] == T_NULL)
+				{
+					free_2d_array(&tmp, data->instr_cnt);
+					free_2d_array(&data->instr[instr_idx], ip_idx);
+					idx = -1;
+					while (++idx < instr_idx)
+						free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
+					free(data->instr);
+					free(instr);
+					exit(1);
+				}
+				idx2 = -1;
+				while (idx_chk < idx)
+				{
+					if (tmp_ptr[idx_chk] != '\"' && tmp_ptr[idx_chk] != '\'')
+						data->instr[instr_idx][ip_idx][++idx2] = tmp_ptr[idx_chk];
+					idx_chk++;
+				}
+				ip_idx++;
+				if (tmp_ptr[idx] == '\0' || ip_idx == data->instr_infos[instr_idx].size)
+					break;
+			}
+			idx++;
+		}
 	}
-	free(tmp);
+	free_2d_array(&tmp, data->instr_cnt);
 }
