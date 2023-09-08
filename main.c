@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/08 13:14:15 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/08 14:09:38 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,10 +106,16 @@ int main(int argc, char **argv)
 			}
 		}
 		free(instr);
-		printf("syntax ok\n");
+		idx = -1;
+		while (++idx < data.instr_cnt)
+			free_2d_array(&data.instr[idx], data.instr_infos[idx].size);
+		free(data.instr);
+		free(data.instr_infos);
+			
+		printf("syntax ok\n\n");
 
-		// printf("\n\n----------------------------------------\n\n");
-		// system("leaks minishell");
-		// printf("\n\n----------------------------------------\n\n");
+		printf("\n\n----------------------------------------\n\n");
+		system("leaks minishell");
+		printf("\n\n----------------------------------------\n\n");
 	}
 }

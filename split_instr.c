@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/08 13:15:29 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/08 14:09:07 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,7 @@ void split_instr(t_data *data, char *instr)
 			idx = -1;
 			while (++idx < instr_idx)
 				free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
+			free(data->instr_infos);
 			free(data->instr);
 			free(instr);
 			exit(1);
@@ -209,6 +210,7 @@ void split_instr(t_data *data, char *instr)
 					while (++idx < instr_idx)
 						free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
 					free(data->instr);
+					free(data->instr_infos);
 					free(instr);
 					exit(1);
 				}
@@ -220,7 +222,10 @@ void split_instr(t_data *data, char *instr)
 						char_tmp = tmp_ptr[front];
 						tmp_ptr[front] = ' ';
 						while (tmp_ptr[++front] != char_tmp)
+						{
 							data->instr[instr_idx][redir_idx][++idx2] = tmp_ptr[front];
+							tmp_ptr[front] = ' ';
+						}
 						tmp_ptr[front] = ' ';
 					}
 					else if (!((9 <= tmp_ptr[front] && tmp_ptr[front] <= 13) || tmp_ptr[front] == ' '))
@@ -252,6 +257,7 @@ void split_instr(t_data *data, char *instr)
 			}
 			idx++;
 		}
+		printf("tmp_ptr : %s\n", tmp_ptr);
 		// after doing all above action, in tmp_ptr string, only command, options, parameters are remain.
 
 		char **temp_2d;
@@ -287,6 +293,7 @@ void split_instr(t_data *data, char *instr)
 				free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
 			free_2d_array(&data->instr[instr_idx], data->instr_infos[idx].redir_cnt);
 			free(data->instr);
+			free(data->instr_infos);
 			free(instr);
 			exit(1);
 		}
@@ -327,6 +334,7 @@ void split_instr(t_data *data, char *instr)
 					while (++idx < instr_idx)
 						free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
 					free(data->instr);
+					free(data->instr_infos);
 					free(instr);
 					exit(1);
 				}

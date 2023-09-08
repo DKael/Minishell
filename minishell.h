@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/08 11:40:50 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/08 13:58:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ typedef struct s_data
 	char *program_name;
 } t_data;
 
+void free_2d_array(char ***arr_ptr, int num);
 t_bool check_quote(const char *instr);
 t_bool check_special_char_syntax(char **input_ptr);
 char *ft_strjoin(char const *s1, char const *s2);
