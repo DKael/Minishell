@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/07 17:08:10 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/09 11:36:59 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,6 +14,9 @@ SRCS =	main.c \
 		check_special_char_syntax.c \
 		util.c \
 		split_instr.c
+		double_linked_list1.c \
+		double_linked_list2.c \
+		double_linked_list2.c 
 		
 OBJS = 	${SRCS:.c=.o}
 

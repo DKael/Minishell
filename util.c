@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/06 21:53:30 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/09 21:33:56 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,4 +109,57 @@ void	*ft_calloc(size_t count, size_t size)
 		index++;
 	}
 	return (result);
+}
+
+int	ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+	size_t			index;
+	unsigned char	*p1;
+	unsigned char	*p2;
+
+	index = 0;
+	p1 = (unsigned char *)s1;
+	p2 = (unsigned char *)s2;
+	while (index < n)
+	{
+		if (p1[index] != p2[index])
+			return ((int)(p1[index] - p2[index]));
+		else if (p1[index] == '\0')
+			return (0);
+		index++;
+	}
+	return (0);
+}
+
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	int				index;
+	unsigned char	*p1;
+	unsigned char	*p2;
+
+	index = 0;
+	p1 = (unsigned char *)s1;
+	p2 = (unsigned char *)s2;
+	while (p1[index] == p2[index]
+		&& p1[index] != '\0' && p2[index] != '\0')
+		index++;
+	return ((int)(p1[index] - p2[index]));
+}
+
+char 	*ft_getenv(t_data *data, const char* name)
+{
+	char *result;
+	t_dllnode *ptr;
+
+	result = getenv(name);
+	if (result != T_NULL)
+		return (result);
+	ptr = data->envdll.head.back;
+	while (ptr != &(data->envdll.tail))
+	{
+		if (ft_strcmp(((t_envval *)(ptr->contents))->name, name) == 0)
+			return (((t_envval *)(ptr->contents))->value);
+		ptr = ptr->back;
+	}
+	return (T_NULL);
 }

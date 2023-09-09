@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/08 13:58:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/09 12:07:53 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <signal.h>
 #include <readline/history.h>
 #include <readline/readline.h>
+#include "double_linked_list.h"
 
 #if !defined(TRUE) && !defined(FALSE)
 #define TRUE 1
@@ -35,6 +36,11 @@
 
 typedef int t_bool;
 
+typedef struct s_envval
+{
+	char *name;
+	char *value;
+}	t_envval;
 typedef struct s_instr_info
 {
 	int	size;
@@ -50,10 +56,13 @@ typedef struct s_data
 {
 	char ***instr;
 	int instr_cnt;
-	int wstatus;
 	pid_t *pid_table;
 	t_instr_info *instr_infos;
+
+
+	int wstatus;
 	char *program_name;
+	t_dll envdll;
 } t_data;
 
 void free_2d_array(char ***arr_ptr, int num);

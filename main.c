@@ -3,16 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/08 14:09:38 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/09 22:58:53 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void data_init(t_data *data)
+void data_init(t_data*data, char *program_name)
+{
+	data->program_name = program_name;
+	data->instr = T_NULL;
+	data->instr_cnt = 0;
+	data->pid_table = T_NULL;
+	data->instr_infos = T_NULL;
+	dll_init(&data->envdll);
+}
+
+void data_cycle_init(t_data *data)
 {
 	data->instr = T_NULL;
 	data->instr_cnt = 0;
@@ -40,13 +50,13 @@ t_bool check_quote(const char *instr)
 	return (TRUE);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp)
 {
 	t_data data;
 	char *instr;
 	int	idx;
 
-	data.program_name = argv[0];
+	data_init(&data, argv[0]);
 	if (argc != 1)
 	{
 		printf("%s don't support file read or need any other inputs\n", argv[0]);
@@ -55,7 +65,7 @@ int main(int argc, char **argv)
 	data.wstatus = 0;
 	while (1)
 	{
-		data_init(&data);
+		data_cycle_init(&data);
 		instr = readline("minishell$ ");
 		if (instr == T_NULL)
 		{
