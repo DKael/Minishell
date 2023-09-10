@@ -3,16 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   check_special_char_syntax.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/08 00:54:53 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/10 16:52:43 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static t_bool syntax_error_print(char *chr);
 static t_bool case_pipe_and_or(char **input_ptr, int *idx);
 static t_bool wait_for_additional_input(char **input_ptr, char *input);
 static t_bool case_lts_gts(char *input, int *idx);
@@ -20,13 +19,14 @@ static t_bool case_lts_gts(char *input, int *idx);
 t_bool check_special_char_syntax(char **input_ptr)
 {
 	char *input;
+	char *sliced_part;
 	int idx;
 	int save_idx;
-	char	tmp;
+	char char_tmp;
 
 	input = *input_ptr;
 	idx = 0;
-	while ((9 <= input[idx] && input[idx] <= 13) || input[idx] == ' ')
+	while (ft_isblank(input[idx]) == TRUE)
 		idx++;
 	if (input[idx] == '|')
 	{
@@ -37,6 +37,7 @@ t_bool check_special_char_syntax(char **input_ptr)
 	}
 	else if (input[idx] == '&' && input[idx + 1] == '&')
 		return (syntax_error_print("&&"));
+
 	while (input[idx] != '\0')
 	{
 		if (input[idx] == '|' || (input[idx] == '&' && input[idx + 1] == '&'))
@@ -50,11 +51,10 @@ t_bool check_special_char_syntax(char **input_ptr)
 			{
 				input = *input_ptr;
 				idx = save_idx;
-				if (check_quote(&input[idx]) == FALSE)
-				{
-					printf("minishell: syntax error, unclosed quote\n");
+				if (check_multiple_lines(&input[idx]) == FALSE 
+					|| check_quote_closed(&input[idx]) == FALSE
+					|| check_parentheses_syntax(&input[idx]) == FALSE)
 					return (FALSE);
-				}
 			}
 		}
 		else if (input[idx] == '<' || input[idx] == '>')
@@ -66,9 +66,36 @@ t_bool check_special_char_syntax(char **input_ptr)
 		}
 		else if (input[idx] == '\"' || input[idx] == '\'')
 		{
-			tmp = input[idx];
-			while (input[++idx] != tmp)
+			char_tmp = input[idx];
+			while (input[++idx] != char_tmp)
 				;
+			idx++;
+		}
+		else if (input[idx] == '(')
+		{
+			save_idx = idx;
+			while (input[++idx] != ')')
+			{
+				if (input[idx] == '\"' || input[idx] == '\'')
+				{
+					char_tmp = input[idx];
+					while (input[++idx] != char_tmp)
+						;
+				}
+			}
+			sliced_part = ft_strndup(&input[save_idx + 1], idx - save_idx - 1);
+			if (sliced_part == T_NULL)
+			{
+				printf("minishell: malloc error!\n");
+				free(input);
+				exit(1);
+			}
+			if (check_special_char_syntax(&sliced_part) == FALSE)
+			{
+				free(sliced_part);
+				return (FALSE);
+			}
+			free(sliced_part);
 			idx++;
 		}
 		else
@@ -77,18 +104,12 @@ t_bool check_special_char_syntax(char **input_ptr)
 	return (TRUE);
 }
 
-static t_bool syntax_error_print(char *chr)
-{
-	printf("minishell: syntax error near unexpected token `%s'\n", chr);
-	return (FALSE);
-}
-
 static t_bool case_pipe_and_or(char **input_ptr, int *idx)
 {
 	char *input;
 
 	input = *input_ptr;
-	while ((9 <= input[++(*idx)] && input[(*idx)] <= 13) || input[(*idx)] == ' ')
+	while (ft_isblank(input[++(*idx)]) == TRUE)
 		;
 	if (input[(*idx)] == '|' && input[(*idx) + 1] != '|')
 		return (syntax_error_print("|"));
@@ -125,7 +146,10 @@ static t_bool wait_for_additional_input(char **input_ptr, char *input)
 		free(input);
 		*input_ptr = temp;
 		if (temp == T_NULL)
+		{
+			printf("minishell: malloc error!\n");
 			exit(1);
+		}
 		break;
 	}
 	return (TRUE);
@@ -136,7 +160,7 @@ static t_bool case_lts_gts(char *input, int *idx)
 	int check;
 	char *temp;
 
-	while ((9 <= input[++(*idx)] && input[(*idx)] <= 13) || input[(*idx)] == ' ')
+	while (ft_isblank(input[++(*idx)]) == TRUE)
 		;
 	if (input[(*idx)] == '>' && input[(*idx) + 1] != '>')
 		return (syntax_error_print(">"));
@@ -154,14 +178,18 @@ static t_bool case_lts_gts(char *input, int *idx)
 		return (syntax_error_print("&&"));
 	else if (input[(*idx)] == '\0')
 		return (syntax_error_print("newline"));
-	check = (*idx)++;
-	while (input[(*idx)] != '<' && input[(*idx)] != '>' && input[(*idx)] != '\0' && input[(*idx)] != '|' && !(input[(*idx)] == '&' && input[(*idx) + 1] == '&') && !((9 <= input[(*idx)] && input[(*idx)] <= 13) || input[(*idx)] == ' '))
-		(*idx)++;
+	check = (*idx);
+	while (input[++(*idx)] != '<' && input[(*idx)] != '>'
+		&& input[(*idx)] != '\0' && input[(*idx)] != '|'
+		&& !(input[(*idx)] == '&' && input[(*idx) + 1] == '&')
+		&& ft_isblank(input[(*idx)]) == FALSE)
+		;
 	if (input[(*idx)] == '<' || input[(*idx)] == '>')
 	{
 		temp = ft_strndup(&input[check], (*idx) - check);
 		if (temp == T_NULL)
 		{
+			printf("minishell: malloc error!\n");
 			free(input);
 			exit(1);
 		}

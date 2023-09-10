@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_instr.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/08 14:09:07 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/10 15:02:01 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,9 +175,9 @@ void split_instr(t_data *data, char *instr)
 			if (tmp_ptr[idx] == '<' || tmp_ptr[idx] == '>')
 			{
 				front = idx;
-				while (--front >= 0 && ('0' <= tmp_ptr[front] && tmp_ptr[front] < '9') && tmp_ptr[front] != ' ')
+				while (--front >= 0 && ('0' <= tmp_ptr[front] && tmp_ptr[front] < '9') && ft_isblank(tmp_ptr[front]) == FALSE)
 					;
-				if (front != -1 && tmp_ptr[front] != ' ')
+				if (front >= 0 && ft_isblank(tmp_ptr[front]) == FALSE)
 					front = idx;
 				else
 					front++;
@@ -186,11 +186,11 @@ void split_instr(t_data *data, char *instr)
 					back++;
 				blank = 0;
 				quote_cnt = 0;
-				while ((9 <= tmp_ptr[++back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ')
+				while (ft_isblank(tmp_ptr[++back]) == TRUE)
 					blank++;
 				while (tmp_ptr[back] != '\0')
 				{
-					if (((9 <= tmp_ptr[back] && tmp_ptr[back] <= 13) || tmp_ptr[back] == ' ') || tmp_ptr[back] == '<' || tmp_ptr[back] == '>')
+					if (ft_isblank(tmp_ptr[back]) == TRUE || tmp_ptr[back] == '<' || tmp_ptr[back] == '>')
 						break;
 					else if (tmp_ptr[back] == '\"' || tmp_ptr[back] == '\'')
 					{
@@ -228,7 +228,7 @@ void split_instr(t_data *data, char *instr)
 						}
 						tmp_ptr[front] = ' ';
 					}
-					else if (!((9 <= tmp_ptr[front] && tmp_ptr[front] <= 13) || tmp_ptr[front] == ' '))
+					else if (ft_isblank(tmp_ptr[front]) == FALSE)
 					{
 						data->instr[instr_idx][redir_idx][++idx2] = tmp_ptr[front];
 						if (tmp_ptr[front] == '<' || tmp_ptr[front] == '>')
@@ -265,10 +265,10 @@ void split_instr(t_data *data, char *instr)
 		idx = 0;
 		while (tmp_ptr[idx] != '\0')
 		{
-			if (!((9 <= tmp_ptr[idx] && tmp_ptr[idx] <= 13) || tmp_ptr[idx] == ' '))
+			if (ft_isblank(tmp_ptr[idx]) == FALSE)
 			{
 				data->instr_infos[instr_idx].ip_cnt++;
-				while (!((9 <= tmp_ptr[idx] && tmp_ptr[idx] <= 13) || tmp_ptr[idx] == ' ') && tmp_ptr[idx] != '\0')
+				while (ft_isblank(tmp_ptr[idx]) == FALSE && tmp_ptr[idx] != '\0')
 				{
 					if (tmp_ptr[idx] == '\"' || tmp_ptr[idx] == '\'')
 					{
@@ -310,11 +310,11 @@ void split_instr(t_data *data, char *instr)
 		idx = 0;
 		while (tmp_ptr[idx] != '\0')
 		{
-			if (!((9 <= tmp_ptr[idx] && tmp_ptr[idx] <= 13) || tmp_ptr[idx] == ' '))
+			if (ft_isblank(tmp_ptr[idx]) == FALSE)
 			{
 				quote_cnt = 0;
 				idx_chk = idx;
-				while (!((9 <= tmp_ptr[idx] && tmp_ptr[idx] <= 13) || tmp_ptr[idx] == ' ') && tmp_ptr[idx] != '\0')
+				while (ft_isblank(tmp_ptr[idx]) == FALSE && tmp_ptr[idx] != '\0')
 				{
 					if (tmp_ptr[idx] == '\"' || tmp_ptr[idx] == '\'')
 					{

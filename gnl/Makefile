@@ -5,38 +5,26 @@
 #                                                     +:+ +:+         +:+      #
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/10 16:32:38 by hyungdki         ###   ########.fr        #
+#    Created: 2023/05/03 20:28:31 by hyungdki          #+#    #+#              #
+#    Updated: 2023/05/30 13:05:20 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
-SRCS =	main.c \
-		check_special_char_syntax.c \
-		util.c \
-		split_instr.c \
-		error.c \
-		
-OBJS = 	${SRCS:.c=.o}
-
-TOTAL_OBJS = ${OBJS}
 
 CC = cc
 
 CFLAGS = -Wall -Wextra -Werror
 
-NAME = minishell
+SRCS =	get_next_line.c	\
+		get_next_line_utils.c	\
 
-INCLUDE = -I.
+OBJS = 	${SRCS:.c=.o}
 
-LIBDLL_DIR = dll
-LIBGNL_DIR = gnl
+NAME = libgnl.a
 
-LDFLAGS = -lreadline -L./${LIBDLL_DIR} -L./${LIBGNL_DIR} -ldll -lgnl
+TOTAL_OBJS = $(OBJS)
 
 ${NAME} : ${TOTAL_OBJS}
-	@make -C ${LIBDLL_DIR} all
-	@make -C ${LIBGNL_DIR} all
-	${CC} ${CFLAGS} ${TOTAL_OBJS} ${INCLUDE} ${LDFLAGS} -o $@
+		ar -rsc ${NAME} ${TOTAL_OBJS}
 
 %.o :%.c
 	${CC} ${CFLAGS} -c -I. $< -o $@
@@ -44,16 +32,17 @@ ${NAME} : ${TOTAL_OBJS}
 all : ${NAME}
 
 clean:
-	@make -C ${LIBDLL_DIR} fclean
-	@make -C ${LIBGNL_DIR} fclean
-	rm -f ${OBJS}
+	rm -f $(OBJS) $(OBJS_BONUS)
 
-fclean:
-	make clean
-	rm -rf ${NAME}
+fclean: 
+	@$(MAKE) clean
+	rm -f  ${NAME}
 
 re: 
-	make fclean
-	make all
+	@$(MAKE) fclean
+	@$(MAKE) all
 
-.PHONY: all clean fclean re ADDRESS_CHECK
+bonus:
+	@make all
+
+.PHONY: all clean fclean re bonus

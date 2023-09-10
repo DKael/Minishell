@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/09 21:33:56 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/10 16:58:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,20 +146,16 @@ int	ft_strcmp(const char *s1, const char *s2)
 	return ((int)(p1[index] - p2[index]));
 }
 
-char 	*ft_getenv(t_data *data, const char* name)
+t_bool	ft_isblank(char c)
 {
-	char *result;
-	t_dllnode *ptr;
+	if ((9 <= c && c < 13) || c == ' ')
+		return (TRUE);
+	return (FALSE);
+}
 
-	result = getenv(name);
-	if (result != T_NULL)
-		return (result);
-	ptr = data->envdll.head.back;
-	while (ptr != &(data->envdll.tail))
-	{
-		if (ft_strcmp(((t_envval *)(ptr->contents))->name, name) == 0)
-			return (((t_envval *)(ptr->contents))->value);
-		ptr = ptr->back;
-	}
-	return (T_NULL);
+t_bool	ft_isdigit(int c)
+{
+	if ('0' <= c && c <= '9')
+		return (TRUE);
+	return (FALSE);
 }
