@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 16:57:32 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/10 20:28:57 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,9 +55,10 @@ typedef struct s_instr_info
 
 typedef struct s_data
 {
-	t_dll *instr;
+	char ***instr;
 	int instr_cnt;
 	pid_t *pid_table;
+	t_instr_info *instr_infos;
 
 	char *program_name;
 	int wstatus;
@@ -76,6 +77,14 @@ void split_instr(t_data *data, char *instr);
 size_t ft_strlen(const char *s);
 t_bool ft_isdecimal(char *str);
 char *ft_strndup(char *src, size_t n);
+int	ft_strcmp(const char *s1, const char *s2);
 void	*ft_calloc(size_t count, size_t size);
 t_bool	ft_isblank(char c);
+char *ft_getenv(t_data *data, const char *name);
+char *get_dollor_parameter(char *instr);
+void	str_delete_func(void *log);
+
+
+
+void	envval_delete_func(void *str);
 #endif

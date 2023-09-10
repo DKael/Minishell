@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 15:02:01 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/10 20:34:38 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,10 @@ void split_instr(t_data *data, char *instr)
 	int redir_idx;
 	int idx2;
 	int quote_cnt;
+	t_dll temp_dll;
 
 	instr_idx = -1;
+	dll_init(&temp_dll);
 	while (++instr_idx < data->instr_cnt)
 	{
 		data->instr[instr_idx] = (char **)ft_calloc(data->instr_infos[instr_idx].redir_cnt, sizeof(char *));
@@ -305,6 +307,9 @@ void split_instr(t_data *data, char *instr)
 
 		int ip_idx;
 		int idx_chk;
+		int expansion_len;
+		t_envval env_tmp;
+		t_dllnode *node_ptr;
 
 		ip_idx = data->instr_infos[instr_idx].redir_cnt;
 		idx = 0;
@@ -313,6 +318,7 @@ void split_instr(t_data *data, char *instr)
 			if (ft_isblank(tmp_ptr[idx]) == FALSE)
 			{
 				quote_cnt = 0;
+				expansion_len = 0;
 				idx_chk = idx;
 				while (ft_isblank(tmp_ptr[idx]) == FALSE && tmp_ptr[idx] != '\0')
 				{
@@ -321,11 +327,66 @@ void split_instr(t_data *data, char *instr)
 						quote_cnt += 2;
 						char_tmp = tmp_ptr[idx];
 						while (tmp_ptr[++idx] != char_tmp)
-							;
+						{
+							if (char_tmp == '\"' && tmp_ptr[idx] == '$' && ft_isblank(tmp_ptr[idx + 1]) == FALSE)
+							{
+								env_tmp.name = get_dollor_parameter(&tmp_ptr[idx]);
+								if (env_tmp.name == (char *)-1)
+									exit(1);
+								else if (env_tmp.name == T_NULL)
+								{
+									free_2d_array(&tmp, data->instr_cnt);
+									free_2d_array(&data->instr[instr_idx], ip_idx);
+									idx = -1;
+									while (++idx < instr_idx)
+										free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
+									free(data->instr);
+									free(data->instr_infos);
+									free(instr);
+									return;
+								}
+								env_tmp.value = ft_getenv(data, env_tmp.name);
+								if (env_tmp.value != T_NULL)
+									expansion_len += ft_strlen(env_tmp.value);
+								else
+									env_tmp.value = "";
+								node_ptr = dll_new_node((void *)(&env_tmp));
+								if (node_ptr == T_NULL)
+									exit(1);
+								dll_add_tail(&temp_dll, node_ptr);
+							}
+						}
+					}
+					else if (tmp_ptr[idx] == '$' && ft_isblank(tmp_ptr[idx + 1]) == FALSE && tmp_ptr[idx + 1] != '\0')
+					{
+						env_tmp.name = get_dollor_parameter(&tmp_ptr[idx]);
+						if (env_tmp.name == (char *)-1)
+							exit(1);
+						else if (env_tmp.name == T_NULL)
+						{
+							free_2d_array(&tmp, data->instr_cnt);
+							free_2d_array(&data->instr[instr_idx], ip_idx);
+							idx = -1;
+							while (++idx < instr_idx)
+								free_2d_array(&data->instr[idx], data->instr_infos[idx].size);
+							free(data->instr);
+							free(data->instr_infos);
+							free(instr);
+							return;
+						}
+						env_tmp.value = ft_getenv(data, env_tmp.name);
+						if (env_tmp.value != T_NULL)
+							expansion_len += ft_strlen(env_tmp.value);
+						else
+							env_tmp.value = "";
+						node_ptr = dll_new_node((void *)(&env_tmp));
+						if (node_ptr == T_NULL)
+							exit(1);
+						dll_add_tail(&temp_dll, node_ptr);
 					}
 					idx++;
 				}
-				data->instr[instr_idx][ip_idx] = (char *)ft_calloc(idx - idx_chk - quote_cnt + 1,sizeof(char));
+				data->instr[instr_idx][ip_idx] = (char *)ft_calloc(idx - idx_chk - quote_cnt + expansion_len + 1, sizeof(char));
 				if (data->instr[instr_idx][ip_idx] == T_NULL)
 				{
 					free_2d_array(&tmp, data->instr_cnt);
@@ -338,11 +399,36 @@ void split_instr(t_data *data, char *instr)
 					free(instr);
 					exit(1);
 				}
+				int idx3;
+
 				idx2 = -1;
+				node_ptr = temp_dll.head.back;
 				while (idx_chk < idx)
 				{
-					if (tmp_ptr[idx_chk] != '\"' && tmp_ptr[idx_chk] != '\'')
+					if (tmp_ptr[idx_chk] != '\'')
 						data->instr[instr_idx][ip_idx][++idx2] = tmp_ptr[idx_chk];
+					else if (tmp_ptr[idx_chk] == '$')
+					{
+						idx3 = -1;
+						while (((char *)(node_ptr->contents))[++idx3] != '\0')
+							data->instr[instr_idx][ip_idx][++idx2] = ((char *)(node_ptr->contents))[idx3];
+						node_ptr = node_ptr->back;
+					}
+					else if (tmp_ptr[idx_chk] == '\"')
+					{
+						while (tmp_ptr[++idx] != '\"')
+						{
+							if (tmp_ptr[idx_chk] == '$')
+							{
+								idx3 = -1;
+								while (((char *)(node_ptr->contents))[++idx3] != '\0')
+									data->instr[instr_idx][ip_idx][++idx2] = ((char *)(node_ptr->contents))[idx3];
+								node_ptr = node_ptr->back;
+							}
+							else
+								data->instr[instr_idx][ip_idx][++idx2] = tmp_ptr[idx_chk];
+						}
+					}
 					idx_chk++;
 				}
 				ip_idx++;
@@ -350,6 +436,7 @@ void split_instr(t_data *data, char *instr)
 					break;
 			}
 			idx++;
+			dll_clear(&temp_dll, envval_delete_func);
 		}
 	}
 	free_2d_array(&tmp, data->instr_cnt);

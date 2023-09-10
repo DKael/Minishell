@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 16:58:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/10 20:28:43 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,4 +158,27 @@ t_bool	ft_isdigit(int c)
 	if ('0' <= c && c <= '9')
 		return (TRUE);
 	return (FALSE);
+}
+
+void	str_delete_func(void *str)
+{
+	char	*temp;
+
+	if (str != T_NULL)
+	{
+		temp = (char *)str;
+		free(temp);
+	}
+}
+
+void	envval_delete_func(void *str)
+{
+	t_envval	*temp;
+
+	if (str != T_NULL)
+	{
+		temp = (t_envval *)str;
+		free(temp->name);
+		
+	}
 }

@@ -6,18 +6,18 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 18:13:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/10 20:37:45 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char 	*ft_getenv(t_data *data, const char* name)
+char *ft_getenv(t_data *data, const char *name)
 {
 	char *result;
 	t_dllnode *ptr;
 
-	result = getenv(name);
+	
 	if (result != T_NULL)
 		return (result);
 	ptr = data->envdll.head.back;
@@ -30,32 +30,52 @@ char 	*ft_getenv(t_data *data, const char* name)
 	return (T_NULL);
 }
 
-char	*get_dollor_parameter(t_data data, char *instr)
+char *get_dollor_parameter(char *instr)
 {
-	int	idx;
-	int	idx_chk;
-	t_bool blank_flag;
+	int idx;
+	char char_tmp;
+	t_bool bad_flag;
+	char *result;
 
-	if (instr[0] != '$')
-		return (T_NULL);
-	if (ft_isblank(instr[1]) == TRUE)
-		return (T_NULL);
-	else if (instr[1] == '{')
+	if (instr[1] == '{')
 	{
 		idx = 1;
-		blank_flag == FALSE;
+		bad_flag = FALSE;
 		while (instr[++idx] != '}')
 		{
-			if (blank_flag == FALSE && ft_isblank(instr[idx]) == TRUE)
-				blank_flag = TRUE;
+			if (ft_isblank(instr[idx]) == TRUE || instr[idx] == '$')
+				bad_flag = TRUE;
+			else if (instr[idx] == '\"' || instr[idx] == '\'')
+			{
+				bad_flag = TRUE;
+				char_tmp = instr[idx];
+				while (instr[++idx] != char_tmp)
+					;
+			}
 			else if (instr[idx] == '\0')
 			{
 				printf("minishell: syntax error, unclosed brace\n");
-				
+				return (T_NULL);
 			}
-				
 		}
+		if (bad_flag)
+		{
+			write(2, "minishell: ", 12);
+			write(2, instr, idx + 1);
+			write(2, ": bad substitution\n", 20);
+			return (T_NULL);
+		}
+		result = (char *)ft_strndup(&instr[2], idx - 2);
 	}
 	else
-	;
+	{
+		idx = 0;
+		while (instr[++idx] != '\0' && instr[idx] != '{'
+		&& instr[idx] != '\"' && instr[idx] != '\'' && ft_isblank(instr[idx]) == FALSE)
+			;
+		result = (char *)ft_strndup(&instr[1], idx - 1);
+	}
+	if (result == T_NULL)
+		return ((char *)-1);
+	return (result);
 }
