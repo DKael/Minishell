@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 20:28:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/10 22:29:57 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,13 @@
 #endif
 
 typedef int t_bool;
+
+typedef struct s_dollor_tmp
+{
+	char *name;
+	char *value;
+	int idx_jump;
+}	t_dollor_tmp;
 
 typedef struct s_envval
 {
@@ -79,10 +86,12 @@ t_bool ft_isdecimal(char *str);
 char *ft_strndup(char *src, size_t n);
 int	ft_strcmp(const char *s1, const char *s2);
 void	*ft_calloc(size_t count, size_t size);
+char	*ft_itoa(int n);
 t_bool	ft_isblank(char c);
 char *ft_getenv(t_data *data, const char *name);
-char *get_dollor_parameter(char *instr);
+char *get_dollor_parameter(char *instr, int *origin_idx);
 void	str_delete_func(void *log);
+char	*ft_strdup(char *src);
 
 
 

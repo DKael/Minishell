@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 20:28:43 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/11 00:12:04 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	s1_size = ft_strlen(s1);
 	s2_size = ft_strlen(s2);
 	result = (char *)malloc(sizeof(char) * (s1_size + s2_size + 1));
-	if (result == NULL)
-		return (NULL);
+	if (result == T_NULL)
+		return (T_NULL);
 	index = 0;
 	while (index < s1_size)
 	{
@@ -74,8 +74,8 @@ char	*ft_strndup(char *src, size_t n)
 	char	*replica;
 
 	replica = (char *)malloc(sizeof(char) * (n + 1));
-	if (replica == NULL)
-		return (NULL);
+	if (replica == T_NULL)
+		return (T_NULL);
 	index = 0;
 	while (src[index] != '\0' && index < n)
 	{
@@ -171,14 +171,99 @@ void	str_delete_func(void *str)
 	}
 }
 
-void	envval_delete_func(void *str)
+void	envval_delete_func(void *envval)
 {
 	t_envval	*temp;
 
-	if (str != T_NULL)
+	if (envval != T_NULL)
 	{
-		temp = (t_envval *)str;
+		temp = (t_envval *)envval;
 		free(temp->name);
-		
+		free(temp->value);
+		free(temp);
 	}
+}
+
+static char	*case_pos(int n, int digit);
+static char	*case_neg(int n, int digit);
+
+char	*ft_itoa(int n)
+{
+	int		digit;
+	int		temp_n;
+	char	*result;
+
+	if (n == 0)
+	{
+		result = (char *)malloc(sizeof(char) * 2);
+		if (result == T_NULL)
+			return (T_NULL);
+		result[0] = '0';
+		result[1] = '\0';
+		return (result);
+	}
+	temp_n = n;
+	digit = 0;
+	while (temp_n != 0)
+	{
+		digit++;
+		temp_n /= 10;
+	}
+	if (n > 0)
+		return (case_pos(n, digit));
+	else
+		return (case_neg(n, digit));
+}
+
+static char	*case_pos(int n, int digit)
+{
+	char	*result;
+
+	result = (char *)malloc(sizeof(char) * (digit + 1));
+	if (result == T_NULL)
+		return (T_NULL);
+	result[digit--] = '\0';
+	while (n != 0)
+	{
+		result[digit--] = (n % 10) + '0';
+		n /= 10;
+	}
+	return (result);
+}
+
+static char	*case_neg(int n, int digit)
+{
+	char	*result;
+
+	result = (char *)malloc(sizeof(char) * (digit + 2));
+	if (result == T_NULL)
+		return (T_NULL);
+	result[0] = '-';
+	result[digit + 1] = '\0';
+	while (n != 0)
+	{
+		result[digit--] = (-1) * (n % 10) + '0';
+		n /= 10;
+	}
+	return (result);
+}
+
+char	*ft_strdup(char *src)
+{
+	size_t	src_length;
+	size_t	index;
+	char	*replica;
+
+	src_length = ft_strlen(src);
+	replica = (char *)malloc(sizeof(char) * (src_length + 1));
+	if (replica == T_NULL)
+		return (T_NULL);
+	index = 0;
+	while (src[index] != '\0')
+	{
+		replica[index] = src[index];
+		index++;
+	}
+	replica[index] = '\0';
+	return (replica);
 }

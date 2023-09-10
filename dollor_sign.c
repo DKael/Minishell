@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 20:37:45 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/11 00:17:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,25 @@
 
 char *ft_getenv(t_data *data, const char *name)
 {
+	char *temp;
 	char *result;
 	t_dllnode *ptr;
 
-	
-	if (result != T_NULL)
+	if (name[0] == '?' && name[1] == '\0')
+	{
+		result = ft_itoa(data->wstatus);
+		if (result == T_NULL)
+			return ((char *)-1);
 		return (result);
+	}
+	temp = getenv(name);
+	if (temp != T_NULL)
+	{
+		result = ft_strdup(temp);
+		if (result == T_NULL)
+			return ((char *)-1);
+		return (result);
+	}
 	ptr = data->envdll.head.back;
 	while (ptr != &(data->envdll.tail))
 	{
@@ -30,12 +43,12 @@ char *ft_getenv(t_data *data, const char *name)
 	return (T_NULL);
 }
 
-char *get_dollor_parameter(char *instr)
+char *get_dollor_parameter(char *instr, int *origin_idx)
 {
-	int idx;
 	char char_tmp;
 	t_bool bad_flag;
 	char *result;
+	int idx;
 
 	if (instr[1] == '{')
 	{
@@ -66,14 +79,16 @@ char *get_dollor_parameter(char *instr)
 			return (T_NULL);
 		}
 		result = (char *)ft_strndup(&instr[2], idx - 2);
+		*origin_idx += idx;
 	}
 	else
 	{
 		idx = 0;
-		while (instr[++idx] != '\0' && instr[idx] != '{'
-		&& instr[idx] != '\"' && instr[idx] != '\'' && ft_isblank(instr[idx]) == FALSE)
+		while (instr[++idx] != '\0' && instr[idx] != '{' && instr[idx] != '\"'
+		&& instr[idx] != '\'' && ft_isblank(instr[idx]) == FALSE && instr[idx] != '$')
 			;
 		result = (char *)ft_strndup(&instr[1], idx - 1);
+		*origin_idx += (idx - 1);
 	}
 	if (result == T_NULL)
 		return ((char *)-1);
