@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 22:18:25 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/12 12:09:32 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,226 +16,135 @@ void data_init(t_data *data, char *program_name, char **envp)
 {
 	data->program_name = program_name;
 	data->envp = envp;
-	data->instr = T_NULL;
-	data->instr_cnt = 0;
-	data->pid_table = T_NULL;
-	data->instr_infos = T_NULL;
-	data->wstatus = 0;
+	data->last_exit_code = 0;
 	dll_init(&data->envdll);
+	store_env_in_dll(&data, envp);
 }
 
 void data_cycle_init(t_data *data)
 {
-	data->instr = T_NULL;
-	data->instr_cnt = 0;
+	data->tkn = T_NULL;
+	data->ao_cnt = 0;
+	data->pipe_cnt = T_NULL;
 	data->pid_table = T_NULL;
-	data->instr_infos = T_NULL;
 }
 
-t_bool check_multiple_lines(const char *instr)
+
+void set_last_exit_code(t_data *data, unsigned int input_exit_code)
 {
 	int idx;
+	unsigned int temp;
 
-	idx = -1;
-	while (instr[++idx] != '\0')
+	data->last_exit_code = input_exit_code;
+	temp = data->last_exit_code;
+	idx = 0;
+	if (temp / 100U != 0)
+		data->last_exit_code_str[idx++] = (temp / 100U);
+	temp %= 100U;
+	if (temp / 10U != 0)
+		data->last_exit_code_str[idx++] = (temp / 10U);
+	temp %= 10U;
+	data->last_exit_code_str[idx++] = temp;
+	data->last_exit_code_str[idx] = '\0';
+}
+
+
+
+void store_env_in_dll(t_data *data, char **envp)
+{
+	t_envval *env;
+	char **temp;
+	t_dllnode *node;
+
+	while (*envp)
 	{
-		if (instr[idx] == '\n')
+		temp = ft_split(*envp, '=');
+		if (temp == T_NULL)
 		{
-			printf("minishell: syntax error, multiple lines input\n");
+			dll_clear(&data->envdll, envval_delete_func);
+			message_exit("minishell: malloc error!\n", 1);
+		}
+		env = (t_envval *)malloc(sizeof(t_envval));
+		if (env == T_NULL)
+		{
+			dll_clear(&data->envdll, envval_delete_func);
+			free_2d_array(&temp, 2);
+			message_exit("minishell: malloc error!\n", 1);
+		}
+		env->name = temp[0];
+		env->value = temp[1];
+		node = dll_new_node((void *)env);
+		if (node == T_NULL)
+		{
+			dll_clear(&data->envdll, envval_delete_func);
+			free(env);
+			free_2d_array(&temp, 2);
+			message_exit("minishell: malloc error!\n", 1);
+		}
+		dll_add_tail(&data->envdll, node);
+		free(temp);
+		envp++;
+	}
+}
+
+t_bool	check_syntax_error(char *cmd, int mode)
+{
+	if (check_multiple_lines(cmd) == FALSE
+		|| check_quote_closed(cmd) == FALSE
+		|| check_parentheses_syntax(cmd) == FALSE
+		|| check_dollor_braces(cmd) == FALSE)
+		return (FALSE);
+	if (mode == 0)
+		if ((check_special_char_syntax(&cmd) == FALSE))
 			return (FALSE);
-		}
-	}
-	return (TRUE);
-}
-
-t_bool check_quote_closed(const char *instr)
-{
-	int idx;
-	char tmp;
-
-	idx = -1;
-	while (instr[++idx] != '\0')
-	{
-		if (instr[idx] == '\"' || instr[idx] == '\'')
-		{
-			tmp = instr[idx];
-			while (instr[++idx] != tmp && instr[idx] != '\0')
-				;
-			if (instr[idx] == '\0')
-			{
-				printf("minishell: syntax error, unclosed quote\n");
-				return (FALSE);
-			}
-		}
-	}
-	return (TRUE);
-}
-
-t_bool check_parentheses_syntax(char *instr)
-{
-	int idx;
-	int save_idx;
-	char char_tmp;
-	t_bool empty_flag;
-	int word_cnt;
-	char *sliced_part;
-
-	idx = -1;
-	while (instr[++idx] != '\0')
-	{
-		if (instr[idx] == '(')
-		{
-			save_idx = idx;
-			word_cnt = 0;
-			while (--idx >= 0 && instr[idx] != '|' && instr[idx] != '&')
-			{
-				if (instr[idx] == '<' || instr[idx] == '>')
-					return (syntax_error_print("("));
-				else if (ft_isblank(instr[idx]) == FALSE)
-				{
-					if (ft_isblank(instr[idx]) == FALSE
-					&& ft_isblank(instr[idx + 1]) == TRUE)
-					{
-						word_cnt++;
-						if (word_cnt >= 2)
-							return (syntax_error_print("("));
-					}
-					if (instr[idx] == '\"' || instr[idx] == '\'')
-					{
-						char_tmp = instr[idx];
-						while (instr[--idx] != char_tmp)
-							;
-					}
-				}
-			}
-			if (word_cnt == 1)
-			{
-				idx = save_idx;
-				while (ft_isblank(instr[++idx]) == TRUE)
-					;
-				if (instr[idx] == ')')
-				{
-					printf("minishell: function not supported\n");
-					return (FALSE);
-				}
-				else if (instr[idx] == '\0')
-					return (syntax_error_print("newline"));
-				save_idx = idx;
-				while (instr[idx] != '\0' && instr[idx] != ')' && ft_isblank(instr[idx]) == FALSE)
-				{
-					if (instr[idx] == '\"' || instr[idx] == '\'')
-					{
-						char_tmp = instr[idx];
-						while (instr[++idx] != char_tmp)
-							;
-					}
-					idx++;
-				}
-					
-				sliced_part = ft_strndup(&instr[save_idx], idx - save_idx);
-				if (sliced_part == T_NULL)
-				{
-					printf("minishell: malloc error!\n");
-					free(instr);
-					exit(1);
-				}
-				syntax_error_print(sliced_part);
-				free(sliced_part);
-				return (FALSE);
-			}
-
-			empty_flag = TRUE;
-			while (instr[++idx] != '\0')
-			{
-				if (instr[idx] == ')')
-					break;
-				else if (instr[idx] == '\"' || instr[idx] == '\'')
-				{
-					empty_flag = FALSE;
-					char_tmp = instr[idx];
-					while (instr[++idx] != char_tmp)
-						;
-				}
-				else if (ft_isblank(instr[idx]) == FALSE)
-					empty_flag = FALSE;
-			}
-			if (instr[idx] == '\0')
-			{
-				printf("minishell: syntax error, unclosed parentheses\n");
-				return (FALSE);
-			}
-			else if (empty_flag == TRUE)
-				return (syntax_error_print(")"));
-		}
-		else if (instr[idx] == '\"' || instr[idx] == '\'')
-		{
-			char_tmp = instr[idx];
-			while (instr[++idx] != char_tmp)
-				;
-		}
-		else if (instr[idx] == ')')
-			return (syntax_error_print(")"));
-	}
 	return (TRUE);
 }
 
 int main(int argc, char **argv, char **envp)
 {
 	t_data data;
-	char *instr;
+	char *cmd;
 	int idx;
 
-	data_init(&data, argv[0], envp);
 	if (argc != 1)
 	{
 		printf("minishell: don't support file read or need any other inputs\n");
 		return (1);
 	}
+	data_init(&data, argv[0], envp);
 	while (1)
 	{
 		data_cycle_init(&data);
-		instr = readline("minishell$ ");
-		if (instr == T_NULL)
+		cmd = readline("minishell$ ");
+		if (cmd == T_NULL)
 		{
 			printf("exit\n");
 			return (0);
 		}
-		else if (instr[0] == '\0')
+		else if (cmd[0] == '\0')
 		{
-			free(instr);
+			free(cmd);
 			continue;
 		}
-	
-		add_history(instr);
-		if (check_multiple_lines(instr) == FALSE
-			|| check_quote_closed(instr) == FALSE
-			|| check_parentheses_syntax(instr) == FALSE
-			|| check_special_char_syntax(&instr) == FALSE)
+
+		add_history(cmd);
+		if (check_syntax_error(cmd, 0) == FALSE)
 		{
-			data.wstatus = 258;
-			free(instr);
+			set_last_exit_code(&data, 258);
+			free(cmd);
 			continue;
 		}
-		split_instr(&data, instr);
-		for (int i = 0; i < data.instr_cnt; i++)
-		{
-			printf("\n<%d instruction set>\n", i + 1);
-			for (int j = 0; j < data.instr_infos[i].size; j++)
-			{
-				printf("_%s_\n", data.instr[i][j]);
-			}
-		}
-		free(instr);
-		idx = -1;
-		while (++idx < data.instr_cnt)
-			free_2d_array(&data.instr[idx], data.instr_infos[idx].size);
-		free(data.instr);
-		free(data.instr_infos);
+		split_cmd(&data, cmd);
+
+
+
+		
 
 		printf("syntax ok\n\n");
 
 		printf("\n\n----------------------------------------\n\n");
 		system("leaks minishell");
 		printf("\n\n----------------------------------------\n\n");
+		
 	}
 }

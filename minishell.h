@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 22:29:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/12 17:48:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,38 +49,47 @@ typedef struct s_envval
 	char *name;
 	char *value;
 }	t_envval;
-typedef struct s_instr_info
+typedef struct s_cmd_info
 {
 	int	size;
 	int	redir_cnt;
 	int	heredoc_cnt;
 	char	**heredoc_names;
-	t_bool instr_flag;
+	
+	t_bool	parentheses_flag;
+	t_bool cmd_flag;
 	int		ip_cnt;
-	t_bool logic_flag;
-}	t_instr_info;
+	
+}	t_cmd_info;
 
 typedef struct s_data
 {
-	char ***instr;
-	int instr_cnt;
+	t_dll ***tkn;
+	char **ao_split;
+	int ao_cnt;
+	int	*pipe_cnt;
 	pid_t *pid_table;
-	t_instr_info *instr_infos;
 
 	char *program_name;
-	int wstatus;
+	unsigned int last_exit_code;
+	char	last_exit_code_str[4];
 	char **envp;
 	t_dll envdll;
 } t_data;
 
 t_bool syntax_error_print(char *chr);
-void free_2d_array(char ***arr_ptr, int num);
-t_bool check_multiple_lines(const char *instr);
-t_bool check_quote_closed(const char *instr);
-t_bool check_parentheses_syntax(char *instr);
+void message_exit(const char *msg, int exit_code);
+void *free_2d_array(char ***arr_ptr, int num);
+
+t_bool	check_syntax_error(char *cmd, int mode);
+t_bool check_multiple_lines(const char *cmd);
+t_bool check_quote_closed(const char *cmd);
+t_bool check_parentheses_syntax(char *cmd);
+t_bool check_dollor_braces(char *cmd);;
 t_bool check_special_char_syntax(char **input_ptr);
+
 char *ft_strjoin(char const *s1, char const *s2);
-void split_instr(t_data *data, char *instr);
+void split_cmd(t_data *data, char *cmd);
 size_t ft_strlen(const char *s);
 t_bool ft_isdecimal(char *str);
 char *ft_strndup(char *src, size_t n);
@@ -88,8 +97,10 @@ int	ft_strcmp(const char *s1, const char *s2);
 void	*ft_calloc(size_t count, size_t size);
 char	*ft_itoa(int n);
 t_bool	ft_isblank(char c);
+char	**ft_split(char const *s, char c);
+long long	ft_atoll(const char *str);
 char *ft_getenv(t_data *data, const char *name);
-char *get_dollor_parameter(char *instr, int *origin_idx);
+char *get_dollor_parameter(char *cmd, int *origin_idx);
 void	str_delete_func(void *log);
 char	*ft_strdup(char *src);
 

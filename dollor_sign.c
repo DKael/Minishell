@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/11 00:17:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/12 12:02:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,7 @@ char *ft_getenv(t_data *data, const char *name)
 	t_dllnode *ptr;
 
 	if (name[0] == '?' && name[1] == '\0')
-	{
-		result = ft_itoa(data->wstatus);
-		if (result == T_NULL)
-			return ((char *)-1);
-		return (result);
-	}
-	temp = getenv(name);
-	if (temp != T_NULL)
-	{
-		result = ft_strdup(temp);
-		if (result == T_NULL)
-			return ((char *)-1);
-		return (result);
-	}
+		return (data->last_exit_code_str);
 	ptr = data->envdll.head.back;
 	while (ptr != &(data->envdll.tail))
 	{
@@ -43,54 +30,28 @@ char *ft_getenv(t_data *data, const char *name)
 	return (T_NULL);
 }
 
-char *get_dollor_parameter(char *instr, int *origin_idx)
+char *get_dollor_parameter(char *cmd, int *origin_idx)
 {
 	char char_tmp;
-	t_bool bad_flag;
 	char *result;
 	int idx;
 
-	if (instr[1] == '{')
+	if (cmd[1] == '{')
 	{
 		idx = 1;
-		bad_flag = FALSE;
-		while (instr[++idx] != '}')
-		{
-			if (ft_isblank(instr[idx]) == TRUE || instr[idx] == '$')
-				bad_flag = TRUE;
-			else if (instr[idx] == '\"' || instr[idx] == '\'')
-			{
-				bad_flag = TRUE;
-				char_tmp = instr[idx];
-				while (instr[++idx] != char_tmp)
-					;
-			}
-			else if (instr[idx] == '\0')
-			{
-				printf("minishell: syntax error, unclosed brace\n");
-				return (T_NULL);
-			}
-		}
-		if (bad_flag)
-		{
-			write(2, "minishell: ", 12);
-			write(2, instr, idx + 1);
-			write(2, ": bad substitution\n", 20);
-			return (T_NULL);
-		}
-		result = (char *)ft_strndup(&instr[2], idx - 2);
+		while (cmd[++idx] != '}')
+			;
+		result = (char *)ft_strndup(&cmd[2], idx - 2);
 		*origin_idx += idx;
 	}
 	else
 	{
 		idx = 0;
-		while (instr[++idx] != '\0' && instr[idx] != '{' && instr[idx] != '\"'
-		&& instr[idx] != '\'' && ft_isblank(instr[idx]) == FALSE && instr[idx] != '$')
+		while (cmd[++idx] != '\0' && cmd[idx] != '{' && cmd[idx] != '\"'
+		&& cmd[idx] != '\'' && ft_isblank(cmd[idx]) == FALSE && cmd[idx] != '$')
 			;
-		result = (char *)ft_strndup(&instr[1], idx - 1);
+		result = (char *)ft_strndup(&cmd[1], idx - 1);
 		*origin_idx += (idx - 1);
 	}
-	if (result == T_NULL)
-		return ((char *)-1);
 	return (result);
 }
