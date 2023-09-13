@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 22:19:35 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/13 17:03:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,19 @@ t_bool check_parentheses_syntax(char *cmd)
 	int save_idx;
 	char char_tmp;
 	t_bool empty_flag;
+	t_bool parentheses_flag;
 	int word_cnt;
 
+	parentheses_flag = FALSE;
 	idx = -1;
 	while (cmd[++idx] != '\0')
 	{
 		if (cmd[idx] == '(')
 		{
+			if (parentheses_flag == FALSE)
+				parentheses_flag = TRUE;
+			else
+				return (syntax_error_print("("));
 			save_idx = idx;
 			word_cnt = 0;
 			while (--idx >= 0 && cmd[idx] != '|' && cmd[idx] != '&')
