@@ -6,14 +6,17 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/10 20:23:12 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/12 22:11:12 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS =	main.c \
-		check_special_char_syntax.c \
-		util.c \
-		split_instr.c \
+		check_syntax_error1.c \
+		check_syntax_error2.c \
+		util1.c \
+		util2.c \
+		util3.c \
+		split_cmd.c \
 		error.c \
 		dollor_sign.c
 		

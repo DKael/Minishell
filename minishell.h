@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 17:48:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/13 00:16:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,12 @@
 #endif
 
 typedef int t_bool;
+
+typedef enum e_logic
+{
+	AND = 1,
+	OR = 2
+}	t_logic;
 
 typedef struct s_dollor_tmp
 {
@@ -69,6 +75,7 @@ typedef struct s_data
 	int ao_cnt;
 	int	*pipe_cnt;
 	pid_t *pid_table;
+	t_logic	*logic_table;
 
 	char *program_name;
 	unsigned int last_exit_code;
@@ -80,6 +87,7 @@ typedef struct s_data
 t_bool syntax_error_print(char *chr);
 void message_exit(const char *msg, int exit_code);
 void *free_2d_array(char ***arr_ptr, int num);
+void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 
 t_bool	check_syntax_error(char *cmd, int mode);
 t_bool check_multiple_lines(const char *cmd);
@@ -104,7 +112,8 @@ char *get_dollor_parameter(char *cmd, int *origin_idx);
 void	str_delete_func(void *log);
 char	*ft_strdup(char *src);
 
-
+void ignore_quote(char *cmd, int *idx);
+void ignore_parentheses(char *cmd, int *idx);
 
 void	envval_delete_func(void *str);
 #endif

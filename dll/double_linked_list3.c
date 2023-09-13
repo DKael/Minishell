@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 18:31:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/13 00:37:40 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,10 @@ void	dll_node_move_to_another_dll_tail(t_dllnode *node,
 	}
 }
 
+/*
+If mode is 0, node which include content add in front of tail,
+else, add back of head.
+*/
 t_bool	dll_content_add(t_dll *dll, void *content, int mode)
 {
 	t_dllnode *node_ptr;
@@ -127,4 +131,17 @@ t_bool	dll_content_add(t_dll *dll, void *content, int mode)
 	else
 		dll_add_head(dll, node_ptr);
 	return (TRUE);
+}
+
+void	dll_print(t_dll *dll, void (*print)(void *))
+{
+	t_dllnode	*node_ptr;
+
+	node_ptr = dll->head.back;
+	while (node_ptr != &(dll->tail))
+	{
+		if (print != T_NULL)
+			print(node_ptr->contents);
+		node_ptr = node_ptr->back;
+	}
 }

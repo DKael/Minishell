@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:31:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 11:31:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/13 09:57:41 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ long long	ft_atoll(const char *str)
 	nb = 0;
 	sign = 1;
 	idx = 0;
-	while (9 <= str[idx] && str[idx] <= 13 || str[idx] == ' ')
+	while ((9 <= str[idx] && str[idx] <= 13) || str[idx] == ' ')
 		idx++;
 	if (str[idx] == '+' || str[idx] == '-')
 		if (str[idx++] == '-')
@@ -123,4 +123,31 @@ long long	ft_atoll(const char *str)
 		nb = nb * 10 + (str[idx++] - '0');
 	}
 	return (nb * sign);
+}
+
+char	*ft_strstr(char *str, char *to_find)
+{
+	int	str_index;
+	int	find_index;
+
+	if (to_find[0] == '\0')
+		return (str);
+	str_index = 0;
+	while (str[str_index] != '\0')
+	{
+		if (str[str_index] == to_find[0])
+		{
+			find_index = 1;
+			while (to_find[find_index] != '\0')
+			{
+				if (str[str_index + find_index] != to_find[find_index])
+					break ;
+				find_index++;
+			}
+			if (to_find[find_index] == '\0')
+				return (&str[str_index]);
+		}
+		str_index++;
+	}
+	return (0);
 }

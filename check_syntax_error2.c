@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   check_syntax.error2.c                              :+:      :+:    :+:   */
+/*   check_syntax_error2.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 19:43:38 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/12 22:19:35 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ t_bool check_parentheses_syntax(char *cmd)
 	char char_tmp;
 	t_bool empty_flag;
 	int word_cnt;
-	char *sliced_part;
 
 	idx = -1;
 	while (cmd[++idx] != '\0')
@@ -103,23 +102,11 @@ t_bool check_parentheses_syntax(char *cmd)
 				while (cmd[idx] != '\0' && cmd[idx] != ')' && ft_isblank(cmd[idx]) == FALSE)
 				{
 					if (cmd[idx] == '\"' || cmd[idx] == '\'')
-					{
-						char_tmp = cmd[idx];
-						while (cmd[++idx] != char_tmp)
-							;
-					}
+						ignore_quote(cmd, &idx);
 					idx++;
 				}
-
-				sliced_part = ft_strndup(&cmd[save_idx], idx - save_idx);
-				if (sliced_part == T_NULL)
-				{
-					printf("minishell: malloc error!\n");
-					free(cmd);
-					exit(1);
-				}
-				syntax_error_print(sliced_part);
-				free(sliced_part);
+				cmd[idx] = '\0';
+				syntax_error_print(&cmd[save_idx]);
 				return (FALSE);
 			}
 
@@ -132,9 +119,7 @@ t_bool check_parentheses_syntax(char *cmd)
 				else if (cmd[idx] == '\"' || cmd[idx] == '\'')
 				{
 					empty_flag = FALSE;
-					char_tmp = cmd[idx];
-					while (cmd[++idx] != char_tmp)
-						;
+					ignore_quote(cmd, &idx);
 				}
 				else if (ft_isblank(cmd[idx]) == FALSE)
 					empty_flag = FALSE;
@@ -148,11 +133,7 @@ t_bool check_parentheses_syntax(char *cmd)
 				return (syntax_error_print(")"));
 		}
 		else if (cmd[idx] == '\"' || cmd[idx] == '\'')
-		{
-			char_tmp = cmd[idx];
-			while (cmd[++idx] != char_tmp)
-				;
-		}
+			ignore_quote(cmd, &idx);
 		else if (cmd[idx] == ')')
 			return (syntax_error_print(")"));
 	}

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 12:02:50 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/12 22:25:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 char *ft_getenv(t_data *data, const char *name)
 {
-	char *temp;
-	char *result;
 	t_dllnode *ptr;
 
 	if (name[0] == '?' && name[1] == '\0')
@@ -32,7 +30,6 @@ char *ft_getenv(t_data *data, const char *name)
 
 char *get_dollor_parameter(char *cmd, int *origin_idx)
 {
-	char char_tmp;
 	char *result;
 	int idx;
 
