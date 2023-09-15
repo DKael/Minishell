@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/15 21:04:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 00:17:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,14 @@ t_bool parentheses_in_parentheses(char *cmd, int *idx)
 		if (cmd[(*idx)] == '(')
 			return (syntax_error_print("("));
 		idx2 = (*idx);
-		while (cmd[(*idx)] != '(' && cmd[(*idx)] != ')' && ft_isblank(cmd[(*idx)]) == FALSE && cmd[(*idx)] != '<' && cmd[(*idx)] != '>')
+		while (cmd[(*idx)] != '(' && cmd[(*idx)] != ')' && ft_isblank(cmd[(*idx)]) == FALSE
+			&& cmd[(*idx)] != '<' && cmd[(*idx)] != '>' && cmd[(*idx)] != '\0')
+		{
+			if (cmd[(*idx)] == '\'' || cmd[(*idx)] == '\"')
+				ignore_quote(cmd, idx);
 			(*idx)++;
+		}
+			
 		if (cmd[(*idx)] == '<' || cmd[(*idx)] == '>')
 		{
 			if (ft_isndecimal(&cmd[idx2], (*idx) - idx2) == FALSE)
@@ -140,7 +146,7 @@ t_bool parentheses_in_parentheses(char *cmd, int *idx)
 			}
 			if ((cmd[(*idx)] == '<' && cmd[(*idx) + 1] == '<') || (cmd[(*idx)] == '>' && cmd[(*idx) + 1] == '>'))
 				(*idx)++;
-			if (case_lts_gts(cmd, &(*idx)) == FALSE)
+			if (case_lts_gts(cmd, idx) == FALSE)
 				return (FALSE);
 			(*idx)--;
 		}
@@ -252,8 +258,14 @@ t_bool check_parentheses_syntax(char *cmd)
 		else if (parentheses_flag == TRUE && ft_isblank(cmd[idx]) == FALSE)
 		{
 			save_idx = idx;
-			while (cmd[idx] != '\0' && cmd[idx] != '(' && cmd[idx] != ')' && ft_isblank(cmd[idx]) == FALSE && cmd[idx] != '|' && cmd[idx] != '&' && cmd[idx] != '<' && cmd[idx] != '>')
+			while (cmd[idx] != '\0' && cmd[idx] != '(' && cmd[idx] != ')'
+			&& ft_isblank(cmd[idx]) == FALSE && cmd[idx] != '|'
+			&& cmd[idx] != '&' && cmd[idx] != '<' && cmd[idx] != '>')
+			{
+				if (cmd[idx] == '\'' || cmd[idx] == '\"')
+					ignore_quote(cmd, &idx);
 				idx++;
+			}
 			if (cmd[idx] == '<' || cmd[idx] == '>')
 			{
 				if (ft_isndecimal(&cmd[save_idx], idx - save_idx) == FALSE)

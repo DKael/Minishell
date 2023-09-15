@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/15 10:13:09 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 00:40:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,24 @@ void ignore_quote(char *cmd, int *idx)
 
 void ignore_parentheses(char *cmd, int *idx)
 {
-	while (cmd[++(*idx)] != ')')
-		;
+	int	layer;
+
+	layer = 0;
+	while (1)
+	{
+		(*idx)++;
+		if (cmd[(*idx)] == ')')
+		{
+			if (layer == 0)
+				break;
+			else
+				layer--;
+		}
+		else if (cmd[(*idx)] == '(')
+			layer++;
+		else if (cmd[(*idx)] == '\'' || cmd[(*idx)] == '\"')
+			ignore_quote(cmd, idx);
+	}
 }
 
 void split_cmd(t_data *data, char *cmd)
@@ -341,7 +357,7 @@ t_dll **make_dlls(int pipe_cnt)
 		{
 			free(tmp[idx]);
 			return (free_2d_dll(&tmp, idx, T_NULL));
-		}	
+		}
 	}
 	return (tmp);
 }
@@ -498,20 +514,35 @@ t_bool parentheses_split(t_dll *dll, char *tkns)
 	int idx;
 	int idx_chk;
 	char *tmp;
+	int layer;
 
 	idx = -1;
+	layer = 0;
 	while (tkns[++idx] != '\0')
 	{
 		if (tkns[idx] == '(')
 		{
 			((t_cmd_info *)(dll->head.contents))->parentheses_flag = TRUE;
 			idx_chk = idx;
-			while (tkns[++idx] != ')')
-				;
+			while (1)
+			{
+				idx++;
+				if (tkns[idx] == ')')
+				{
+					if (layer == 0)
+						break;
+					else
+						layer--;
+				}
+				else if (tkns[idx] == '(')
+					layer++;
+				else if (tkns[idx] == '\'' || tkns[idx] == '\"')
+					ignore_quote(tkns, &idx);
+			}
 			tmp = ft_strndup(&tkns[idx_chk], idx - idx_chk + 1);
 			if (tmp == T_NULL)
 				return (FALSE);
-			if (dll_content_add(dll, (void *)tmp, 1) == FALSE)
+			if (dll_content_add(dll, (void *)tmp, 0) == FALSE)
 				return (ft_free2(tmp, FALSE));
 			while (idx_chk <= idx)
 				tkns[idx_chk++] = ' ';
@@ -559,13 +590,14 @@ t_bool remain_split(t_dll *dll, char *tkns)
 			tmp->ip_cnt++;
 			idx[2] = 0;
 			idx[1] = idx[0];
-			while (ft_isblank(tkns[++idx[0]]) == FALSE && tkns[idx[0]] != '\0')
+			while (ft_isblank(tkns[idx[0]]) == FALSE && tkns[idx[0]] != '\0')
 			{
 				if (tkns[idx[0]] == '\"' || tkns[idx[0]] == '\'')
 				{
 					idx[2] += 2;
 					ignore_quote(tkns, &idx[0]);
 				}
+				idx[0]++;
 			}
 			if (remain_split2(dll, tkns, idx) == FALSE)
 				return (FALSE);

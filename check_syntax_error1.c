@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/15 13:40:58 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 00:25:24 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,7 @@ t_bool case_lts_gts(char *cmd, int *idx)
 	while (cmd[++(*idx)] != '<' && cmd[(*idx)] != '>'
 		&& cmd[(*idx)] != '\0' && cmd[(*idx)] != '|'
 		&& !(cmd[(*idx)] == '&' && cmd[(*idx) + 1] == '&')
+		&& cmd[(*idx)] != '(' && cmd[(*idx)] != ')'
 		&& ft_isblank(cmd[(*idx)]) == FALSE)
 		;
 	if (cmd[(*idx)] == '<' || cmd[(*idx)] == '>')
