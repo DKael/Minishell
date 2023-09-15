@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/15 15:11:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/15 19:58:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,69 +58,106 @@ t_bool parentheses_in_parentheses(char *cmd, int *idx)
 	t_bool empty_flag;
 	int word_cnt;
 
-	while (cmd[(*idx)] != ')')
+	idx2 = (*idx);
+	word_cnt = 0;
+	while (cmd[--idx2] != '(' && cmd[idx2] != '|' && cmd[idx2] != '&')
 	{
-		idx2 = (*idx);
-		word_cnt = 0;
-		while (cmd[--idx2] != '(' && cmd[idx2] != '|' && cmd[idx2] != '&')
+		if (cmd[idx2] == '<' || cmd[idx2] == '>')
+			return (syntax_error_print("("));
+		else if (ft_isblank(cmd[idx2]) == FALSE)
 		{
-			if (cmd[idx2] == '<' || cmd[idx2] == '>')
+			if (ft_isblank(cmd[idx2]) == FALSE && (ft_isblank(cmd[idx2 + 1]) == '(' || ft_isblank(cmd[idx2 + 1]) == TRUE))
+				word_cnt++;
+			if (word_cnt >= 2)
 				return (syntax_error_print("("));
-			else if (ft_isblank(cmd[idx2]) == FALSE)
-			{
-				if (ft_isblank(cmd[idx2]) == FALSE && ft_isblank(cmd[idx2 + 1]) == TRUE)
-				{
-					word_cnt++;
-					if (word_cnt >= 2)
-						return (syntax_error_print("("));
-				}
-				if (cmd[idx2] == '\"' || cmd[idx2] == '\'')
-				{
-					char_tmp = cmd[idx2];
-					while (cmd[--idx2] != char_tmp)
-						;
-				}
-			}
 		}
-		if (word_cnt == 1)
+		if (cmd[idx2] == '\"' || cmd[idx2] == '\'')
 		{
-			while (ft_isblank(cmd[++(*idx)]) == TRUE)
+			char_tmp = cmd[idx2];
+			while (cmd[--idx2] != char_tmp)
 				;
-			if (cmd[(*idx)] == ')')
-			{
-				printf("minishell: function not supported\n");
+		}
+	}
+	if (word_cnt == 1)
+	{
+		while (ft_isblank(cmd[++(*idx)]) == TRUE)
+			;
+		if (cmd[(*idx)] == ')')
+		{
+			printf("minishell: function not supported\n");
+			return (FALSE);
+		}
+		else if (cmd[(*idx)] == '\0')
+		{
+			printf("minishell: syntax error, unclosed parentheses\n");
+			return (FALSE);
+		}
+		idx2 = (*idx);
+		while (cmd[(*idx)] != '\0' && cmd[(*idx)] != ')' && cmd[(*idx)] != '(' && ft_isblank(cmd[(*idx)]) == FALSE)
+		{
+			if (cmd[(*idx)] == '\"' || cmd[(*idx)] == '\'')
+				ignore_quote(cmd, idx);
+			(*idx)++;
+		}
+		cmd[(*idx)] = '\0';
+		return (syntax_error_print(&cmd[idx2]));
+	}
+	empty_flag = TRUE;
+	while (cmd[++(*idx)] != ')' && cmd[(*idx)] != '\0')
+	{
+		if (ft_isblank(cmd[(*idx)]) == FALSE)
+		{
+			empty_flag = FALSE;
+			if (cmd[(*idx)] == '\"' || cmd[(*idx)] == '\'')
+				ignore_quote(cmd, idx);
+			else if (cmd[(*idx)] == '(' && parentheses_in_parentheses(cmd, idx) == FALSE)
 				return (FALSE);
-			}
-			else if (cmd[(*idx)] == '\0')
+		}
+	}
+	if (cmd[(*idx)] == '\0')
+	{
+		printf("minishell: syntax error, unclosed parentheses\n");
+		return (FALSE);
+	}
+	else if (empty_flag == TRUE)
+		return (syntax_error_print(")"));
+
+	while (cmd[++(*idx)] != ')' && cmd[(*idx)] != '|' && cmd[(*idx)] != '&' && cmd[(*idx)] != '\0')
+	{
+		if (ft_isblank(cmd[(*idx)]) == TRUE)
+			continue;
+		if (cmd[(*idx)] == '(')
+			return (syntax_error_print("("));
+		idx2 = (*idx);
+		while (cmd[(*idx)] != '(' && cmd[(*idx)] != ')' && ft_isblank(cmd[(*idx)]) == FALSE && cmd[(*idx)] != '<' && cmd[(*idx)] != '>')
+			(*idx)++;
+		if (cmd[(*idx)] == '<' || cmd[(*idx)] == '>')
+		{
+			if (ft_isndecimal(&cmd[idx2], (*idx) - idx2) == FALSE)
 			{
-				printf("minishell: syntax error, unclosed parentheses\n");
-				return (FALSE);
+				cmd[(*idx)] = '\0';
+				return (syntax_error_print(&cmd[idx2]));
 			}
-				return (syntax_error_print("newline"));
-			idx2 = idx;
-			while (cmd[(*idx)] != '\0' && cmd[(*idx)] != ')' && ft_isblank(cmd[(*idx)]) == FALSE)
-			{
-				if (cmd[(*idx)] == '\"' || cmd[(*idx)] == '\'')
-					ignore_quote(cmd, &idx);
+			if ((cmd[(*idx)] == '<' && cmd[(*idx) + 1] == '<') || (cmd[(*idx)] == '>' && cmd[(*idx) + 1] == '>'))
 				(*idx)++;
-			}
+			if (case_lts_gts(cmd, &(*idx)) == FALSE)
+				return (FALSE);
+			(*idx)--;
+		}
+		else
+		{
 			cmd[(*idx)] = '\0';
 			return (syntax_error_print(&cmd[idx2]));
 		}
-		empty_flag = TRUE;
-		while (cmd[++(*idx)] != ')' && cmd[(*idx)] != '\0')
-		{
-			if (ft_isblank(cmd[(*idx)]) == FALSE)
-			{
-				empty_flag = FALSE;
-				if (cmd[(*idx)] == '\"' || cmd[(*idx)] == '\'')
-					ignore_quote(cmd, idx);
-				else if (cmd[(*idx)] == '(' && parentheses_in_parentheses(&cmd[(*idx)], idx) == FALSE)
-					return (FALSE);
-			}
-		}
-		(*idx)++;
 	}
+	if (cmd[(*idx)] == '\0')
+	{
+		printf("minishell: syntax error, unclosed parentheses\n");
+		return (FALSE);
+	}
+	else if (cmd[(*idx)] == ')')
+		(*idx)--;
+	return (TRUE);
 }
 
 t_bool check_parentheses_syntax(char *cmd)
@@ -150,7 +187,7 @@ t_bool check_parentheses_syntax(char *cmd)
 					return (syntax_error_print("("));
 				else if (ft_isblank(cmd[idx]) == FALSE)
 				{
-					if (ft_isblank(cmd[idx]) == FALSE && ft_isblank(cmd[idx + 1]) == TRUE)
+					if (ft_isblank(cmd[idx]) == FALSE && (ft_isblank(cmd[idx + 1]) == '(' || ft_isblank(cmd[idx + 1]) == TRUE))
 					{
 						word_cnt++;
 						if (word_cnt >= 2)
@@ -196,7 +233,7 @@ t_bool check_parentheses_syntax(char *cmd)
 					empty_flag = FALSE;
 					if (cmd[idx] == '\"' || cmd[idx] == '\'')
 						ignore_quote(cmd, &idx);
-					else if (cmd[idx] == '(' && parentheses_in_parentheses(&cmd[idx], &idx) == FALSE)
+					else if (cmd[idx] == '(' && parentheses_in_parentheses(cmd, &idx) == FALSE)
 						return (FALSE);
 				}
 			}
