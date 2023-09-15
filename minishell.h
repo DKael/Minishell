@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/14 17:00:09 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/15 15:01:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ typedef struct s_cmd_info
 
 typedef struct s_data
 {
+	char	*cmd;
 	t_dll ***tkn;
 	char **ao_split;
 	int ao_cnt;
@@ -91,7 +92,7 @@ void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 
 t_bool case_lts_gts(char *cmd, int *idx);
 
-t_bool	check_syntax_error(char *cmd, int mode);
+t_bool	check_syntax_error(char **cmd, int mode);
 t_bool check_multiple_lines(const char *cmd);
 t_bool check_quote_closed(const char *cmd);
 t_bool check_parentheses_syntax(char *cmd);

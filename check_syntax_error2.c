@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_syntax_error2.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/14 21:00:41 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/15 15:03:19 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,77 @@ t_bool check_quote_closed(const char *cmd)
 		}
 	}
 	return (TRUE);
+}
+
+t_bool parentheses_in_parentheses(char *cmd, int *idx)
+{
+	int idx2;
+	char char_tmp;
+	t_bool empty_flag;
+	int word_cnt;
+
+	while (cmd[(*idx)] != ')')
+	{
+		idx2 = (*idx);
+		word_cnt = 0;
+		while (cmd[--idx2] != '(' && cmd[idx2] != '|' && cmd[idx2] != '&')
+		{
+			if (cmd[idx2] == '<' || cmd[idx2] == '>')
+				return (syntax_error_print("("));
+			else if (ft_isblank(cmd[idx2]) == FALSE)
+			{
+				if (ft_isblank(cmd[idx2]) == FALSE && ft_isblank(cmd[idx2 + 1]) == TRUE)
+				{
+					word_cnt++;
+					if (word_cnt >= 2)
+						return (syntax_error_print("("));
+				}
+				if (cmd[idx2] == '\"' || cmd[idx2] == '\'')
+				{
+					char_tmp = cmd[idx2];
+					while (cmd[--idx2] != char_tmp)
+						;
+				}
+			}
+		}
+		if (word_cnt == 1)
+		{
+			while (ft_isblank(cmd[++(*idx)]) == TRUE)
+				;
+			if (cmd[(*idx)] == ')')
+			{
+				printf("minishell: function not supported\n");
+				return (FALSE);
+			}
+			else if (cmd[(*idx)] == '\0')
+				return (syntax_error_print("newline"));
+			idx2 = idx;
+			while (cmd[(*idx)] != '\0' && cmd[(*idx)] != ')' && ft_isblank(cmd[(*idx)]) == FALSE)
+			{
+				if (cmd[(*idx)] == '\"' || cmd[(*idx)] == '\'')
+					ignore_quote(cmd, &idx);
+				(*idx)++;
+			}
+			cmd[(*idx)] = '\0';
+			syntax_error_print(&cmd[idx2]);
+			return (FALSE);
+		}
+		empty_flag = TRUE;
+		while (cmd[++(*idx)] != '\0')
+		{
+			if (cmd[(*idx)] == ')')
+				break;
+			else if (ft_isblank(cmd[(*idx)]) == FALSE)
+			{
+				empty_flag = FALSE;
+				if (cmd[(*idx)] == '\"' || cmd[(*idx)] == '\'')
+					ignore_quote(cmd, idx);
+				else if (cmd[(*idx)] == '(' && parentheses_in_parentheses(&cmd[(*idx)], idx) == FALSE)
+					return (FALSE);
+			}
+		}
+		(*idx)++;
+	}
 }
 
 t_bool check_parentheses_syntax(char *cmd)
@@ -122,13 +193,14 @@ t_bool check_parentheses_syntax(char *cmd)
 			{
 				if (cmd[idx] == ')')
 					break;
-				else if (cmd[idx] == '\"' || cmd[idx] == '\'')
+				else if (ft_isblank(cmd[idx]) == FALSE)
 				{
 					empty_flag = FALSE;
-					ignore_quote(cmd, &idx);
+					if (cmd[idx] == '\"' || cmd[idx] == '\'')
+						ignore_quote(cmd, &idx);
+					else if (cmd[idx] == '(' && parentheses_in_parentheses(&cmd[idx], &idx) == FALSE)
+						return (FALSE);
 				}
-				else if (ft_isblank(cmd[idx]) == FALSE)
-					empty_flag = FALSE;
 			}
 			if (cmd[idx] == '\0')
 			{
@@ -145,8 +217,7 @@ t_bool check_parentheses_syntax(char *cmd)
 		else if (parentheses_flag == TRUE && ft_isblank(cmd[idx]) == FALSE)
 		{
 			save_idx = idx;
-			while (cmd[idx] != '\0' && cmd[idx] != '(' && cmd[idx] != ')' && ft_isblank(cmd[idx]) == FALSE
-				&& cmd[idx] != '|' && cmd[idx] != '&' && cmd[idx] != '<' && cmd[idx] != '>')
+			while (cmd[idx] != '\0' && cmd[idx] != '(' && cmd[idx] != ')' && ft_isblank(cmd[idx]) == FALSE && cmd[idx] != '|' && cmd[idx] != '&' && cmd[idx] != '<' && cmd[idx] != '>')
 				idx++;
 			if (cmd[idx] == '<' || cmd[idx] == '>')
 			{
@@ -161,7 +232,7 @@ t_bool check_parentheses_syntax(char *cmd)
 					return (FALSE);
 				idx--;
 			}
-			else if((cmd[idx] == '|' || cmd[idx] == '&') && save_idx == idx)
+			else if ((cmd[idx] == '|' || cmd[idx] == '&') && save_idx == idx)
 				parentheses_flag = FALSE;
 			else
 			{

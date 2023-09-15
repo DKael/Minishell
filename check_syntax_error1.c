@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_syntax_error1.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/14 16:44:59 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/15 13:40:58 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ t_bool check_special_char_syntax(char **cmd_ptr)
 			{
 				cmd = *cmd_ptr;
 				idx = save_idx;
-				if (check_syntax_error(&cmd[idx], 1) == FALSE)
+				sliced_part = &cmd[idx];
+				if (check_syntax_error(&sliced_part, 1) == FALSE)
 					return (FALSE);
 			}
 		}
@@ -67,33 +68,6 @@ t_bool check_special_char_syntax(char **cmd_ptr)
 			char_tmp = cmd[idx];
 			while (cmd[++idx] != char_tmp)
 				;
-			idx++;
-		}
-		else if (cmd[idx] == '(')
-		{
-			save_idx = idx;
-			while (cmd[++idx] != ')')
-			{
-				if (cmd[idx] == '\"' || cmd[idx] == '\'')
-				{
-					char_tmp = cmd[idx];
-					while (cmd[++idx] != char_tmp)
-						;
-				}
-			}
-			sliced_part = ft_strndup(&cmd[save_idx + 1], idx - save_idx - 1);
-			if (sliced_part == T_NULL)
-			{
-				printf("minishell: malloc error!\n");
-				free(cmd);
-				exit(1);
-			}
-			if (check_special_char_syntax(&sliced_part) == FALSE)
-			{
-				free(sliced_part);
-				return (FALSE);
-			}
-			free(sliced_part);
 			idx++;
 		}
 		else
@@ -115,6 +89,8 @@ static t_bool case_pipe_and_or(char **cmd_ptr, int *idx)
 		return (syntax_error_print("||"));
 	else if (cmd[(*idx)] == '&' && cmd[(*idx) + 1] == '&')
 		return (syntax_error_print("&&"));
+	else if (cmd[(*idx)] == ')')
+		return (syntax_error_print(")"));
 	else if (cmd[(*idx)] == '\0')
 		if (wait_for_additional_cmd(cmd_ptr, cmd) == FALSE)
 			return (FALSE);
@@ -174,6 +150,8 @@ t_bool case_lts_gts(char *cmd, int *idx)
 		return (syntax_error_print("||"));
 	else if (cmd[(*idx)] == '&' && cmd[(*idx) + 1] == '&')
 		return (syntax_error_print("&&"));
+	else if (cmd[(*idx)] == ')')
+		return (syntax_error_print(")"));
 	else if (cmd[(*idx)] == '\0')
 		return (syntax_error_print("newline"));
 	check = (*idx);

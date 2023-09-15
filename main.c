@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/13 12:13:24 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/15 11:17:22 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void data_init(t_data *data, char *program_name, char **envp)
 
 void data_cycle_init(t_data *data)
 {
+	data->cmd = T_NULL;
 	data->tkn = T_NULL;
 	data->ao_cnt = 0;
 	data->pipe_cnt = T_NULL;
@@ -84,12 +85,12 @@ void store_env_in_dll(t_data *data, char **envp)
 	}
 }
 
-t_bool check_syntax_error(char *cmd, int mode)
+t_bool check_syntax_error(char **cmd, int mode)
 {
-	if (check_multiple_lines(cmd) == FALSE || check_quote_closed(cmd) == FALSE || check_parentheses_syntax(cmd) == FALSE || check_dollor_braces(cmd) == FALSE)
+	if (check_multiple_lines(*cmd) == FALSE || check_quote_closed(*cmd) == FALSE || check_parentheses_syntax(*cmd) == FALSE || check_dollor_braces(*cmd) == FALSE)
 		return (FALSE);
 	if (mode == 0)
-		if ((check_special_char_syntax(&cmd) == FALSE))
+		if ((check_special_char_syntax(cmd) == FALSE))
 			return (FALSE);
 	return (TRUE);
 }
@@ -105,7 +106,6 @@ void dll_env_print_func(void *content)
 int main(int argc, char **argv, char **envp)
 {
 	t_data data;
-	char *cmd;
 	int idx;
 
 	if (argc != 1)
@@ -126,32 +126,32 @@ int main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		data_cycle_init(&data);
-		cmd = readline("minishell$ ");
-		if (cmd == T_NULL)
+		data.cmd = readline("minishell$ ");
+		if (data.cmd == T_NULL)
 		{
 			printf("exit\n");
 			return (0);
 		}
-		else if (cmd[0] == '\0')
+		else if (data.cmd[0] == '\0')
 		{
-			free(cmd);
+			free(data.cmd);
 			continue;
 		}
 
-		add_history(cmd);
+		add_history(data.cmd);
 		// printf("\n\n----------------------<3>----------------------\n\n");
 		// system("leaks minishell");
 		// printf("\n\n----------------------<3>----------------------\n\n");
-		if (check_syntax_error(cmd, 0) == FALSE)
+		if (check_syntax_error(&(data.cmd), 0) == FALSE)
 		{
 			set_last_exit_code(&data, 258);
-			free(cmd);
+			free(data.cmd);
 			continue;
 		}
 		// printf("\n\n----------------------<4>----------------------\n\n");
 		// system("leaks minishell");
 		// printf("\n\n----------------------<4>----------------------\n\n");
-		split_cmd(&data, cmd);
+		split_cmd(&data, data.cmd);
 		// printf("\n\n----------------------<5>----------------------\n\n");
 		// system("leaks minishell");
 		// printf("\n\n----------------------<5>----------------------\n\n");
@@ -175,7 +175,10 @@ int main(int argc, char **argv, char **envp)
 		// system("leaks minishell");
 		// printf("\n\n----------------------<6>----------------------\n\n");
 
-		free(cmd);
+
+
+
+		free(data.cmd);
 		dll_clear(&data.envdll, envval_delete_func);
 		free_2d_array(&data.ao_split, data.ao_cnt);
 		idx = -1;
