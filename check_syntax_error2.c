@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/15 15:03:19 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/15 15:11:57 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,10 @@ t_bool parentheses_in_parentheses(char *cmd, int *idx)
 				return (FALSE);
 			}
 			else if (cmd[(*idx)] == '\0')
+			{
+				printf("minishell: syntax error, unclosed parentheses\n");
+				return (FALSE);
+			}
 				return (syntax_error_print("newline"));
 			idx2 = idx;
 			while (cmd[(*idx)] != '\0' && cmd[(*idx)] != ')' && ft_isblank(cmd[(*idx)]) == FALSE)
@@ -101,15 +105,12 @@ t_bool parentheses_in_parentheses(char *cmd, int *idx)
 				(*idx)++;
 			}
 			cmd[(*idx)] = '\0';
-			syntax_error_print(&cmd[idx2]);
-			return (FALSE);
+			return (syntax_error_print(&cmd[idx2]));
 		}
 		empty_flag = TRUE;
-		while (cmd[++(*idx)] != '\0')
+		while (cmd[++(*idx)] != ')' && cmd[(*idx)] != '\0')
 		{
-			if (cmd[(*idx)] == ')')
-				break;
-			else if (ft_isblank(cmd[(*idx)]) == FALSE)
+			if (ft_isblank(cmd[(*idx)]) == FALSE)
 			{
 				empty_flag = FALSE;
 				if (cmd[(*idx)] == '\"' || cmd[(*idx)] == '\'')
@@ -183,17 +184,14 @@ t_bool check_parentheses_syntax(char *cmd)
 					idx++;
 				}
 				cmd[idx] = '\0';
-				syntax_error_print(&cmd[save_idx]);
-				return (FALSE);
+				return (syntax_error_print(&cmd[save_idx]));
 			}
 
 			empty_flag = TRUE;
 			idx = save_idx;
-			while (cmd[++idx] != '\0')
+			while (cmd[++idx] != '\0' && cmd[idx] != ')')
 			{
-				if (cmd[idx] == ')')
-					break;
-				else if (ft_isblank(cmd[idx]) == FALSE)
+				if (ft_isblank(cmd[idx]) == FALSE)
 				{
 					empty_flag = FALSE;
 					if (cmd[idx] == '\"' || cmd[idx] == '\'')
