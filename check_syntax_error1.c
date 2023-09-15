@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_syntax_error1.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 12:02:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/14 16:44:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static t_bool case_pipe_and_or(char **cmd_ptr, int *idx);
 static t_bool wait_for_additional_cmd(char **cmd_ptr, char *cmd);
-static t_bool case_lts_gts(char *cmd, int *idx);
+
 
 t_bool check_special_char_syntax(char **cmd_ptr)
 {
@@ -153,7 +153,7 @@ static t_bool wait_for_additional_cmd(char **cmd_ptr, char *cmd)
 	return (TRUE);
 }
 
-static t_bool case_lts_gts(char *cmd, int *idx)
+t_bool case_lts_gts(char *cmd, int *idx)
 {
 	int check;
 	char *temp;

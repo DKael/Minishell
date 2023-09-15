@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_syntax_error2.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/13 17:03:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/14 21:00:41 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,10 +138,37 @@ t_bool check_parentheses_syntax(char *cmd)
 			else if (empty_flag == TRUE)
 				return (syntax_error_print(")"));
 		}
-		else if (cmd[idx] == '\"' || cmd[idx] == '\'')
+		else if (parentheses_flag == FALSE && (cmd[idx] == '\"' || cmd[idx] == '\''))
 			ignore_quote(cmd, &idx);
 		else if (cmd[idx] == ')')
 			return (syntax_error_print(")"));
+		else if (parentheses_flag == TRUE && ft_isblank(cmd[idx]) == FALSE)
+		{
+			save_idx = idx;
+			while (cmd[idx] != '\0' && cmd[idx] != '(' && cmd[idx] != ')' && ft_isblank(cmd[idx]) == FALSE
+				&& cmd[idx] != '|' && cmd[idx] != '&' && cmd[idx] != '<' && cmd[idx] != '>')
+				idx++;
+			if (cmd[idx] == '<' || cmd[idx] == '>')
+			{
+				if (ft_isndecimal(&cmd[save_idx], idx - save_idx) == FALSE)
+				{
+					cmd[idx] = '\0';
+					return (syntax_error_print(&cmd[save_idx]));
+				}
+				if ((cmd[idx] == '<' && cmd[idx + 1] == '<') || (cmd[idx] == '>' && cmd[idx + 1] == '>'))
+					idx++;
+				if (case_lts_gts(cmd, &idx) == FALSE)
+					return (FALSE);
+				idx--;
+			}
+			else if((cmd[idx] == '|' || cmd[idx] == '&') && save_idx == idx)
+				parentheses_flag = FALSE;
+			else
+			{
+				cmd[idx] = '\0';
+				return (syntax_error_print(&cmd[save_idx]));
+			}
+		}
 	}
 	return (TRUE);
 }

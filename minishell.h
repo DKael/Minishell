@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/13 16:48:31 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/14 17:00:09 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,8 @@ void message_exit(const char *msg, int exit_code);
 void *free_2d_array(char ***arr_ptr, int num);
 void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 
+t_bool case_lts_gts(char *cmd, int *idx);
+
 t_bool	check_syntax_error(char *cmd, int mode);
 t_bool check_multiple_lines(const char *cmd);
 t_bool check_quote_closed(const char *cmd);
@@ -100,6 +102,7 @@ char *ft_strjoin(char const *s1, char const *s2);
 void split_cmd(t_data *data, char *cmd);
 size_t ft_strlen(const char *s);
 t_bool ft_isdecimal(char *str);
+t_bool	ft_isndecimal(char *str, int n);
 char *ft_strndup(char *src, size_t n);
 int	ft_strcmp(const char *s1, const char *s2);
 void	*ft_calloc(size_t count, size_t size);

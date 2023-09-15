@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   util1.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: hyungdki <hyungdki@student.42seoul>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 11:33:12 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/14 16:58:41 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,22 @@ t_bool	ft_isdecimal(char *str)
 	if (str[0] == '-' || str[0] == '+')
 		idx++;
 	while (str[idx] != '\0')
+	{
+		if (!('0' <= str[idx] && str[idx] <= '9'))
+			return (FALSE);
+		idx++;
+	}
+	return (TRUE);
+}
+
+t_bool	ft_isndecimal(char *str, int n)
+{
+	int	idx;
+
+	idx = 0;
+	if (str[0] == '-' || str[0] == '+')
+		idx++;
+	while (str[idx] != '\0' && idx < n)
 	{
 		if (!('0' <= str[idx] && str[idx] <= '9'))
 			return (FALSE);
