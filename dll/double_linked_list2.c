@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/13 00:37:42 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 10:33:23 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,16 +50,20 @@ void	dll_clear(t_dll *dll, void (*del)(void *))
 	t_dllnode	*delete;
 	t_dllnode	*next_node;
 
-	next_node = dll->head.back;
-	while (next_node != &(dll->tail))
+	if (dll != T_NULL)
 	{
-		delete = next_node;
-		next_node = next_node->back;
-		if (del != T_NULL)
-			del(delete->contents);
-		free(delete);
+		next_node = dll->head.back;
+		while (next_node != &(dll->tail))
+		{
+			delete = next_node;
+			next_node = next_node->back;
+			if (del != T_NULL)
+				del(delete->contents);
+			free(delete);
+		}
+		dll_init(dll);
 	}
-	dll_init(dll);
+	
 }
 
 t_dllnode	*dll_new_node(void *contents)

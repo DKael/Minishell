@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/15 15:01:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 12:58:27 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 # include <signal.h>
 # include <readline/history.h>
 # include <readline/readline.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 # include "dll/double_linked_list.h"
 # include "gnl/get_next_line.h"
 
@@ -35,7 +37,10 @@
 #define T_NULL (void *)0
 #endif
 
+# define hd_path "/tmp"
+
 typedef int t_bool;
+typedef	struct stat t_stat;
 
 typedef enum e_logic
 {
@@ -60,7 +65,7 @@ typedef struct s_cmd_info
 	int	size;
 	int	redir_cnt;
 	int	heredoc_cnt;
-	char	**heredoc_names;
+	t_dll	heredoc_names;
 	
 	t_bool	parentheses_flag;
 	t_bool cmd_flag;
@@ -111,6 +116,7 @@ char	*ft_itoa(int n);
 t_bool	ft_isblank(char c);
 char	**ft_split(char const *s, char c);
 long long	ft_atoll(const char *str);
+char	*ft_strstr(char *str, char *to_find);
 char *ft_getenv(t_data *data, const char *name);
 char *get_dollor_parameter(char *cmd, int *origin_idx);
 void	str_delete_func(void *log);
@@ -120,4 +126,12 @@ void ignore_quote(char *cmd, int *idx);
 void ignore_parentheses(char *cmd, int *idx);
 
 void	envval_delete_func(void *str);
+
+t_bool	heredoc(t_cmd_info *info, char *del);
+
+t_bool redirect_split(t_dll *dll, char *tkns);
+void redirect_split2_1(char *tkns, char *tmp, int *front, int *back);
+void redirect_split2_2(char *tkns, char *tmp, int *front, int *idx);
+void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx);
+void find_front(char *tkns, int *pos, int idx);
 #endif

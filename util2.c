@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:31:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/13 09:57:41 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 10:41:51 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,5 +149,5 @@ char	*ft_strstr(char *str, char *to_find)
 		}
 		str_index++;
 	}
-	return (0);
+	return (T_NULL);
 }

@@ -22,6 +22,7 @@
 		"__locale": "c",
 		"__hash_table": "c",
 		"unordered_map": "c",
-		"__string": "c"
+		"__string": "c",
+		"ios": "c"
 	}
 }

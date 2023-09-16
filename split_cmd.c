@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 00:40:34 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 13:24:42 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,9 +88,13 @@ void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *))
 		idx = -1;
 		while (++idx < num)
 		{
-			free(tmp[idx]->head.contents);
-			dll_clear(tmp[idx], del);
-			free(tmp[idx]);
+			if (tmp[idx] != T_NULL)
+			{
+				dll_clear(&((t_cmd_info *)(tmp[idx]->head.contents))->heredoc_names, del);
+				free(tmp[idx]->head.contents);
+				dll_clear(tmp[idx], del);
+				free(tmp[idx]);
+			}
 		}
 		free(tmp);
 		*dll_ptr = T_NULL;
@@ -142,16 +146,16 @@ void split_cmd(t_data *data, char *cmd)
 	}
 	data->ao_split = split_cmd_by_ao(cmd, data->ao_cnt, data->logic_table);
 
-	// for (int i = 0; i < data->ao_cnt - 1; i++)
-	// {
-	// 	if (data->logic_table[i] == OR)
-	// 		printf("OR ");
-	// 	else
-	// 		printf("AND ");
-	// }
-	// printf("\n\n");
-	// for (int i = 0; i < data->ao_cnt; i++)
-	// 	printf("data->ao_split[%d] : %s\n", i, data->ao_split[i]);
+	for (int i = 0; i < data->ao_cnt - 1; i++)
+	{
+		if (data->logic_table[i] == OR)
+			printf("OR ");
+		else
+			printf("AND ");
+	}
+	printf("\n\n");
+	for (int i = 0; i < data->ao_cnt; i++)
+		printf("data->ao_split[%d] : %s\n", i, data->ao_split[i]);
 
 	data->tkn = (t_dll ***)ft_calloc(data->ao_cnt, sizeof(t_dll **));
 	data->pipe_cnt = (int *)ft_calloc(data->ao_cnt, sizeof(int));
@@ -249,10 +253,10 @@ t_dll **tokenize(char *tkns, int *pipe_cnt)
 	if (tkn_part == T_NULL)
 		return (free_2d_array(&split_tmp, (*pipe_cnt)));
 
-	// printf("\n\ntkns : %s\n", tkns);
-	// for (int i = 0; i < (*pipe_cnt); i++)
-	// 	printf("_%s_\n", split_tmp[i]);
-	// printf("\n");
+	printf("\n\ntkns : %s\n", tkns);
+	for (int i = 0; i < (*pipe_cnt); i++)
+		printf("_%s_\n", split_tmp[i]);
+	printf("\n");
 
 	idx = -1;
 	while (++idx < (*pipe_cnt))
@@ -260,22 +264,22 @@ t_dll **tokenize(char *tkns, int *pipe_cnt)
 		// redirect_count(tkn_part[idx], split_tmp[idx]);
 		if (redirect_split(tkn_part[idx], split_tmp[idx]) == FALSE)
 			break;
-		// printf("after redirection split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
+		printf("after redirection split\n");
+		printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
+		dll_print(tkn_part[idx], dll_str_print_func);
 
 		if (parentheses_split(tkn_part[idx], split_tmp[idx]) == FALSE)
 			break;
-		// printf("after parentheses split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
+		printf("after parentheses split\n");
+		printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
+		dll_print(tkn_part[idx], dll_str_print_func);
 
 		// remain_count(tkn_part[idx], split_tmp[idx]);
 		if (remain_split(tkn_part[idx], split_tmp[idx]) == FALSE)
 			break;
-		// printf("after remain split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
+		printf("after remain split\n");
+		printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
+		dll_print(tkn_part[idx], dll_str_print_func);
 	}
 	free_2d_array(&split_tmp, (*pipe_cnt));
 	if (idx < (*pipe_cnt))
@@ -358,6 +362,7 @@ t_dll **make_dlls(int pipe_cnt)
 			free(tmp[idx]);
 			return (free_2d_dll(&tmp, idx, T_NULL));
 		}
+		dll_init(&((t_cmd_info *)(tmp[idx]->head.contents))->heredoc_names);
 	}
 	return (tmp);
 }
