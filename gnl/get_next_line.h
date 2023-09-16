@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/23 17:23:40 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 16:31:52 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 14:46:06 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,13 @@
 # include <unistd.h>
 # include <stdlib.h>
 
-# define T_NULL (void *)0
+#if !defined(TRUE) && !defined(FALSE)
+#define TRUE 1
+#define FALSE 0
+#endif
+#ifndef T_NULL
+#define T_NULL (void *)0
+#endif
 
 typedef struct s_fd_node
 {

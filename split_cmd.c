@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 13:24:42 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 14:57:25 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,14 +231,6 @@ char **split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table)
 	return (tmp);
 }
 
-void dll_str_print_func(void *content)
-{
-	char *tmp;
-
-	tmp = (char *)content;
-	printf("%s\n", tmp);
-}
-
 t_dll **tokenize(char *tkns, int *pipe_cnt)
 {
 	char **split_tmp;
@@ -452,9 +444,6 @@ t_bool redirect_split(t_dll *dll, char *tkns)
 		if (tkns[idx] == '<' || tkns[idx] == '>')
 		{
 			tmp->redir_cnt++;
-			if (tkns[idx + 1] == '<')
-				tmp->heredoc_cnt++;
-
 			find_front(tkns, pos, idx);
 			find_back_and_calc_blank_quote(tkns, pos, idx);
 			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2] - pos[3] + 2, sizeof(char));

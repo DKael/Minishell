@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 12:58:27 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 17:05:00 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include <readline/readline.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <fcntl.h>
 # include "dll/double_linked_list.h"
 # include "gnl/get_next_line.h"
 
@@ -64,7 +65,6 @@ typedef struct s_cmd_info
 {
 	int	size;
 	int	redir_cnt;
-	int	heredoc_cnt;
 	t_dll	heredoc_names;
 	
 	t_bool	parentheses_flag;
@@ -90,6 +90,9 @@ typedef struct s_data
 	t_dll envdll;
 } t_data;
 
+void dll_str_print_func(void *content);
+void dll_env_print_func(void *content);
+
 t_bool syntax_error_print(char *chr);
 void message_exit(const char *msg, int exit_code);
 void *free_2d_array(char ***arr_ptr, int num);
@@ -105,6 +108,7 @@ t_bool check_dollor_braces(char *cmd);;
 t_bool check_special_char_syntax(char **input_ptr);
 
 char *ft_strjoin(char const *s1, char const *s2);
+char	*ft_strjoin2(char const *s1, char const *s2, char *between);
 void split_cmd(t_data *data, char *cmd);
 size_t ft_strlen(const char *s);
 t_bool ft_isdecimal(char *str);
@@ -127,11 +131,15 @@ void ignore_parentheses(char *cmd, int *idx);
 
 void	envval_delete_func(void *str);
 
-t_bool	heredoc(t_cmd_info *info, char *del);
+t_bool	heredoc_make1_1(t_dll *dll, int *idx, char *del);
+t_bool	heredoc_make1_2(t_dll *dll, t_dllnode *ptr, int *idx, char *del);
 
 t_bool redirect_split(t_dll *dll, char *tkns);
 void redirect_split2_1(char *tkns, char *tmp, int *front, int *back);
 void redirect_split2_2(char *tkns, char *tmp, int *front, int *idx);
 void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx);
 void find_front(char *tkns, int *pos, int idx);
+
+void *ft_free1(void *ptr);
+t_bool ft_free2(void *ptr, t_bool flag);
 #endif

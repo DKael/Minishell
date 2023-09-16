@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:16:13 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/13 00:37:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 16:31:57 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ void		dll_node_move_to_another_dll_head(t_dllnode *n,
 void		dll_node_move_to_another_dll_tail(t_dllnode *n,
 				t_dll *dll1, t_dll *dll2);
 t_bool		dll_content_add(t_dll *dll, void *content, int mode);
+t_bool		dll_content_add2(t_dll *dll, void *content, t_dllnode *ptr, int mode);
 void		dll_print(t_dll *dll, void (*print)(void *));
 
 #endif

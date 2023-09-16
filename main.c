@@ -6,13 +6,15 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 13:32:59 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 17:14:26 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 void store_env_in_dll(t_data *data, char **envp);
+t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd);
+t_bool heredoc_split(t_dll *dll, char *tkns);
 
 void data_init(t_data *data, char *program_name, char **envp)
 {
@@ -103,6 +105,14 @@ void dll_env_print_func(void *content)
 	printf("%s=%s\n", tmp->name, tmp->value);
 }
 
+void dll_str_print_func(void *content)
+{
+	char *tmp;
+
+	tmp = (char *)content;
+	printf("%s\n", tmp);
+}
+
 void resource_free_and_exit(t_data *data)
 {
 	int idx;
@@ -122,12 +132,11 @@ void resource_free_and_exit(t_data *data)
 int main(int argc, char **argv, char **envp)
 {
 	t_data data;
-	int idx;
-	t_dllnode *ptr;
-	//int idx2;
-	// int idx3;
-	// t_cmd_info *info_ptr;
-	// char *tmp_str;
+	int idx[2];
+	t_dllnode *ptr[2];
+	int idx3;
+	t_cmd_info *info_ptr;
+	char *tmp_str;
 
 	if (argc != 1)
 	{
@@ -177,57 +186,63 @@ int main(int argc, char **argv, char **envp)
 		// system("leaks minishell");
 		// printf("\n\n----------------------<5>----------------------\n\n");
 
+		idx[0] = -1;
+		while (++idx[0] < data.ao_cnt)
+		{
+			idx3 = -1;
+			idx[1] = -1;
+			while (++idx[1] < data.pipe_cnt[idx[0]])
+			{
+				info_ptr = (t_cmd_info *)(data.tkn[idx[0]][idx[1]]->head.contents);
+				if (info_ptr->parentheses_flag == TRUE)
+				{
+					ptr[0] = data.tkn[idx[0]][idx[1]]->tail.front;
+					tmp_str = ft_strdup((char *)(ptr[0]->contents));
+					if (tmp_str == T_NULL)
+						resource_free_and_exit(&data);
+					if (parentheses_heredoc(&info_ptr->heredoc_names, idx, tmp_str) == FALSE)
+						resource_free_and_exit(&data);
+					ptr[0] = data.tkn[idx[0]][idx[1]]->head.back;
+					ptr[1] = info_ptr->heredoc_names.head.back;
+					while (++idx3 < info_ptr->redir_cnt)
+					{
+						tmp_str = ft_strstr((char *)(ptr[0]->contents), "<<");
+						if (tmp_str != T_NULL && heredoc_make1_2(&info_ptr->heredoc_names, ptr[1], idx, tmp_str + 3) == FALSE)
+							resource_free_and_exit(&data);
+						ptr[0] = ptr[0]->back;
+					}
+				}
+				else
+				{
+					ptr[0] = data.tkn[idx[0]][idx[1]]->head.back;
+					while (++idx3 < info_ptr->redir_cnt)
+					{
+						tmp_str = ft_strstr((char *)(ptr[0]->contents), "<<");
+						if (tmp_str != T_NULL && heredoc_make1_1(&info_ptr->heredoc_names, idx, tmp_str + 3) == FALSE)
+							resource_free_and_exit(&data);
+						ptr[0] = ptr[0]->back;
+					}
+				}
+			}
+		}
+
 		printf("\n------------------------------------\n");
 
 		for (int i = 0; i < data.ao_cnt; i++)
 		{
 			for (int j = 0; j < data.pipe_cnt[i]; j++)
 			{
-				ptr = data.tkn[i][j]->head.back;
-				while (ptr != &data.tkn[i][j]->tail)
+				printf("<heredoc %d_%d>\n", i, j);
+				dll_print(&((t_cmd_info *)(data.tkn[i][j]->head.contents))->heredoc_names, dll_str_print_func);
+				printf("------------------------\n");
+				ptr[0] = data.tkn[i][j]->head.back;
+				while (ptr[0] != &data.tkn[i][j]->tail)
 				{
-					printf("%s\n", (char *)ptr->contents);
-					ptr = ptr->back;
+					printf("%s\n", (char *)ptr[0]->contents);
+					ptr[0] = ptr[0]->back;
 				}
 			}
 		}
-
-		// idx = -1;
-		// while (++idx < data.ao_cnt)
-		// {
-		// 	idx2 = -1;
-		// 	while (++idx2 < data.pipe_cnt[idx])
-		// 	{
-		// 		idx3 = -1;
-		// 		ptr = data.tkn[idx][idx2]->head.back;
-		// 		info_ptr = (t_cmd_info *)(data.tkn[idx][idx2]->head.contents);
-		// 		while (++idx3 < info_ptr->redir_cnt)
-		// 		{
-		// 			tmp_str = ft_strstr((char *)(ptr->contents), "<<");
-		// 			if (tmp_str != T_NULL && heredoc_make(&info_ptr->heredoc_names, tmp_str + 3) == FALSE)
-		// 				resource_free_and_exit(&data);
-		// 			ptr = ptr->back;
-		// 		}
-		// 		if (info_ptr->parentheses_flag == TRUE)
-		// 		{
-		// 			tmp_str = ft_strdup((char *)(ptr->contents));
-		// 			if (tmp_str == T_NULL)
-		// 				resource_free_and_exit(&data);
-		// 			if (parentheses_heredoc(data.tkn[idx][idx2], tmp_str) == FALSE)
-		// 				resource_free_and_exit(&data);
-		// 			ptr = ptr->back;
-		// 			while (ptr != &(data.tkn[idx][idx2]->tail))
-		// 			{
-		// 				tmp_str = ft_strstr((char *)(ptr->contents), "<<");
-		// 				if (tmp_str != T_NULL && heredoc_make(&info_ptr->heredoc_names, tmp_str + 3) == FALSE)
-		// 					resource_free_and_exit(&data);
-		// 				ptr = ptr->back;
-		// 			}
-		// 		}
-		// 	}
-		// }
-
-		
 
 		// printf("\n\n----------------------<6>----------------------\n\n");
 		// system("leaks minishell");
@@ -236,9 +251,9 @@ int main(int argc, char **argv, char **envp)
 		free(data.cmd);
 		dll_clear(&data.envdll, envval_delete_func);
 		free_2d_array(&data.ao_split, data.ao_cnt);
-		idx = -1;
-		while (++idx < data.ao_cnt)
-			free_2d_dll(&data.tkn[idx], data.pipe_cnt[idx], str_delete_func);
+		idx[0] = -1;
+		while (++idx[0] < data.ao_cnt)
+			free_2d_dll(&data.tkn[idx[0]], data.pipe_cnt[idx[0]], str_delete_func);
 		free(data.tkn);
 		free(data.pipe_cnt);
 		free(data.logic_table);
@@ -250,11 +265,42 @@ int main(int argc, char **argv, char **envp)
 	}
 }
 
-t_bool parentheses_heredoc(t_dll *dll, char *cmd)
+t_bool heredoc_split(t_dll *dll, char *tkns)
+{
+	int idx;
+	int pos[4];
+	char *con;
+
+	idx = -1;
+	while (tkns[++idx] != '\0')
+	{
+		if (tkns[idx] == '<' && tkns[idx + 1] == '<')
+		{
+			find_front(tkns, pos, idx);
+			find_back_and_calc_blank_quote(tkns, pos, idx);
+			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2] - pos[3] + 2, sizeof(char));
+			if (con == T_NULL)
+				return (FALSE);
+			redirect_split2_1(tkns, con, &pos[0], &pos[1]);
+			if (dll_content_add(dll, (void *)con, 0) == FALSE)
+				return (ft_free2((void *)con, FALSE));
+			idx = pos[1] - 1;
+		}
+		else if (tkns[idx] == '\"' || tkns[idx] == '\'')
+			ignore_quote(tkns, &idx);
+		else if (tkns[idx] == '(')
+			ignore_parentheses(tkns, &idx);
+	}
+	return (TRUE);
+}
+
+t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd)
 {
 	int idx;
 	int p_idx[2];
 	char *tmp;
+	t_dllnode *ptr[2];
+	t_dll tmp_dll;
 
 	cmd[0] = ' ';
 	cmd[ft_strlen(cmd) - 1] = ' ';
@@ -269,20 +315,30 @@ t_bool parentheses_heredoc(t_dll *dll, char *cmd)
 			p_idx[1] = idx;
 		}
 	}
-	if (redirect_split(dll, cmd) == FALSE)
-	{
-		free(cmd);
-		return (FALSE);
-	}
 	if (p_idx[0] != -1)
 	{
 		tmp = ft_strndup(&cmd[p_idx[0]], p_idx[1] - p_idx[0] + 1);
-		free(cmd);
 		if (tmp == T_NULL)
 			return (FALSE);
-		if (parentheses_heredoc(dll, tmp) == FALSE)
-			return (FALSE);
+		if (parentheses_heredoc(heredoc_names, tkn_idx, tmp) == FALSE)
+			return (ft_free2(tmp, FALSE));
+		free(tmp);
 	}
-	free(cmd);
+	dll_init(&tmp_dll);
+	if (heredoc_split(&tmp_dll, cmd) == FALSE)
+		return (FALSE);
+	ptr[1] = heredoc_names->head.back;
+	ptr[0] = tmp_dll.head.back;
+	while (ptr[0] != &(tmp_dll.tail))
+	{
+		tmp = ft_strstr((char *)(ptr[0]->contents), "<<");
+		if (ptr[0] != T_NULL && heredoc_make1_2(heredoc_names, ptr[1], tkn_idx, tmp + 3) == FALSE)
+		{
+			dll_clear(&tmp_dll, str_delete_func);
+			return (FALSE);
+		}
+		ptr[0] = ptr[0]->back;
+	}
+	dll_clear(&tmp_dll, str_delete_func);
 	return (TRUE);
 }

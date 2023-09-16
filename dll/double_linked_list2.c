@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 10:33:23 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 16:46:10 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,22 @@ void	dll_add_front(t_dll *dll, t_dllnode *node, t_dllnode *new)
 {
 	if (dll_is_in(dll, node) == TRUE)
 	{
-		node->front->back = new;
-		new->front = node->front;
-		new->back = node;
-		node->front = new;
-		dll->size++;
+		if (node->front == &(dll->head))
+		{
+			new->front = &(dll->head);
+			new->back = node;
+			dll->head.back = new;
+			node->front = new;
+			dll->size++;
+		}
+		else
+		{
+			node->front->back = new;
+			new->front = node->front;
+			new->back = node;
+			node->front = new;
+			dll->size++;
+		}
 	}
 }
 
@@ -28,11 +39,22 @@ void	dll_add_back(t_dll *dll, t_dllnode *node, t_dllnode *new)
 {
 	if (dll_is_in(dll, node) == TRUE)
 	{
-		node->back->front = new;
-		new->front = node;
-		new->back = node->back;
-		node->back = new;
-		dll->size++;
+		if (node->back == &(dll->tail))
+		{
+			new->back = &(dll->tail);
+			new->front = node;
+			dll->tail.front = new;
+			node->back = new;
+			dll->size++;
+		}
+		else
+		{
+			node->back->front = new;
+			new->front = node;
+			new->back = node->back;
+			node->back = new;
+			dll->size++;
+		}
 	}
 }
 

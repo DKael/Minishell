@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/23 16:46:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/10 16:31:51 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/16 14:47:58 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ char	*get_next_line(int fd)
 	{
 		data.it = (t_fd_node *)malloc(sizeof(t_fd_node));
 		if (data.it == T_NULL)
-			return (T_NULL);
+			return ((T_NULL));
 		data.it->fd = fd;
 		data.it->start = 0;
 		data.it->next = start;

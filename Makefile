@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/12 22:11:12 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/16 14:53:51 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,8 @@ SRCS =	main.c \
 		util3.c \
 		split_cmd.c \
 		error.c \
-		dollor_sign.c
+		dollor_sign.c \
+		heredoc.c
 		
 OBJS = 	${SRCS:.c=.o}
 

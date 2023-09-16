@@ -14,6 +14,7 @@
                 "util3.c",
                 "error.c",
                 "dollor_sign.c",
+                "heredoc.c",
                 "-L./dll",
                 "-L./gnl",
                 "-ldll",
