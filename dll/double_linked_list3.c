@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 16:29:14 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 15:01:00 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,8 @@ else, add front of ptr's node.
 */
 t_bool	dll_content_add2(t_dll *dll, void *content, t_dllnode *ptr, int mode)
 {
-	t_dllnode *node_ptr;
+	t_dllnode	*node_ptr;
+	t_bool		result;
 
 	node_ptr = dll_new_node(content);
 	if (node_ptr == T_NULL)
@@ -147,21 +148,24 @@ t_bool	dll_content_add2(t_dll *dll, void *content, t_dllnode *ptr, int mode)
 	if (ptr == T_NULL)
 		return (FALSE);
 	if (mode == 0)
-		dll_add_back(dll, ptr, node_ptr);
+		result = dll_add_back(dll, ptr, node_ptr);
 	else
-		dll_add_front(dll, ptr, node_ptr);
-	return (TRUE);
+		result = dll_add_front(dll, ptr, node_ptr);
+	return (result);
 }
 
 void	dll_print(t_dll *dll, void (*print)(void *))
 {
 	t_dllnode	*node_ptr;
 
-	node_ptr = dll->head.back;
-	while (node_ptr != &(dll->tail))
+	if (dll != T_NULL)
 	{
-		if (print != T_NULL)
-			print(node_ptr->contents);
-		node_ptr = node_ptr->back;
+		node_ptr = dll->head.back;
+		while (node_ptr != &(dll->tail))
+		{
+			if (print != T_NULL)
+				print(node_ptr->contents);
+			node_ptr = node_ptr->back;
+		}
 	}
 }

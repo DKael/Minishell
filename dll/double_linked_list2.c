@@ -6,13 +6,13 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 16:46:10 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 14:58:05 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "double_linked_list.h"
 
-void	dll_add_front(t_dll *dll, t_dllnode *node, t_dllnode *new)
+t_bool	dll_add_front(t_dll *dll, t_dllnode *node, t_dllnode *new)
 {
 	if (dll_is_in(dll, node) == TRUE)
 	{
@@ -22,7 +22,6 @@ void	dll_add_front(t_dll *dll, t_dllnode *node, t_dllnode *new)
 			new->back = node;
 			dll->head.back = new;
 			node->front = new;
-			dll->size++;
 		}
 		else
 		{
@@ -30,12 +29,14 @@ void	dll_add_front(t_dll *dll, t_dllnode *node, t_dllnode *new)
 			new->front = node->front;
 			new->back = node;
 			node->front = new;
-			dll->size++;
 		}
+		dll->size++;
+		return (TRUE);
 	}
+	return (FALSE);
 }
 
-void	dll_add_back(t_dll *dll, t_dllnode *node, t_dllnode *new)
+t_bool	dll_add_back(t_dll *dll, t_dllnode *node, t_dllnode *new)
 {
 	if (dll_is_in(dll, node) == TRUE)
 	{
@@ -45,7 +46,6 @@ void	dll_add_back(t_dll *dll, t_dllnode *node, t_dllnode *new)
 			new->front = node;
 			dll->tail.front = new;
 			node->back = new;
-			dll->size++;
 		}
 		else
 		{
@@ -53,12 +53,14 @@ void	dll_add_back(t_dll *dll, t_dllnode *node, t_dllnode *new)
 			new->front = node;
 			new->back = node->back;
 			node->back = new;
-			dll->size++;
 		}
+		dll->size++;
+		return (TRUE);
 	}
+	return (FALSE);
 }
 
-void	dll_swap_node(t_dllnode *node1, t_dllnode *node2)
+void	dll_swap_node_contents(t_dllnode *node1, t_dllnode *node2)
 {
 	void	*temp;
 

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 17:14:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 15:09:25 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,8 @@ void store_env_in_dll(t_data *data, char **envp)
 
 t_bool check_syntax_error(char **cmd, int mode)
 {
-	if (check_multiple_lines(*cmd) == FALSE || check_quote_closed(*cmd) == FALSE || check_parentheses_syntax(*cmd) == FALSE || check_dollor_braces(*cmd) == FALSE)
+	if (check_multiple_lines(*cmd) == FALSE || check_quote_closed(*cmd) == FALSE
+		|| check_parentheses_syntax(*cmd) == FALSE || check_dollor_braces(*cmd) == FALSE)
 		return (FALSE);
 	if (mode == 0)
 		if ((check_special_char_syntax(cmd) == FALSE))
@@ -137,6 +138,7 @@ int main(int argc, char **argv, char **envp)
 	int idx3;
 	t_cmd_info *info_ptr;
 	char *tmp_str;
+	t_bool	result;
 
 	if (argc != 1)
 	{
@@ -189,7 +191,6 @@ int main(int argc, char **argv, char **envp)
 		idx[0] = -1;
 		while (++idx[0] < data.ao_cnt)
 		{
-			idx3 = -1;
 			idx[1] = -1;
 			while (++idx[1] < data.pipe_cnt[idx[0]])
 			{
@@ -202,30 +203,35 @@ int main(int argc, char **argv, char **envp)
 						resource_free_and_exit(&data);
 					if (parentheses_heredoc(&info_ptr->heredoc_names, idx, tmp_str) == FALSE)
 						resource_free_and_exit(&data);
-					ptr[0] = data.tkn[idx[0]][idx[1]]->head.back;
+					free(tmp_str);
 					ptr[1] = info_ptr->heredoc_names.head.back;
-					while (++idx3 < info_ptr->redir_cnt)
-					{
-						tmp_str = ft_strstr((char *)(ptr[0]->contents), "<<");
-						if (tmp_str != T_NULL && heredoc_make1_2(&info_ptr->heredoc_names, ptr[1], idx, tmp_str + 3) == FALSE)
-							resource_free_and_exit(&data);
-						ptr[0] = ptr[0]->back;
-					}
 				}
-				else
+				ptr[0] = data.tkn[idx[0]][idx[1]]->head.back;
+				idx3 = -1;
+				while (++idx3 < info_ptr->redir_cnt)
 				{
-					ptr[0] = data.tkn[idx[0]][idx[1]]->head.back;
-					while (++idx3 < info_ptr->redir_cnt)
+					tmp_str = ft_strstr((char *)(ptr[0]->contents), "<<");
+					if (tmp_str == T_NULL)
 					{
-						tmp_str = ft_strstr((char *)(ptr[0]->contents), "<<");
-						if (tmp_str != T_NULL && heredoc_make1_1(&info_ptr->heredoc_names, idx, tmp_str + 3) == FALSE)
-							resource_free_and_exit(&data);
 						ptr[0] = ptr[0]->back;
+						continue;
 					}
+					if (info_ptr->parentheses_flag == TRUE)
+						result = heredoc_make1_2(&info_ptr->heredoc_names, ptr[1], idx, tmp_str + 3);
+					else  
+						result = heredoc_make1_1(&info_ptr->heredoc_names, idx, tmp_str + 3);
+					if (result == FALSE)
+						resource_free_and_exit(&data);
+					ptr[0] = ptr[0]->back;
 				}
 			}
 		}
 
+		// execution part
+		
+
+
+		// Print result to check all code work fine. It will be deleted at the end.
 		printf("\n------------------------------------\n");
 
 		for (int i = 0; i < data.ao_cnt; i++)
@@ -241,6 +247,7 @@ int main(int argc, char **argv, char **envp)
 					printf("%s\n", (char *)ptr[0]->contents);
 					ptr[0] = ptr[0]->back;
 				}
+				printf("\n\n");
 			}
 		}
 
@@ -332,7 +339,12 @@ t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd)
 	while (ptr[0] != &(tmp_dll.tail))
 	{
 		tmp = ft_strstr((char *)(ptr[0]->contents), "<<");
-		if (ptr[0] != T_NULL && heredoc_make1_2(heredoc_names, ptr[1], tkn_idx, tmp + 3) == FALSE)
+		if (tmp == T_NULL)
+		{
+			ptr[0] = ptr[0]->back;
+			continue;
+		}
+		if (heredoc_make1_2(heredoc_names, ptr[1], tkn_idx, tmp + 3) == FALSE)
 		{
 			dll_clear(&tmp_dll, str_delete_func);
 			return (FALSE);

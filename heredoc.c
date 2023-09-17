@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/15 09:26:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 16:46:13 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 14:52:04 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,6 @@ t_bool	heredoc_make1_1(t_dll *dll, int *idx, char *del)
 	free(make_path);
 	if (name == T_NULL)
 		return (FALSE);
-	printf("name : %s\n", name);
 	if (heredoc_make2(name, del) == FALSE)
 		return (ft_free2(name, FALSE));
 	if (dll_content_add(dll, (void *)name, 0) == FALSE)
@@ -109,7 +108,6 @@ t_bool	heredoc_make1_2(t_dll *dll, t_dllnode *ptr, int *idx, char *del)
 	free(make_path);
 	if (name == T_NULL)
 		return (FALSE);
-	printf("name : %s\n", name);
 	if (heredoc_make2(name, del) == FALSE)
 		return (ft_free2(name, FALSE));
 	if (dll_content_add2(dll, (void *)name, ptr, 1) == FALSE)
