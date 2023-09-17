@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 15:09:25 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 18:09:47 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,24 +31,25 @@ void data_cycle_init(t_data *data)
 	data->tkn = T_NULL;
 	data->ao_cnt = 0;
 	data->pipe_cnt = T_NULL;
+	data->pp = T_NULL;
 	data->pid_table = T_NULL;
 	data->logic_table = T_NULL;
 }
 
-void set_last_exit_code(t_data *data, unsigned int input_exit_code)
+void set_last_exit_code(t_data *data, int input_exit_code)
 {
 	int idx;
-	unsigned int temp;
+	int temp;
 
 	data->last_exit_code = input_exit_code;
 	temp = data->last_exit_code;
 	idx = 0;
-	if (temp / 100U != 0)
-		data->last_exit_code_str[idx++] = (temp / 100U);
-	temp %= 100U;
-	if (temp / 10U != 0)
-		data->last_exit_code_str[idx++] = (temp / 10U);
-	temp %= 10U;
+	if (temp / 100 != 0)
+		data->last_exit_code_str[idx++] = (temp / 100);
+	temp %= 100;
+	if (temp / 10 != 0)
+		data->last_exit_code_str[idx++] = (temp / 10);
+	temp %= 10;
 	data->last_exit_code_str[idx++] = temp;
 	data->last_exit_code_str[idx] = '\0';
 }
@@ -114,46 +115,69 @@ void dll_str_print_func(void *content)
 	printf("%s\n", tmp);
 }
 
+void	close_pipes(t_data *data, int num)
+{
+	int	idx;
+
+	if (data->pp != T_NULL)
+	{
+		idx = 0;
+		while (++idx < num)
+		{
+			if (data->pp[idx] != T_NULL)
+			{
+				close(data->pp[idx][0]);
+				close(data->pp[idx][1]);
+			}
+		}
+	}
+}
+
 void resource_free_and_exit(t_data *data)
 {
 	int idx;
 
 	free(data->cmd);
 	dll_clear(&data->envdll, envval_delete_func);
-	free_2d_array(&data->ao_split, data->ao_cnt);
+	free_2d_array((void ***)&data->ao_split, data->ao_cnt);
 	idx = -1;
 	while (++idx < data->ao_cnt)
 		free_2d_dll(&data->tkn[idx], data->pipe_cnt[idx], str_delete_func);
 	free(data->tkn);
 	free(data->pipe_cnt);
 	free(data->logic_table);
+	free(data->pid_table);
 	exit(1);
+}
+
+void	on_execution_part_error(t_data *data, int pp_make_cnt, int pp_cnt)
+{
+	close_pipes(data, pp_make_cnt);
+	free_2d_array((void ***)&data->pp, pp_cnt);
+	free(data->pid_table);
+	resource_free_and_exit(data);
 }
 
 int main(int argc, char **argv, char **envp)
 {
 	t_data data;
+
 	int idx[2];
-	t_dllnode *ptr[2];
 	int idx3;
+	t_dllnode *ptr[2];
 	t_cmd_info *info_ptr;
 	char *tmp_str;
 	t_bool	result;
+
+	int	ao_idx;
+	int	pp_idx;
 
 	if (argc != 1)
 	{
 		printf("minishell: don't support file read or need any other inputs\n");
 		return (1);
 	}
-	// printf("\n\n----------------------<1>----------------------\n\n");
-	// system("leaks minishell");
-	// printf("\n\n----------------------<1>----------------------\n\n");
-
 	data_init(&data, argv[0], envp);
-
-	// printf("\n\n----------------------<2>----------------------\n\n");
-	// system("leaks minishell");
-	// printf("\n\n----------------------<2>----------------------\n\n");
 	dll_print(&data.envdll, dll_env_print_func);
 	while (1)
 	{
@@ -169,25 +193,16 @@ int main(int argc, char **argv, char **envp)
 			free(data.cmd);
 			continue;
 		}
-
 		add_history(data.cmd);
-		// printf("\n\n----------------------<3>----------------------\n\n");
-		// system("leaks minishell");
-		// printf("\n\n----------------------<3>----------------------\n\n");
 		if (check_syntax_error(&(data.cmd), 0) == FALSE)
 		{
 			set_last_exit_code(&data, 258);
 			free(data.cmd);
 			continue;
 		}
-		// printf("\n\n----------------------<4>----------------------\n\n");
-		// system("leaks minishell");
-		// printf("\n\n----------------------<4>----------------------\n\n");
 		split_cmd(&data, data.cmd);
-		// printf("\n\n----------------------<5>----------------------\n\n");
-		// system("leaks minishell");
-		// printf("\n\n----------------------<5>----------------------\n\n");
 
+		
 		idx[0] = -1;
 		while (++idx[0] < data.ao_cnt)
 		{
@@ -227,10 +242,6 @@ int main(int argc, char **argv, char **envp)
 			}
 		}
 
-		// execution part
-		
-
-
 		// Print result to check all code work fine. It will be deleted at the end.
 		printf("\n------------------------------------\n");
 
@@ -251,13 +262,89 @@ int main(int argc, char **argv, char **envp)
 			}
 		}
 
+		// execution part
+
+		
+
+		sem_unlink("print_sem");
+		data.print_sem = sem_open("print_sem", O_EXCL | O_CREAT, 0644, 1);
+
+
+
+		ao_idx = -1;
+		while (++ao_idx < data.ao_cnt)
+		{
+			if (ao_idx > 0)
+			{
+				if ((data.logic_table[ao_idx - 1] == AND && data.last_exit_code != 0) || (data.logic_table[ao_idx - 1] == OR && data.last_exit_code == 0))
+				{
+					continue;
+				}
+			}
+			data.pp = (int **)ft_calloc(data.pipe_cnt[ao_idx] + 1, sizeof(int *));
+			if (data.pp == T_NULL)
+				resource_free_and_exit(&data);
+			pp_idx = -1;
+			while (++pp_idx < data.pipe_cnt[ao_idx] + 1)
+			{
+				data.pp[pp_idx] = (int *)ft_calloc(2, sizeof(int));
+				if (data.pp[pp_idx] == T_NULL)
+					on_execution_part_error(&data, 0, pp_idx);
+			}
+			pp_idx = 0;
+			while (++pp_idx < data.pipe_cnt[ao_idx])
+			{
+				if (pipe(data.pp[pp_idx]) == -1)
+					on_execution_part_error(&data, pp_idx, data.pipe_cnt[ao_idx] + 1);
+			}
+
+			data.pid_table = (pid_t *)ft_calloc(data.pipe_cnt[ao_idx], sizeof(pid_t));
+			if (data.pid_table == T_NULL)
+				on_execution_part_error(&data, data.pipe_cnt[ao_idx], data.pipe_cnt[ao_idx] + 1);
+
+			pp_idx = -1;
+			while (++pp_idx < data.pipe_cnt[ao_idx])
+			{
+				data.pid_table[pp_idx] = fork();
+				if (data.pid_table[pp_idx] == -1)
+				{
+					while (--pp_idx >= 0)
+					{
+						kill(data.pid_table[pp_idx], SIGTERM);
+						wait(T_NULL);
+					}
+					on_execution_part_error(&data, data.pipe_cnt[ao_idx], data.pipe_cnt[ao_idx] + 1);
+				}
+				else if (data.pid_table[pp_idx] == 0)
+				{
+					child(&data, ao_idx, pp_idx);
+					exit(0);
+				}
+					
+			}
+			close_pipes(&data, data.pipe_cnt[ao_idx]);
+			pp_idx = -1;
+			while (++pp_idx < data.pipe_cnt[ao_idx])
+			{
+				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == wait(&data.last_exit_code))
+					set_last_exit_code(&data, (data.last_exit_code >> 8) & 0xFF);
+			}
+			close_pipes(&data, data.pipe_cnt[ao_idx]);
+			free_2d_array((void ***)&data.pp, data.pipe_cnt[ao_idx] + 1);
+			free(data.pid_table);
+		}
+
+		sem_close(data.print_sem);
+		sem_unlink("print_sem");
+
+
 		// printf("\n\n----------------------<6>----------------------\n\n");
 		// system("leaks minishell");
 		// printf("\n\n----------------------<6>----------------------\n\n");
 
 		free(data.cmd);
 		dll_clear(&data.envdll, envval_delete_func);
-		free_2d_array(&data.ao_split, data.ao_cnt);
+		free_2d_array((void ***)&data.ao_split, data.ao_cnt);
 		idx[0] = -1;
 		while (++idx[0] < data.ao_cnt)
 			free_2d_dll(&data.tkn[idx[0]], data.pipe_cnt[idx[0]], str_delete_func);
@@ -266,91 +353,8 @@ int main(int argc, char **argv, char **envp)
 		free(data.logic_table);
 		printf("syntax ok\n\n");
 
-		printf("\n\n----------------------<7>----------------------\n\n");
-		system("leaks minishell");
-		printf("\n\n----------------------<7>----------------------\n\n");
+		// printf("\n\n----------------------<7>----------------------\n\n");
+		// system("leaks minishell");
+		// printf("\n\n----------------------<7>----------------------\n\n");
 	}
-}
-
-t_bool heredoc_split(t_dll *dll, char *tkns)
-{
-	int idx;
-	int pos[4];
-	char *con;
-
-	idx = -1;
-	while (tkns[++idx] != '\0')
-	{
-		if (tkns[idx] == '<' && tkns[idx + 1] == '<')
-		{
-			find_front(tkns, pos, idx);
-			find_back_and_calc_blank_quote(tkns, pos, idx);
-			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2] - pos[3] + 2, sizeof(char));
-			if (con == T_NULL)
-				return (FALSE);
-			redirect_split2_1(tkns, con, &pos[0], &pos[1]);
-			if (dll_content_add(dll, (void *)con, 0) == FALSE)
-				return (ft_free2((void *)con, FALSE));
-			idx = pos[1] - 1;
-		}
-		else if (tkns[idx] == '\"' || tkns[idx] == '\'')
-			ignore_quote(tkns, &idx);
-		else if (tkns[idx] == '(')
-			ignore_parentheses(tkns, &idx);
-	}
-	return (TRUE);
-}
-
-t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd)
-{
-	int idx;
-	int p_idx[2];
-	char *tmp;
-	t_dllnode *ptr[2];
-	t_dll tmp_dll;
-
-	cmd[0] = ' ';
-	cmd[ft_strlen(cmd) - 1] = ' ';
-	p_idx[0] = -1;
-	idx = -1;
-	while (cmd[++idx] != '\0')
-	{
-		if (cmd[idx] == '(')
-		{
-			p_idx[0] = idx;
-			ignore_parentheses(cmd, &idx);
-			p_idx[1] = idx;
-		}
-	}
-	if (p_idx[0] != -1)
-	{
-		tmp = ft_strndup(&cmd[p_idx[0]], p_idx[1] - p_idx[0] + 1);
-		if (tmp == T_NULL)
-			return (FALSE);
-		if (parentheses_heredoc(heredoc_names, tkn_idx, tmp) == FALSE)
-			return (ft_free2(tmp, FALSE));
-		free(tmp);
-	}
-	dll_init(&tmp_dll);
-	if (heredoc_split(&tmp_dll, cmd) == FALSE)
-		return (FALSE);
-	ptr[1] = heredoc_names->head.back;
-	ptr[0] = tmp_dll.head.back;
-	while (ptr[0] != &(tmp_dll.tail))
-	{
-		tmp = ft_strstr((char *)(ptr[0]->contents), "<<");
-		if (tmp == T_NULL)
-		{
-			ptr[0] = ptr[0]->back;
-			continue;
-		}
-		if (heredoc_make1_2(heredoc_names, ptr[1], tkn_idx, tmp + 3) == FALSE)
-		{
-			dll_clear(&tmp_dll, str_delete_func);
-			return (FALSE);
-		}
-		ptr[0] = ptr[0]->back;
-	}
-	dll_clear(&tmp_dll, str_delete_func);
-	return (TRUE);
 }

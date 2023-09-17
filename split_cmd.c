@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 14:57:25 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 17:50:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void cmd_split_error(t_data *data, char *cmd)
 
 	free(cmd);
 	dll_clear(&data->envdll, envval_delete_func);
-	free_2d_array(&data->ao_split, data->ao_cnt);
+	free_2d_array((void ***)&data->ao_split, data->ao_cnt);
 	idx1 = -1;
 	while (++idx1 < data->ao_cnt)
 		free_2d_dll(&data->tkn[idx1], data->pipe_cnt[idx1], str_delete_func);
@@ -49,10 +49,10 @@ void cmd_split_error(t_data *data, char *cmd)
 	exit(1);
 }
 
-void *free_2d_array(char ***arr_ptr, int num)
+void *free_2d_array(void ***arr_ptr, int num)
 {
 	int idx;
-	char **tmp;
+	void **tmp;
 
 	if (*arr_ptr != T_NULL)
 	{
@@ -215,7 +215,7 @@ char **split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table)
 				logic_table[ao_idx] = AND;
 			tmp[ao_idx] = ft_strndup(&cmd[idx_chk], idx - idx_chk);
 			if (tmp[ao_idx] == T_NULL)
-				return (free_2d_array(&tmp, ao_idx));
+				return (free_2d_array((void ***)&tmp, ao_idx));
 			idx_chk = idx + 2;
 			ao_idx++;
 			idx++;
@@ -227,7 +227,7 @@ char **split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table)
 	}
 	tmp[ao_idx] = ft_strndup(&cmd[idx_chk], idx - idx_chk);
 	if (tmp[ao_idx] == T_NULL)
-		return (free_2d_array(&tmp, ao_idx));
+		return (free_2d_array((void ***)&tmp, ao_idx));
 	return (tmp);
 }
 
@@ -243,7 +243,7 @@ t_dll **tokenize(char *tkns, int *pipe_cnt)
 		return (T_NULL);
 	tkn_part = make_dlls((*pipe_cnt));
 	if (tkn_part == T_NULL)
-		return (free_2d_array(&split_tmp, (*pipe_cnt)));
+		return (free_2d_array((void ***)&split_tmp, (*pipe_cnt)));
 
 	printf("\n\ntkns : %s\n", tkns);
 	for (int i = 0; i < (*pipe_cnt); i++)
@@ -273,7 +273,7 @@ t_dll **tokenize(char *tkns, int *pipe_cnt)
 		printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
 		dll_print(tkn_part[idx], dll_str_print_func);
 	}
-	free_2d_array(&split_tmp, (*pipe_cnt));
+	free_2d_array((void ***)&split_tmp, (*pipe_cnt));
 	if (idx < (*pipe_cnt))
 		return (free_2d_dll(&tkn_part, (*pipe_cnt), str_delete_func));
 	return (tkn_part);
@@ -317,7 +317,7 @@ char **split_tkns_by_pipe(char *tkns, int pipe_cnt)
 		{
 			tmp[pipe_idx] = ft_strndup(&tkns[idx_chk], idx - idx_chk);
 			if (tmp[pipe_idx] == T_NULL)
-				return (free_2d_array(&tmp, pipe_idx));
+				return (free_2d_array((void ***)&tmp, pipe_idx));
 			idx_chk = idx + 1;
 			pipe_idx++;
 			idx++;
@@ -329,7 +329,7 @@ char **split_tkns_by_pipe(char *tkns, int pipe_cnt)
 	}
 	tmp[pipe_idx] = ft_strndup(&tkns[idx_chk], idx - idx_chk);
 	if (tmp[pipe_idx] == T_NULL)
-		return (free_2d_array(&tmp, pipe_idx));
+		return (free_2d_array((void ***)&tmp, pipe_idx));
 	return (tmp);
 }
 

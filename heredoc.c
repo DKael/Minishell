@@ -6,12 +6,12 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/15 09:26:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 14:52:04 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 17:51:00 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
+t_bool heredoc_split(t_dll *dll, char *tkns);
 static char	*make_name2(char *make_path, char *bf1, char *bf2);
 t_bool	heredoc_make2(char *name, char *del);
 void	heredoc_make3(int fd, char *paste_nl);
@@ -56,6 +56,89 @@ static char	*make_name2(char *make_path, char *bf1, char *bf2)
 	result = ft_strjoin2(make_path, tmp, "/");
 	free(tmp);
 	return (result);
+}
+
+t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd)
+{
+	int idx;
+	int p_idx[2];
+	char *tmp;
+	t_dllnode *ptr[2];
+	t_dll tmp_dll;
+
+	cmd[0] = ' ';
+	cmd[ft_strlen(cmd) - 1] = ' ';
+	p_idx[0] = -1;
+	idx = -1;
+	while (cmd[++idx] != '\0')
+	{
+		if (cmd[idx] == '(')
+		{
+			p_idx[0] = idx;
+			ignore_parentheses(cmd, &idx);
+			p_idx[1] = idx;
+		}
+	}
+	if (p_idx[0] != -1)
+	{
+		tmp = ft_strndup(&cmd[p_idx[0]], p_idx[1] - p_idx[0] + 1);
+		if (tmp == T_NULL)
+			return (FALSE);
+		if (parentheses_heredoc(heredoc_names, tkn_idx, tmp) == FALSE)
+			return (ft_free2(tmp, FALSE));
+		free(tmp);
+	}
+	dll_init(&tmp_dll);
+	if (heredoc_split(&tmp_dll, cmd) == FALSE)
+		return (FALSE);
+	ptr[1] = heredoc_names->head.back;
+	ptr[0] = tmp_dll.head.back;
+	while (ptr[0] != &(tmp_dll.tail))
+	{
+		tmp = ft_strstr((char *)(ptr[0]->contents), "<<");
+		if (tmp == T_NULL)
+		{
+			ptr[0] = ptr[0]->back;
+			continue;
+		}
+		if (heredoc_make1_2(heredoc_names, ptr[1], tkn_idx, tmp + 3) == FALSE)
+		{
+			dll_clear(&tmp_dll, str_delete_func);
+			return (FALSE);
+		}
+		ptr[0] = ptr[0]->back;
+	}
+	dll_clear(&tmp_dll, str_delete_func);
+	return (TRUE);
+}
+
+t_bool heredoc_split(t_dll *dll, char *tkns)
+{
+	int idx;
+	int pos[4];
+	char *con;
+
+	idx = -1;
+	while (tkns[++idx] != '\0')
+	{
+		if (tkns[idx] == '<' && tkns[idx + 1] == '<')
+		{
+			find_front(tkns, pos, idx);
+			find_back_and_calc_blank_quote(tkns, pos, idx);
+			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2] - pos[3] + 2, sizeof(char));
+			if (con == T_NULL)
+				return (FALSE);
+			redirect_split2_1(tkns, con, &pos[0], &pos[1]);
+			if (dll_content_add(dll, (void *)con, 0) == FALSE)
+				return (ft_free2((void *)con, FALSE));
+			idx = pos[1] - 1;
+		}
+		else if (tkns[idx] == '\"' || tkns[idx] == '\'')
+			ignore_quote(tkns, &idx);
+		else if (tkns[idx] == '(')
+			ignore_parentheses(tkns, &idx);
+	}
+	return (TRUE);
 }
 
 // heredoc name will be {idx1}_{idx2}_{dll's size}.heredoc

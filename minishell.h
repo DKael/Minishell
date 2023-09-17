@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 17:05:00 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 17:48:44 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,10 @@
 # include <fcntl.h>
 # include "dll/double_linked_list.h"
 # include "gnl/get_next_line.h"
+
+
+#include <semaphore.h>
+
 
 #if !defined(TRUE) && !defined(FALSE)
 #define TRUE 1
@@ -80,14 +84,19 @@ typedef struct s_data
 	char **ao_split;
 	int ao_cnt;
 	int	*pipe_cnt;
+	int		**pp;
 	pid_t *pid_table;
 	t_logic	*logic_table;
 
 	char *program_name;
-	unsigned int last_exit_code;
+	int last_exit_code;
 	char	last_exit_code_str[4];
 	char **envp;
 	t_dll envdll;
+
+
+	sem_t *print_sem;
+
 } t_data;
 
 void dll_str_print_func(void *content);
@@ -95,7 +104,7 @@ void dll_env_print_func(void *content);
 
 t_bool syntax_error_print(char *chr);
 void message_exit(const char *msg, int exit_code);
-void *free_2d_array(char ***arr_ptr, int num);
+void *free_2d_array(void ***arr_ptr, int num);
 void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 
 t_bool case_lts_gts(char *cmd, int *idx);
@@ -142,4 +151,6 @@ void find_front(char *tkns, int *pos, int idx);
 
 void *ft_free1(void *ptr);
 t_bool ft_free2(void *ptr, t_bool flag);
+
+void	child(t_data *data, int ao_idx, int pp_idx);
 #endif
