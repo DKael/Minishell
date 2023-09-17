@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 18:09:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 21:21:04 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 void store_env_in_dll(t_data *data, char **envp);
 t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd);
 t_bool heredoc_split(t_dll *dll, char *tkns);
+
+void	envdll_sorting(t_data *data);
 
 void data_init(t_data *data, char *program_name, char **envp)
 {
@@ -70,8 +72,16 @@ void store_env_in_dll(t_data *data, char **envp)
 			dll_clear(&data->envdll, envval_delete_func);
 			message_exit("minishell: malloc error!\n", 1);
 		}
-		env->name = ft_strndup(*envp, idx);
-		env->value = ft_strdup(&(*envp)[idx + 1]);
+		if ((*envp)[idx] == '=')
+		{
+			env->name = ft_strndup(*envp, idx);
+			env->value = ft_strdup(&(*envp)[idx + 1]);
+		}
+		else if ((*envp)[idx] == '\0')
+		{
+			env->name = ft_strdup(*envp);
+			env->value = ft_strdup("");
+		}
 		if (env->name == T_NULL || env->value == T_NULL)
 		{
 			dll_clear(&data->envdll, envval_delete_func);
@@ -85,6 +95,67 @@ void store_env_in_dll(t_data *data, char **envp)
 			message_exit("minishell: malloc error!\n", 1);
 		}
 		envp++;
+	}
+	envdll_sorting(data);
+}
+
+int	srt_compare(void *input_lst, int idx1, int idx2)
+{
+	t_srt	*lst;
+	int		result;
+
+	lst = (t_srt *)input_lst;
+	result = ft_strcmp(lst[idx1].name, lst[idx2].name);
+	if (result > 0)
+		return (1);
+	else if (result < 0)
+		return (-1);
+	else
+		return (0);
+}
+
+void	srt_swap(void *input_lst, int idx1, int idx2)
+{
+	t_srt	*lst;
+	t_srt	temp;
+
+	lst = (t_srt *)input_lst;
+	temp = lst[idx1];
+	lst[idx1] = lst[idx2];
+	lst[idx2] = temp;
+}
+
+void	envdll_sorting(t_data *data)
+{
+	t_srt *tmp;
+	t_dllnode *node_ptr;
+	int		idx;
+
+	tmp = (t_srt *)ft_calloc(data->envdll.size, (sizeof(t_srt)));
+	if (tmp == T_NULL)
+	{
+		dll_clear(&data->envdll, envval_delete_func);
+		message_exit("minishell: malloc error!\n", 1);
+	}
+	idx = -1;
+	node_ptr = data->envdll.head.back;
+	while (++idx <  data->envdll.size)
+	{
+		tmp[idx].name = ((t_envval *)(node_ptr->contents))->name;
+		tmp[idx].ptr = node_ptr;
+		node_ptr = node_ptr->back;
+	}
+	sorting((void *)tmp, data->envdll.size, srt_compare, srt_swap);
+	dll_init(&data->sorted_envdll);
+	idx = -1;
+	while (++idx <  data->envdll.size)
+	{
+		if (dll_content_add(&data->sorted_envdll, tmp[idx].ptr, 0) == FALSE)
+		{
+			dll_clear(&data->envdll, envval_delete_func);
+			dll_clear(&data->sorted_envdll, envval_delete_func);
+			message_exit("minishell: malloc error!\n", 1);
+		}
 	}
 }
 
@@ -104,7 +175,25 @@ void dll_env_print_func(void *content)
 	t_envval *tmp;
 
 	tmp = (t_envval *)content;
-	printf("%s=%s\n", tmp->name, tmp->value);
+	if (tmp != T_NULL && tmp->value[0] != '\0')
+		printf("%s=%s\n", tmp->name, tmp->value);
+}
+
+void dll_export_print_func(void *content)
+{
+	t_dllnode *tmp1;
+	t_envval *tmp2;
+
+	tmp1 = (t_dllnode *)content;
+	tmp2 = (t_envval *)(tmp1->contents);
+	if (tmp2 != T_NULL)
+	{
+		if (tmp2->value[0] != '\0')
+		printf("%s=%s\n", tmp2->name, tmp2->value);
+		else
+			printf("%s\n", tmp2->name);
+	}
+	
 }
 
 void dll_str_print_func(void *content)
@@ -177,8 +266,40 @@ int main(int argc, char **argv, char **envp)
 		printf("minishell: don't support file read or need any other inputs\n");
 		return (1);
 	}
+
+	// t_envval test[3];
+	// t_dllnode *tmp_node_ptr;
+
+	// test[0].name = "a";
+	// test[0].value = "a";
+	// test[1].name = "b";
+	// test[1].value = "b";
+	// test[2].name = "c";
+	// test[2].value = "c";
+
+	
+
+	
+
+	// dll_content_add(&data.envdll, &test[0], 0);
+	// dll_content_add(&data.envdll, &test[1], 0);
+	// dll_content_add(&data.envdll, &test[2], 0);
+
+
+	// tmp_node_ptr = data.envdll.tail.front->front->front;
+	// dll_content_add(&data.sorted_envdll, tmp_node_ptr, 0);
+	// tmp_node_ptr = tmp_node_ptr->back;
+	// dll_content_add(&data.sorted_envdll, tmp_node_ptr, 0);
+	// tmp_node_ptr = tmp_node_ptr->back;
+	// dll_content_add(&data.sorted_envdll, tmp_node_ptr, 0);
+
+	// printf("envdll size : %d, sorted_envdll size : %d\n", data.envdll.size, data.sorted_envdll.size);
 	data_init(&data, argv[0], envp);
+	printf("\n------------------------env---------------------------\n");
 	dll_print(&data.envdll, dll_env_print_func);
+
+	printf("\n------------------------export---------------------------\n");
+	dll_print(&data.sorted_envdll, dll_export_print_func);
 	while (1)
 	{
 		data_cycle_init(&data);

@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/17 17:41:10 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/17 20:16:12 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,8 @@ SRCS =	main.c \
 		error.c \
 		dollor_sign.c \
 		heredoc.c \
-		child.c
+		child.c \
+		quick_sort.c 
 		
 OBJS = 	${SRCS:.c=.o}
 

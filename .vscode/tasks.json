@@ -18,6 +18,7 @@
                 "dll/double_linked_list1.c",
                 "dll/double_linked_list2.c",
                 "dll/double_linked_list3.c",
+                "quick_sort.c",
                 "child.c",
                 "-L./gnl",
                 "-lgnl",

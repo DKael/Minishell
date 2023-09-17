@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 17:48:44 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 20:01:49 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 # include <fcntl.h>
 # include "dll/double_linked_list.h"
 # include "gnl/get_next_line.h"
+# include "quick_sort.h"
 
 
 #include <semaphore.h>
@@ -46,6 +47,12 @@
 
 typedef int t_bool;
 typedef	struct stat t_stat;
+
+typedef	struct s_srt
+{
+	char *name;
+	t_dllnode *ptr;
+}	t_srt;
 
 typedef enum e_logic
 {
@@ -92,7 +99,8 @@ typedef struct s_data
 	int last_exit_code;
 	char	last_exit_code_str[4];
 	char **envp;
-	t_dll envdll;
+	t_dll 	envdll;
+	t_dll	sorted_envdll;
 
 
 	sem_t *print_sem;
