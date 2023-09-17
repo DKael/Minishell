@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 21:21:04 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/17 21:37:22 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,7 +278,14 @@ int main(int argc, char **argv, char **envp)
 	// test[2].value = "c";
 
 	
+	/*
+	t_envval *tmp;
 
+	tmp = (t_envval *)ft_calloc(sizeof(t_envval), 1);
+	tmp.name = fwefewf;
+	tmp.value =fwefwe;
+	dll_contents_add(&data.envdll, (void *)&tmp, 0);
+	*/
 	
 
 	// dll_content_add(&data.envdll, &test[0], 0);
@@ -300,6 +307,14 @@ int main(int argc, char **argv, char **envp)
 
 	printf("\n------------------------export---------------------------\n");
 	dll_print(&data.sorted_envdll, dll_export_print_func);
+
+	dll_del_node(&data.envdll, data.envdll.tail.front, envval_delete_func);
+
+	printf("\n------------------------env---------------------------\n");
+	dll_print(&data.envdll, dll_env_print_func);
+
+	// printf("\n------------------------export---------------------------\n");
+	// dll_print(&data.sorted_envdll, dll_export_print_func);
 	while (1)
 	{
 		data_cycle_init(&data);
