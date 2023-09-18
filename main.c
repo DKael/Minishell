@@ -23,6 +23,7 @@ void data_init(t_data *data, char *program_name, char **envp)
 	data->program_name = program_name;
 	data->envp = envp;
 	data->last_exit_code = 0;
+	data->builtin_func[0]
 	dll_init(&data->envdll);
 	store_env_in_dll(data, envp);
 }
@@ -43,16 +44,17 @@ void set_last_exit_code(t_data *data, int input_exit_code)
 	int idx;
 	int temp;
 
+	input_exit_code %= 1000;
 	data->last_exit_code = input_exit_code;
 	temp = data->last_exit_code;
 	idx = 0;
 	if (temp / 100 != 0)
-		data->last_exit_code_str[idx++] = (temp / 100);
+		data->last_exit_code_str[idx++] = (temp / 100) + '0';
 	temp %= 100;
 	if (temp / 10 != 0)
-		data->last_exit_code_str[idx++] = (temp / 10);
+		data->last_exit_code_str[idx++] = (temp / 10) + '0';
 	temp %= 10;
-	data->last_exit_code_str[idx++] = temp;
+	data->last_exit_code_str[idx++] = temp + '0';
 	data->last_exit_code_str[idx] = '\0';
 }
 
@@ -63,15 +65,15 @@ void store_env_in_dll(t_data *data, char **envp)
 
 	while (*envp)
 	{
-		idx = -1;
-		while ((*envp)[++idx] != '=' && (*envp)[idx] != '\0')
-			;
 		env = (t_envval *)ft_calloc(1, sizeof(t_envval));
 		if (env == T_NULL)
 		{
 			dll_clear(&data->envdll, envval_delete_func);
 			message_exit("minishell: malloc error!\n", 1);
 		}
+		idx = -1;
+		while ((*envp)[++idx] != '=' && (*envp)[idx] != '\0')
+			;
 		if ((*envp)[idx] == '=')
 		{
 			env->name = ft_strndup(*envp, idx);
@@ -152,11 +154,13 @@ void	envdll_sorting(t_data *data)
 	{
 		if (dll_content_add(&data->sorted_envdll, tmp[idx].ptr, 0) == FALSE)
 		{
+			free(tmp);
 			dll_clear(&data->envdll, envval_delete_func);
-			dll_clear(&data->sorted_envdll, envval_delete_func);
+			dll_clear(&data->sorted_envdll, T_NULL);
 			message_exit("minishell: malloc error!\n", 1);
 		}
 	}
+	free(tmp);
 }
 
 t_bool check_syntax_error(char **cmd, int mode)
@@ -189,7 +193,7 @@ void dll_export_print_func(void *content)
 	if (tmp2 != T_NULL)
 	{
 		if (tmp2->value[0] != '\0')
-		printf("%s=%s\n", tmp2->name, tmp2->value);
+			printf("%s=%s\n", tmp2->name, tmp2->value);
 		else
 			printf("%s\n", tmp2->name);
 	}
@@ -228,6 +232,7 @@ void resource_free_and_exit(t_data *data)
 
 	free(data->cmd);
 	dll_clear(&data->envdll, envval_delete_func);
+	dll_clear(&data->sorted_envdll, T_NULL);
 	free_2d_array((void ***)&data->ao_split, data->ao_cnt);
 	idx = -1;
 	while (++idx < data->ao_cnt)
@@ -239,12 +244,30 @@ void resource_free_and_exit(t_data *data)
 	exit(1);
 }
 
-void	on_execution_part_error(t_data *data, int pp_make_cnt, int pp_cnt)
+void	 on_execution_part_error(t_data *data, int pp_make_cnt, int pp_cnt)
 {
 	close_pipes(data, pp_make_cnt);
 	free_2d_array((void ***)&data->pp, pp_cnt);
 	free(data->pid_table);
 	resource_free_and_exit(data);
+}
+
+int	is_builtin_func(char *cmd)
+{
+	if (ft_strcmp(cmd, "echo") == 0)
+		return (1); 
+	else if (ft_strcmp(cmd, "cd") == 0)
+		return (2); 
+	else if (ft_strcmp(cmd, "export") == 0)
+		return (3);
+	else if( ft_strcmp(cmd, "unset") == 0)
+		return (4);
+	else if (ft_strcmp(cmd, "pwd") == 0)
+		return (5);
+	else if (ft_strcmp(cmd, "exit") == 0)
+		return (6);
+	else
+		return (0);
 }
 
 int main(int argc, char **argv, char **envp)
@@ -257,9 +280,13 @@ int main(int argc, char **argv, char **envp)
 	t_cmd_info *info_ptr;
 	char *tmp_str;
 	t_bool	result;
+	t_dllnode *node_ptr;
 
 	int	ao_idx;
 	int	pp_idx;
+	int	node_idx;
+	int	int_tmp;
+	int	func_type;
 
 	if (argc != 1)
 	{
@@ -308,10 +335,10 @@ int main(int argc, char **argv, char **envp)
 	printf("\n------------------------export---------------------------\n");
 	dll_print(&data.sorted_envdll, dll_export_print_func);
 
-	dll_del_node(&data.envdll, data.envdll.tail.front, envval_delete_func);
+	// dll_del_node(&data.envdll, data.envdll.tail.front, envval_delete_func);
 
-	printf("\n------------------------env---------------------------\n");
-	dll_print(&data.envdll, dll_env_print_func);
+	// printf("\n------------------------env---------------------------\n");
+	// dll_print(&data.envdll, dll_env_print_func);
 
 	// printf("\n------------------------export---------------------------\n");
 	// dll_print(&data.sorted_envdll, dll_export_print_func);
@@ -417,6 +444,22 @@ int main(int argc, char **argv, char **envp)
 					continue;
 				}
 			}
+			
+			if (data.pipe_cnt[ao_idx] == 1)
+			{
+				int_tmp = ((t_cmd_info *)(data.tkn[ao_idx][0]->head.contents))->redir_cnt;
+				node_ptr = data.tkn[ao_idx][0]->head.back;
+				node_idx = -1;
+				while (++node_idx < int_tmp)
+					node_ptr = node_ptr->back;
+				func_type = 	is_builtin_func((char *)node_ptr->contents);
+				if (func_type != 0)
+				{
+					continue;
+				}
+			}
+			
+			
 			data.pp = (int **)ft_calloc(data.pipe_cnt[ao_idx] + 1, sizeof(int *));
 			if (data.pp == T_NULL)
 				resource_free_and_exit(&data);

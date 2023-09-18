@@ -101,6 +101,8 @@ typedef struct s_data
 	char **envp;
 	t_dll 	envdll;
 	t_dll	sorted_envdll;
+	
+	char		*builtin_func[6];
 
 
 	sem_t *print_sem;
