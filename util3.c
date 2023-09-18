@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:32:02 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/12 14:20:51 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/18 10:58:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ char	**ft_split(char const *s, char c)
 	result = (char **)malloc(sizeof(char *) * (count + 1));
 	if (result == T_NULL)
 	{
-		free(temp);
+		ft_free1((void **)&temp);
 		return (T_NULL);
 	}
 	return (do_split(result, temp, idx));
@@ -70,7 +70,7 @@ static char	**do_split(char **result1, char *temp, size_t len)
 		}
 	}
 	result1[result_idx] = T_NULL;
-	free(temp);
+	ft_free1((void **)&temp);
 	return (result1);
 }
 
@@ -102,10 +102,10 @@ static char	**do_remove(char **result2, size_t result_idx, char *temp)
 	index = 0;
 	while (index < result_idx)
 	{
-		free(result2[index]);
+		ft_free1((void **)&result2[index]);
 		index++;
 	}
-	free(result2);
-	free(temp);
+	ft_free1((void **)&result2);
+	ft_free1((void **)&temp);
 	return (T_NULL);
 }

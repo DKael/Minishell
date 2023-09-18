@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 21:37:22 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/18 16:42:47 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void store_env_in_dll(t_data *data, char **envp);
 t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd);
 t_bool heredoc_split(t_dll *dll, char *tkns);
+void set_last_exit_code(t_data *data, int input_exit_code);
 
 void	envdll_sorting(t_data *data);
 
@@ -22,9 +23,15 @@ void data_init(t_data *data, char *program_name, char **envp)
 {
 	data->program_name = program_name;
 	data->envp = envp;
-	data->last_exit_code = 0;
-	data->builtin_func[0]
+	set_last_exit_code(data, 0);
+	data->builtin_func[0] = ft_echo;
+	data->builtin_func[1] = ft_cd;
+	data->builtin_func[2] = ft_export;
+	data->builtin_func[3] = ft_unset;
+	data->builtin_func[4] = ft_pwd;
+	data->builtin_func[5] = ft_exit;
 	dll_init(&data->envdll);
+	dll_init(&data->sorted_envdll);
 	store_env_in_dll(data, envp);
 }
 
@@ -77,7 +84,15 @@ void store_env_in_dll(t_data *data, char **envp)
 		if ((*envp)[idx] == '=')
 		{
 			env->name = ft_strndup(*envp, idx);
-			env->value = ft_strdup(&(*envp)[idx + 1]);
+			if (ft_strncmp((*envp), "SHLVL", idx) == 0)
+			{
+				if (ft_isdecimal(&(*envp)[idx + 1]) == TRUE)
+					env->value = ft_itoa(ft_atoi(&(*envp)[idx + 1]) + 1);
+				else
+					env->value = ft_itoa(1);
+			}
+			else
+				env->value = ft_strdup(&(*envp)[idx + 1]);
 		}
 		else if ((*envp)[idx] == '\0')
 		{
@@ -148,19 +163,18 @@ void	envdll_sorting(t_data *data)
 		node_ptr = node_ptr->back;
 	}
 	sorting((void *)tmp, data->envdll.size, srt_compare, srt_swap);
-	dll_init(&data->sorted_envdll);
 	idx = -1;
 	while (++idx <  data->envdll.size)
 	{
 		if (dll_content_add(&data->sorted_envdll, tmp[idx].ptr, 0) == FALSE)
 		{
-			free(tmp);
+			ft_free1((void **)&tmp);
 			dll_clear(&data->envdll, envval_delete_func);
 			dll_clear(&data->sorted_envdll, T_NULL);
 			message_exit("minishell: malloc error!\n", 1);
 		}
 	}
-	free(tmp);
+	ft_free1((void **)&tmp);
 }
 
 t_bool check_syntax_error(char **cmd, int mode)
@@ -226,30 +240,30 @@ void	close_pipes(t_data *data, int num)
 	}
 }
 
-void resource_free_and_exit(t_data *data)
+void resource_free_and_exit(t_data *data, int exit_code)
 {
 	int idx;
 
-	free(data->cmd);
+	ft_free1((void **)&data->cmd);
 	dll_clear(&data->envdll, envval_delete_func);
 	dll_clear(&data->sorted_envdll, T_NULL);
 	free_2d_array((void ***)&data->ao_split, data->ao_cnt);
 	idx = -1;
 	while (++idx < data->ao_cnt)
 		free_2d_dll(&data->tkn[idx], data->pipe_cnt[idx], str_delete_func);
-	free(data->tkn);
-	free(data->pipe_cnt);
-	free(data->logic_table);
-	free(data->pid_table);
-	exit(1);
+	ft_free1((void **)&data->tkn);
+	ft_free1((void **)&data->pipe_cnt);
+	ft_free1((void **)&data->logic_table);
+	ft_free1((void **)&data->pid_table);
+	exit(exit_code);
 }
 
 void	 on_execution_part_error(t_data *data, int pp_make_cnt, int pp_cnt)
 {
 	close_pipes(data, pp_make_cnt);
 	free_2d_array((void ***)&data->pp, pp_cnt);
-	free(data->pid_table);
-	resource_free_and_exit(data);
+	ft_free1((void **)&data->pid_table);
+	resource_free_and_exit(data, 1);
 }
 
 int	is_builtin_func(char *cmd)
@@ -353,14 +367,14 @@ int main(int argc, char **argv, char **envp)
 		}
 		else if (data.cmd[0] == '\0')
 		{
-			free(data.cmd);
+			ft_free1((void **)&data.cmd);
 			continue;
 		}
 		add_history(data.cmd);
 		if (check_syntax_error(&(data.cmd), 0) == FALSE)
 		{
 			set_last_exit_code(&data, 258);
-			free(data.cmd);
+			ft_free1((void **)&data.cmd);
 			continue;
 		}
 		split_cmd(&data, data.cmd);
@@ -378,10 +392,10 @@ int main(int argc, char **argv, char **envp)
 					ptr[0] = data.tkn[idx[0]][idx[1]]->tail.front;
 					tmp_str = ft_strdup((char *)(ptr[0]->contents));
 					if (tmp_str == T_NULL)
-						resource_free_and_exit(&data);
+						resource_free_and_exit(&data, 1);
 					if (parentheses_heredoc(&info_ptr->heredoc_names, idx, tmp_str) == FALSE)
-						resource_free_and_exit(&data);
-					free(tmp_str);
+						resource_free_and_exit(&data, 1);
+					ft_free1((void **)&tmp_str);
 					ptr[1] = info_ptr->heredoc_names.head.back;
 				}
 				ptr[0] = data.tkn[idx[0]][idx[1]]->head.back;
@@ -399,7 +413,7 @@ int main(int argc, char **argv, char **envp)
 					else  
 						result = heredoc_make1_1(&info_ptr->heredoc_names, idx, tmp_str + 3);
 					if (result == FALSE)
-						resource_free_and_exit(&data);
+						resource_free_and_exit(&data, 1);
 					ptr[0] = ptr[0]->back;
 				}
 			}
@@ -440,21 +454,26 @@ int main(int argc, char **argv, char **envp)
 			if (ao_idx > 0)
 			{
 				if ((data.logic_table[ao_idx - 1] == AND && data.last_exit_code != 0) || (data.logic_table[ao_idx - 1] == OR && data.last_exit_code == 0))
-				{
 					continue;
-				}
 			}
+
+			pp_idx = -1;
+			while (++pp_idx < data.pipe_cnt[ao_idx])
+				if (retrieve_variable_value(&data, data.tkn[ao_idx][pp_idx]) == FALSE)
+					resource_free_and_exit(&data, 1);
 			
-			if (data.pipe_cnt[ao_idx] == 1)
+			if (data.pipe_cnt[ao_idx] == 1
+				&& ((t_cmd_info *)(data.tkn[ao_idx][0]->head.contents))->cp_cnt > 0)
 			{
 				int_tmp = ((t_cmd_info *)(data.tkn[ao_idx][0]->head.contents))->redir_cnt;
 				node_ptr = data.tkn[ao_idx][0]->head.back;
 				node_idx = -1;
 				while (++node_idx < int_tmp)
 					node_ptr = node_ptr->back;
-				func_type = 	is_builtin_func((char *)node_ptr->contents);
+				func_type = is_builtin_func((char *)node_ptr->contents);
 				if (func_type != 0)
 				{
+					
 					continue;
 				}
 			}
@@ -462,7 +481,7 @@ int main(int argc, char **argv, char **envp)
 			
 			data.pp = (int **)ft_calloc(data.pipe_cnt[ao_idx] + 1, sizeof(int *));
 			if (data.pp == T_NULL)
-				resource_free_and_exit(&data);
+				resource_free_and_exit(&data, 1);
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx] + 1)
 			{
@@ -508,9 +527,8 @@ int main(int argc, char **argv, char **envp)
 				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == wait(&data.last_exit_code))
 					set_last_exit_code(&data, (data.last_exit_code >> 8) & 0xFF);
 			}
-			close_pipes(&data, data.pipe_cnt[ao_idx]);
 			free_2d_array((void ***)&data.pp, data.pipe_cnt[ao_idx] + 1);
-			free(data.pid_table);
+			ft_free1((void **)&data.pid_table);
 		}
 
 		sem_close(data.print_sem);
@@ -521,19 +539,18 @@ int main(int argc, char **argv, char **envp)
 		// system("leaks minishell");
 		// printf("\n\n----------------------<6>----------------------\n\n");
 
-		free(data.cmd);
-		dll_clear(&data.envdll, envval_delete_func);
+		ft_free1((void **)&data.cmd);
 		free_2d_array((void ***)&data.ao_split, data.ao_cnt);
 		idx[0] = -1;
 		while (++idx[0] < data.ao_cnt)
 			free_2d_dll(&data.tkn[idx[0]], data.pipe_cnt[idx[0]], str_delete_func);
-		free(data.tkn);
-		free(data.pipe_cnt);
-		free(data.logic_table);
+		ft_free1((void **)&data.tkn);
+		ft_free1((void **)&data.pipe_cnt);
+		ft_free1((void **)&data.logic_table);
 		printf("syntax ok\n\n");
 
-		// printf("\n\n----------------------<7>----------------------\n\n");
-		// system("leaks minishell");
-		// printf("\n\n----------------------<7>----------------------\n\n");
+		printf("\n\n----------------------<7>----------------------\n\n");
+		system("leaks minishell");
+		printf("\n\n----------------------<7>----------------------\n\n");
 	}
 }

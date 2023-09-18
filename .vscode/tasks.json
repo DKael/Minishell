@@ -20,6 +20,7 @@
                 "dll/double_linked_list3.c",
                 "quick_sort.c",
                 "child.c",
+                "builtin_func.c",
                 "-L./gnl",
                 "-lgnl",
                 "-lreadline",

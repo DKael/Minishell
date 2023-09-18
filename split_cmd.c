@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 17:50:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/18 16:18:09 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ void redirect_count(t_dll *dll, char *tkns);
 void find_front(char *tkns, int *pos, int idx);
 void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx);
 t_bool redirect_split(t_dll *dll, char *tkns);
-void redirect_split2_1(char *tkns, char *tmp, int *front, int *back);
-void redirect_split2_2(char *tkns, char *tmp, int *front, int *idx);
+void redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
+void redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
 t_bool parentheses_split(t_dll *dll, char *tkns);
 void remain_count(t_dll *dll, char *tkns);
 t_bool remain_split(t_dll *dll, char *tkns);
@@ -34,15 +34,15 @@ void cmd_split_error(t_data *data, char *cmd)
 {
 	int idx1;
 
-	free(cmd);
+	ft_free1((void **)&cmd);
 	dll_clear(&data->envdll, envval_delete_func);
 	free_2d_array((void ***)&data->ao_split, data->ao_cnt);
 	idx1 = -1;
 	while (++idx1 < data->ao_cnt)
 		free_2d_dll(&data->tkn[idx1], data->pipe_cnt[idx1], str_delete_func);
-	free(data->tkn);
-	free(data->pipe_cnt);
-	free(data->logic_table);
+	ft_free1((void **)&data->tkn);
+	ft_free1((void **)&data->pipe_cnt);
+	ft_free1((void **)&data->logic_table);
 	printf("\n\n----------------------<error>----------------------\n\n");
 	system("leaks minishell");
 	printf("\n\n----------------------<error>----------------------\n\n");
@@ -59,22 +59,24 @@ void *free_2d_array(void ***arr_ptr, int num)
 		tmp = *arr_ptr;
 		idx = -1;
 		while (++idx < num)
-			free(tmp[idx]);
-		free(tmp);
+			ft_free1((void **)&tmp[idx]);
+		ft_free1((void **)&tmp);
 		*arr_ptr = T_NULL;
 	}
 	return (T_NULL);
 }
 
-void *ft_free1(void *ptr)
+void *ft_free1(void **ptr)
 {
-	free(ptr);
+	free(*ptr);
+	*ptr = T_NULL;
 	return (T_NULL);
 }
 
-t_bool ft_free2(void *ptr, t_bool flag)
+t_bool ft_free2(void **ptr, t_bool flag)
 {
-	free(ptr);
+	free(*ptr);
+	*ptr = T_NULL;
 	return (flag);
 }
 
@@ -91,12 +93,12 @@ void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *))
 			if (tmp[idx] != T_NULL)
 			{
 				dll_clear(&((t_cmd_info *)(tmp[idx]->head.contents))->heredoc_names, del);
-				free(tmp[idx]->head.contents);
+				ft_free1((void **)&tmp[idx]->head.contents);
 				dll_clear(tmp[idx], del);
-				free(tmp[idx]);
+				ft_free1((void **)&tmp[idx]);
 			}
 		}
-		free(tmp);
+		ft_free1((void **)&tmp);
 		*dll_ptr = T_NULL;
 	}
 	return (T_NULL);
@@ -141,7 +143,7 @@ void split_cmd(t_data *data, char *cmd)
 	data->logic_table = (t_logic *)ft_calloc(data->ao_cnt - 1, sizeof(t_logic));
 	if (data->logic_table == T_NULL)
 	{
-		free(cmd);
+		ft_free1((void **)&cmd);
 		exit(1);
 	}
 	data->ao_split = split_cmd_by_ao(cmd, data->ao_cnt, data->logic_table);
@@ -351,7 +353,7 @@ t_dll **make_dlls(int pipe_cnt)
 		tmp[idx]->head.contents = ft_calloc(1, sizeof(t_cmd_info));
 		if (tmp[idx]->head.contents == T_NULL)
 		{
-			free(tmp[idx]);
+			ft_free1((void **)&tmp[idx]);
 			return (free_2d_dll(&tmp, idx, T_NULL));
 		}
 		dll_init(&((t_cmd_info *)(tmp[idx]->head.contents))->heredoc_names);
@@ -436,6 +438,7 @@ t_bool redirect_split(t_dll *dll, char *tkns)
 	int pos[4];
 	char *con;
 	t_cmd_info *tmp;
+	t_bool	heredoc_flag;
 
 	tmp = (t_cmd_info *)(dll->head.contents);
 	idx = -1;
@@ -443,15 +446,19 @@ t_bool redirect_split(t_dll *dll, char *tkns)
 	{
 		if (tkns[idx] == '<' || tkns[idx] == '>')
 		{
+			if (tkns[idx + 1] == '<')
+				heredoc_flag = TRUE;
+			else
+				heredoc_flag = FALSE;
 			tmp->redir_cnt++;
 			find_front(tkns, pos, idx);
 			find_back_and_calc_blank_quote(tkns, pos, idx);
 			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2] - pos[3] + 2, sizeof(char));
 			if (con == T_NULL)
 				return (FALSE);
-			redirect_split2_1(tkns, con, &pos[0], &pos[1]);
+			redirect_split2_1(tkns, con, pos, heredoc_flag);
 			if (dll_content_add(dll, (void *)con, 0) == FALSE)
-				return (ft_free2((void *)con, FALSE));
+				return (ft_free2((void **)&con, FALSE));
 			idx = pos[1] - 1;
 		}
 		else if (tkns[idx] == '\"' || tkns[idx] == '\'')
@@ -462,44 +469,43 @@ t_bool redirect_split(t_dll *dll, char *tkns)
 	return (TRUE);
 }
 
-void redirect_split2_1(char *tkns, char *tmp, int *front, int *back)
+void redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag)
 {
 	char char_tmp;
-	int idx;
 	int idx_chk;
 
-	idx_chk = (*front);
-	idx = -1;
-	while ((*front) < (*back))
+	idx_chk = pos[0];
+	pos[2] = -1;
+	while (pos[0] < pos[1])
 	{
-		if (tkns[(*front)] == '\"' || tkns[(*front)] == '\'')
+		if (tkns[pos[0]] == '\"' || tkns[pos[0]] == '\'')
 		{
-			char_tmp = tkns[(*front)];
-			while (tkns[++(*front)] != char_tmp)
+			char_tmp = tkns[pos[0]];
+			while (tkns[++pos[0]] != char_tmp)
 			{
-				if (tkns[(*front)] == '$' && char_tmp == '\"')
-					tkns[(*front)] = -1;
-				tmp[++idx] = tkns[(*front)];
+				if (tkns[pos[0]] == '$' && char_tmp == '\"' && !heredoc_flag)
+					tkns[pos[0]] = -1;
+				tmp[++pos[2]] = tkns[pos[0]];
 			}
 		}
-		else if (ft_isblank(tkns[(*front)]) == FALSE)
-			redirect_split2_2(tkns, tmp, front, &idx);
-		(*front)++;
+		else if (ft_isblank(tkns[pos[0]]) == FALSE)
+			redirect_split2_2(tkns, tmp, pos, heredoc_flag);
+		pos[0]++;
 	}
-	while (idx_chk < (*back))
+	while (idx_chk < pos[1])
 		tkns[idx_chk++] = ' ';
 }
 
-void redirect_split2_2(char *tkns, char *tmp, int *front, int *idx)
+void redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag)
 {
-	if (tkns[(*front)] == '$')
-		tkns[(*front)] = -1;
-	tmp[++(*idx)] = tkns[(*front)];
-	if (tkns[(*front)] == '<' || tkns[(*front)] == '>')
+	if (tkns[pos[0]] == '$' && !heredoc_flag)
+		tkns[pos[0]] = -1;
+	tmp[++pos[2]] = tkns[pos[0]];
+	if (tkns[pos[0]] == '<' || tkns[pos[0]] == '>')
 	{
-		if (tkns[(*front) + 1] == '<' || tkns[(*front) + 1] == '>')
-			tmp[++(*idx)] = tkns[++(*front)];
-		tmp[++(*idx)] = ' ';
+		if (tkns[pos[0] + 1] == '<' || tkns[pos[0] + 1] == '>')
+			tmp[++pos[2]] = tkns[++pos[0]];
+		tmp[++pos[2]] = ' ';
 	}
 }
 
@@ -537,7 +543,7 @@ t_bool parentheses_split(t_dll *dll, char *tkns)
 			if (tmp == T_NULL)
 				return (FALSE);
 			if (dll_content_add(dll, (void *)tmp, 0) == FALSE)
-				return (ft_free2(tmp, FALSE));
+				return (ft_free2((void **)&tmp, FALSE));
 			while (idx_chk <= idx)
 				tkns[idx_chk++] = ' ';
 		}
@@ -556,7 +562,7 @@ t_bool parentheses_split(t_dll *dll, char *tkns)
 // 	{
 // 		if (ft_isblank(tkns[idx]) == FALSE)
 // 		{
-// 			tmp->ip_cnt++;
+// 			tmp->cp_cnt++;
 // 			while (ft_isblank(tkns[idx]) == FALSE && tkns[idx] != '\0')
 // 			{
 // 				if (tkns[idx] == '\"' || tkns[idx] == '\'')
@@ -567,7 +573,7 @@ t_bool parentheses_split(t_dll *dll, char *tkns)
 // 				break;
 // 		}
 // 	}
-// 	tmp->size = tmp->redir_cnt + tmp->ip_cnt;
+// 	tmp->size = tmp->redir_cnt + tmp->cp_cnt;
 // }
 
 t_bool remain_split(t_dll *dll, char *tkns)
@@ -581,7 +587,7 @@ t_bool remain_split(t_dll *dll, char *tkns)
 	{
 		if (ft_isblank(tkns[idx[0]]) == FALSE)
 		{
-			tmp->ip_cnt++;
+			tmp->cp_cnt++;
 			idx[2] = 0;
 			idx[1] = idx[0];
 			while (ft_isblank(tkns[idx[0]]) == FALSE && tkns[idx[0]] != '\0')
@@ -599,7 +605,7 @@ t_bool remain_split(t_dll *dll, char *tkns)
 		else
 			idx[0]++;
 	}
-	tmp->size = tmp->redir_cnt + tmp->ip_cnt;
+	tmp->size = tmp->redir_cnt + tmp->cp_cnt;
 	return (TRUE);
 }
 
@@ -635,180 +641,6 @@ t_bool remain_split2(t_dll *dll, char *tkns, int *idx)
 		idx[1]++;
 	}
 	if (dll_content_add(dll, (void *)tmp, 0) == FALSE)
-		return (ft_free2(tmp, FALSE));
+		return (ft_free2((void **)&tmp, FALSE));
 	return (TRUE);
 }
-
-// int redir_idx;
-// int idx2;
-// int quote_cnt;
-// t_dll temp_dll;
-// int ip_idx;
-// int expansion_len;
-// t_dollor_tmp *dollor_tmp;
-// t_dllnode *node_ptr;
-// char **temp_2d;
-// int dollor_idx;
-// char *str_temp;
-
-// cmd_idx = -1;
-// dll_init(&temp_dll);
-// while (++cmd_idx < data->cmd_cnt)
-// {
-
-// 	tmp_ptr = tmp[cmd_idx];
-// 	idx = 0;
-// 	redir_idx = 0;
-
-// 	// after doing all above action, in tmp_ptr string, only command, options, parameters are remain.
-
-// 	ip_idx = data->cmd_infos[cmd_idx].redir_cnt;
-// 	idx = 0;
-// 	while (tmp_ptr[idx] != '\0')
-// 	{
-// 		if (ft_isblank(tmp_ptr[idx]) == FALSE)
-// 		{
-// 			quote_cnt = 0;
-// 			expansion_len = 0;
-// 			idx_chk = idx;
-// 			while (ft_isblank(tmp_ptr[idx]) == FALSE && tmp_ptr[idx] != '\0')
-// 			{
-// 				if (tmp_ptr[idx] == '\"' || tmp_ptr[idx] == '\'')
-// 				{
-// 					quote_cnt += 2;
-// 					char_tmp = tmp_ptr[idx];
-// 					while (tmp_ptr[++idx] != char_tmp)
-// 					{
-// 						if (char_tmp == '\"' && tmp_ptr[idx] == '$' && ft_isblank(tmp_ptr[idx + 1]) == FALSE)
-// 						{
-// 							dollor_idx = idx;
-// 							dollor_tmp = (t_dollor_tmp *)malloc(sizeof(t_dollor_tmp));
-// 							if (dollor_tmp == T_NULL)
-// 								exit(1);
-// 							dollor_tmp->name = get_dollor_parameter(&tmp_ptr[idx], &idx);
-// 							if (dollor_tmp->name == (char *)-1)
-// 								exit(1);
-// 							else if (dollor_tmp->name == T_NULL)
-// 							{
-// 								free_2d_array(&tmp, data->cmd_cnt);
-// 								free_2d_array(&data->cmd[cmd_idx], ip_idx);
-// 								idx = -1;
-// 								while (++idx < cmd_idx)
-// 									free_2d_array(&data->cmd[idx], data->cmd_infos[idx].size);
-// 								free(data->cmd);
-// 								free(data->cmd_infos);
-// 								free(cmd);
-// 								return;
-// 							}
-// 							dollor_tmp->value = ft_getenv(data, dollor_tmp->name);
-// 							dollor_tmp->idx_jump = (idx - dollor_idx + 1);
-// 							expansion_len -= (idx - dollor_idx + 1);
-// 							if (dollor_tmp->value != T_NULL)
-// 								expansion_len += ft_strlen(dollor_tmp->value);
-// 							else if (dollor_tmp->value == (char *)-1)
-// 								exit(1);
-// 							else
-// 								dollor_tmp->value = "";
-// 							node_ptr = dll_new_node((void *)dollor_tmp);
-// 							if (node_ptr == T_NULL)
-// 								exit(1);
-// 							dll_add_tail(&temp_dll, node_ptr);
-// 						}
-// 					}
-// 				}
-// 				else if (tmp_ptr[idx] == '$' && ft_isblank(tmp_ptr[idx + 1]) == FALSE && tmp_ptr[idx + 1] != '\0')
-// 				{
-// 					dollor_idx = idx;
-// 					dollor_tmp = (t_dollor_tmp *)malloc(sizeof(t_dollor_tmp));
-// 					if (dollor_tmp == T_NULL)
-// 						exit(1);
-// 					dollor_tmp->name = get_dollor_parameter(&tmp_ptr[idx], &idx);
-// 					if (dollor_tmp->name == (char *)-1)
-// 						exit(1);
-// 					else if (dollor_tmp->name == T_NULL)
-// 					{
-// 						free_2d_array(&tmp, data->cmd_cnt);
-// 						free_2d_array(&data->cmd[cmd_idx], ip_idx);
-// 						idx = -1;
-// 						while (++idx < cmd_idx)
-// 							free_2d_array(&data->cmd[idx], data->cmd_infos[idx].size);
-// 						free(data->cmd);
-// 						free(data->cmd_infos);
-// 						free(cmd);
-// 						return;
-// 					}
-// 					dollor_tmp->value = ft_getenv(data, dollor_tmp->name);
-// 					dollor_tmp->idx_jump = (idx - dollor_idx + 1);
-// 					expansion_len -= (idx - dollor_idx + 1);
-// 					if (dollor_tmp->value != T_NULL)
-// 						expansion_len += ft_strlen(dollor_tmp->value);
-// 					else if (dollor_tmp->value == (char *)-1)
-// 						exit(1);
-// 					else
-// 						dollor_tmp->value = "";
-// 					node_ptr = dll_new_node((void *)dollor_tmp);
-// 					if (node_ptr == T_NULL)
-// 						exit(1);
-// 					dll_add_tail(&temp_dll, node_ptr);
-// 				}
-// 				idx++;
-// 			}
-// 			data->cmd[cmd_idx][ip_idx] = (char *)ft_calloc(idx - idx_chk - quote_cnt + expansion_len + 1, sizeof(char));
-// 			if (data->cmd[cmd_idx][ip_idx] == T_NULL)
-// 			{
-// 				free_2d_array(&tmp, data->cmd_cnt);
-// 				free_2d_array(&data->cmd[cmd_idx], ip_idx);
-// 				idx = -1;
-// 				while (++idx < cmd_idx)
-// 					free_2d_array(&data->cmd[idx], data->cmd_infos[idx].size);
-// 				free(data->cmd);
-// 				free(data->cmd_infos);
-// 				free(cmd);
-// 				exit(1);
-// 			}
-// 			int idx3;
-
-// 			idx2 = -1;
-// 			node_ptr = temp_dll.head.back;
-// 			while (idx_chk < idx)
-// 			{
-// 				if (tmp_ptr[idx_chk] == '$')
-// 				{
-// 					str_temp = ((t_dollor_tmp *)(node_ptr->contents))->value;
-// 					idx3 = -1;
-// 					while (str_temp[++idx3] != '\0')
-// 						data->cmd[cmd_idx][ip_idx][++idx2] = str_temp[idx3];
-// 					idx_chk += (((t_dollor_tmp *)(node_ptr->contents))->idx_jump - 1);
-// 					node_ptr = node_ptr->back;
-// 				}
-// 				else if (tmp_ptr[idx_chk] == '\"')
-// 				{
-// 					while (tmp_ptr[++idx] != '\"')
-// 					{
-// 						if (tmp_ptr[idx_chk] == '$')
-// 						{
-// 							str_temp = ((t_dollor_tmp *)(node_ptr->contents))->value;
-// 							idx3 = -1;
-// 							while (str_temp[++idx3] != '\0')
-// 								data->cmd[cmd_idx][ip_idx][++idx2] = str_temp[idx3];
-// 							idx_chk += (((t_dollor_tmp *)(node_ptr->contents))->idx_jump - 1);
-// 							node_ptr = node_ptr->back;
-// 						}
-// 						else
-// 							data->cmd[cmd_idx][ip_idx][++idx2] = tmp_ptr[idx_chk];
-// 					}
-// 				}
-// 				else if (tmp_ptr[idx_chk] != '\'')
-// 					data->cmd[cmd_idx][ip_idx][++idx2] = tmp_ptr[idx_chk];
-// 				idx_chk++;
-// 			}
-// 			ip_idx++;
-// 			if (tmp_ptr[idx] == '\0' || ip_idx == data->cmd_infos[cmd_idx].size)
-// 				break;
-// 		}
-// 		idx++;
-// 		dll_clear(&temp_dll, envval_delete_func);
-// 	}
-// }
-// free_2d_array(&tmp, data->cmd_cnt);
-// }

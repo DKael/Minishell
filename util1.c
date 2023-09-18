@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 15:07:18 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/18 16:10:15 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,6 +203,35 @@ t_bool	ft_isdigit(int c)
 	return (FALSE);
 }
 
+int	ft_atoi(const char *str)
+{
+	int			idx;
+	int			sign;
+	long long	nb;
+
+	idx = 0;
+	sign = 1;
+	nb = 0;
+	while ((9 <= str[idx] && str[idx] <= 13) || str[idx] == ' ')
+		idx++;
+	if (str[idx] == '-' || str[idx] == '+')
+		if (str[idx++] == '-')
+			sign = -1;
+	while ('0' <= str[idx] && str[idx] <= '9')
+	{
+		if (nb > LLONG_MAX / 10 || (nb == LLONG_MAX / 10 && str[idx] - '0' > 7))
+		{
+			if (sign == 1)
+				return (-1);
+			else
+				return (0);
+		}
+		nb = nb * 10 + (str[idx++] - '0');
+	}
+	return ((int)nb * sign);
+}
+
+
 void	str_delete_func(void *str)
 {
 	char	*temp;
@@ -210,7 +239,7 @@ void	str_delete_func(void *str)
 	if (str != T_NULL)
 	{
 		temp = (char *)str;
-		free(temp);
+		ft_free1((void **)&temp);
 	}
 }
 
@@ -221,8 +250,8 @@ void	envval_delete_func(void *envval)
 	if (envval != T_NULL)
 	{
 		temp = (t_envval *)envval;
-		free(temp->name);
-		free(temp->value);
-		free(temp);
+		ft_free1((void **)&temp->name);
+		ft_free1((void **)&temp->value);
+		ft_free1((void **)&temp);
 	}
 }

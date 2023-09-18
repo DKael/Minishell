@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 00:25:24 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/18 10:55:11 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,12 +112,12 @@ static t_bool wait_for_additional_cmd(char **cmd_ptr, char *cmd)
 		}
 		else if (buffer[0] == '\0')
 		{
-			free(buffer);
+			ft_free1((void **)&buffer);
 			continue;
 		}
 		temp = ft_strjoin(cmd, buffer);
-		free(buffer);
-		free(cmd);
+		ft_free1((void **)buffer);
+		ft_free1((void **)cmd);
 		*cmd_ptr = temp;
 		if (temp == T_NULL)
 		{
@@ -167,16 +167,16 @@ t_bool case_lts_gts(char *cmd, int *idx)
 		if (temp == T_NULL)
 		{
 			printf("minishell: malloc error!\n");
-			free(cmd);
+			ft_free1((void **)cmd);
 			exit(1);
 		}
 		if (ft_isdecimal(temp) == TRUE)
 		{
 			syntax_error_print(temp);
-			free(temp);
+			ft_free1((void **)temp);
 			return (FALSE);
 		}
-		free(temp);
+		ft_free1((void **)temp);
 	}
 	return (TRUE);
 }

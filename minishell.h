@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 20:01:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/18 16:08:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,6 @@ typedef enum e_logic
 
 typedef struct s_dollor_tmp
 {
-	char *name;
 	char *value;
 	int idx_jump;
 }	t_dollor_tmp;
@@ -80,7 +79,7 @@ typedef struct s_cmd_info
 	
 	t_bool	parentheses_flag;
 	t_bool cmd_flag;
-	int		ip_cnt;
+	int		cp_cnt;
 	
 }	t_cmd_info;
 
@@ -102,7 +101,7 @@ typedef struct s_data
 	t_dll 	envdll;
 	t_dll	sorted_envdll;
 	
-	char		*builtin_func[6];
+	int		(*builtin_func[6])(char **);
 
 
 	sem_t *print_sem;
@@ -134,14 +133,22 @@ t_bool ft_isdecimal(char *str);
 t_bool	ft_isndecimal(char *str, int n);
 char *ft_strndup(char *src, size_t n);
 int	ft_strcmp(const char *s1, const char *s2);
+int	ft_strncmp(const char *s1, const char *s2, size_t n);
 void	*ft_calloc(size_t count, size_t size);
 char	*ft_itoa(int n);
+int	ft_atoi(const char *str);
 t_bool	ft_isblank(char c);
 char	**ft_split(char const *s, char c);
 long long	ft_atoll(const char *str);
 char	*ft_strstr(char *str, char *to_find);
+size_t	ft_strlcpy(char *dst, const char *src, size_t dsize);
+char	*ft_strcpy(char *dest, char *src);
+char	*ft_strncpy(char *dest, char *src, unsigned int n);
+
+t_bool	retrieve_variable_value(t_data *data, t_dll *tkns);
 char *ft_getenv(t_data *data, const char *name);
 char *get_dollor_parameter(char *cmd, int *origin_idx);
+
 void	str_delete_func(void *log);
 char	*ft_strdup(char *src);
 
@@ -153,14 +160,21 @@ void	envval_delete_func(void *str);
 t_bool	heredoc_make1_1(t_dll *dll, int *idx, char *del);
 t_bool	heredoc_make1_2(t_dll *dll, t_dllnode *ptr, int *idx, char *del);
 
-t_bool redirect_split(t_dll *dll, char *tkns);
-void redirect_split2_1(char *tkns, char *tmp, int *front, int *back);
-void redirect_split2_2(char *tkns, char *tmp, int *front, int *idx);
+
+void redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
+void redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
 void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx);
 void find_front(char *tkns, int *pos, int idx);
 
-void *ft_free1(void *ptr);
-t_bool ft_free2(void *ptr, t_bool flag);
+void *ft_free1(void **ptr);
+t_bool ft_free2(void **ptr, t_bool flag);
 
 void	child(t_data *data, int ao_idx, int pp_idx);
+
+int	ft_echo(char **input);
+int	ft_cd(char **input);
+int	ft_export(char **input);
+int	ft_unset(char **input);
+int	ft_pwd(char **input);
+int	ft_exit(char **input);
 #endif

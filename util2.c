@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:31:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 10:41:51 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/18 15:31:05 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,4 +150,63 @@ char	*ft_strstr(char *str, char *to_find)
 		str_index++;
 	}
 	return (T_NULL);
+}
+
+size_t	ft_strlcpy(char *dst, const char *src, size_t dsize)
+{
+	size_t	index;
+	size_t	index1;
+
+	index = 0;
+	index1 = -1;
+	while (src[index] != '\0')
+		index++;
+	if (index >= dsize)
+	{
+		while (++index1 + 1 < dsize)
+			dst[index1] = src[index1];
+	}
+	else
+	{
+		while (src[++index1] != '\0')
+			dst[index1] = src[index1];
+	}
+	if (dsize != 0)
+		dst[index1] = '\0';
+	return (index);
+}
+
+char	*ft_strcpy(char *dest, char *src)
+{
+	int	index;
+
+	index = 0;
+	while (src[index] != '\0')
+	{
+		dest[index] = src[index];
+		index++;
+	}
+	dest[index] = '\0';
+	return (dest);
+}
+
+char	*ft_strncpy(char *dest, char *src, unsigned int n)
+{
+	unsigned int	index;
+
+	index = 0;
+	while (index < n && src[index] != '\0')
+	{
+		dest[index] = src[index];
+		index++;
+	}
+	if (index < n)
+	{
+		while (index < n)
+		{
+			dest[index] = '\0';
+			index++;
+		}
+	}
+	return (dest);
 }
