@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 16:42:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/18 18:05:20 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -495,6 +495,8 @@ int main(int argc, char **argv, char **envp)
 				if (pipe(data.pp[pp_idx]) == -1)
 					on_execution_part_error(&data, pp_idx, data.pipe_cnt[ao_idx] + 1);
 			}
+			data.pp[0][0] = 0;
+			data.pp[data.pipe_cnt[ao_idx]][1] = 1;
 
 			data.pid_table = (pid_t *)ft_calloc(data.pipe_cnt[ao_idx], sizeof(pid_t));
 			if (data.pid_table == T_NULL)
