@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 17:10:38 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/19 23:17:40 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,11 @@ char *get_dollor_parameter(char *cmd, int *idx)
 		while (cmd[++(*idx)] != '}')
 			;
 		result = (char *)ft_strndup(&cmd[idx_chk], (*idx) - idx_chk);
+	}
+	else if (cmd[(*idx) + 1] == '?')
+	{
+		(*idx)++;
+		return ((char *)ft_strdup("?"));
 	}
 	else
 	{

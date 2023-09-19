@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:16:13 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 14:51:37 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/19 22:59:15 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,13 +49,15 @@ t_bool		dll_add_back(t_dll *dll, t_dllnode *node, t_dllnode *new);
 void		dll_swap_node_contents(t_dllnode *node1, t_dllnode *node2);
 void		dll_clear(t_dll *dll, void (*del)(void *));
 t_dllnode	*dll_new_node(void *contents);
-void		dll_del_node(t_dll *dll, t_dllnode *node, void (*del)(void *));
 int			dll_node_compare(t_dllnode *n1, t_dllnode *n2,
 				int (*compare)(t_dllnode *, t_dllnode *));
+void		dll_del_node(t_dll *dll, t_dllnode *node, void (*del)(void *));
 void		dll_node_move_to_another_dll_head(t_dllnode *n,
 				t_dll *dll1, t_dll *dll2);
+t_bool		dll_node_move_to_head(t_dllnode *node, t_dll *dll);
 void		dll_node_move_to_another_dll_tail(t_dllnode *n,
 				t_dll *dll1, t_dll *dll2);
+t_bool		dll_node_move_to_tail(t_dllnode *node, t_dll *dll);
 t_bool		dll_content_add(t_dll *dll, void *content, int mode);
 t_bool		dll_content_add2(t_dll *dll, void *content, t_dllnode *ptr, int mode);
 void		dll_print(t_dll *dll, void (*print)(void *));

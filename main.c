@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 18:05:20 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/19 23:59:37 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ void	envdll_sorting(t_data *data);
 
 void data_init(t_data *data, char *program_name, char **envp)
 {
+	int	idx;
+
 	data->program_name = program_name;
 	data->envp = envp;
 	set_last_exit_code(data, 0);
@@ -30,6 +32,12 @@ void data_init(t_data *data, char *program_name, char **envp)
 	data->builtin_func[3] = ft_unset;
 	data->builtin_func[4] = ft_pwd;
 	data->builtin_func[5] = ft_exit;
+	data->old_stdin = 253;
+	data->old_stdout = 254;
+	data->old_stderr = 255;
+	idx = -1;
+	while (++idx < 256)
+		data->opened_fd[idx] = -1;
 	dll_init(&data->envdll);
 	dll_init(&data->sorted_envdll);
 	store_env_in_dll(data, envp);
@@ -37,6 +45,8 @@ void data_init(t_data *data, char *program_name, char **envp)
 
 void data_cycle_init(t_data *data)
 {
+	int	idx;
+	
 	data->cmd = T_NULL;
 	data->tkn = T_NULL;
 	data->ao_cnt = 0;
@@ -44,6 +54,9 @@ void data_cycle_init(t_data *data)
 	data->pp = T_NULL;
 	data->pid_table = T_NULL;
 	data->logic_table = T_NULL;
+	idx = -1;
+	while (data->opened_fd[++idx] != -1)
+		data->opened_fd[idx] = -1;
 }
 
 void set_last_exit_code(t_data *data, int input_exit_code)
@@ -240,10 +253,12 @@ void	close_pipes(t_data *data, int num)
 	}
 }
 
-void resource_free_and_exit(t_data *data, int exit_code)
+void resource_free_and_exit(t_data *data, int exit_code, char *msg)
 {
 	int idx;
 
+	if (msg != T_NULL)
+		err_msg_print1(msg);
 	ft_free1((void **)&data->cmd);
 	dll_clear(&data->envdll, envval_delete_func);
 	dll_clear(&data->sorted_envdll, T_NULL);
@@ -255,15 +270,16 @@ void resource_free_and_exit(t_data *data, int exit_code)
 	ft_free1((void **)&data->pipe_cnt);
 	ft_free1((void **)&data->logic_table);
 	ft_free1((void **)&data->pid_table);
+	opened_fd_close(data);
 	exit(exit_code);
 }
 
-void	 on_execution_part_error(t_data *data, int pp_make_cnt, int pp_cnt)
+void	 on_execution_part_error(t_data *data, int pp_make_cnt, int pp_cnt, char *msg)
 {
 	close_pipes(data, pp_make_cnt);
 	free_2d_array((void ***)&data->pp, pp_cnt);
 	ft_free1((void **)&data->pid_table);
-	resource_free_and_exit(data, 1);
+	resource_free_and_exit(data, 1, msg);
 }
 
 int	is_builtin_func(char *cmd)
@@ -282,6 +298,28 @@ int	is_builtin_func(char *cmd)
 		return (6);
 	else
 		return (0);
+}
+
+void total_heredoc_cnt_chk(char *cmd)
+{
+	int idx;
+	int	heredoc_cnt;
+
+	heredoc_cnt = 0;
+	idx = -1;
+	while (cmd[++idx] != '\0')
+	{
+		if (cmd[idx] == '<' && cmd[idx + 1] == '<')
+		{
+			heredoc_cnt++;
+			if (heredoc_cnt > 16)
+			{
+				free(cmd);
+				printf("minishell: maximum here-document count exceeded\n");
+				exit(2);
+			}
+		}
+	}
 }
 
 int main(int argc, char **argv, char **envp)
@@ -377,6 +415,7 @@ int main(int argc, char **argv, char **envp)
 			ft_free1((void **)&data.cmd);
 			continue;
 		}
+		total_heredoc_cnt_chk(data.cmd);
 		split_cmd(&data, data.cmd);
 
 		
@@ -392,9 +431,9 @@ int main(int argc, char **argv, char **envp)
 					ptr[0] = data.tkn[idx[0]][idx[1]]->tail.front;
 					tmp_str = ft_strdup((char *)(ptr[0]->contents));
 					if (tmp_str == T_NULL)
-						resource_free_and_exit(&data, 1);
+						resource_free_and_exit(&data, 1, "malloc error");
 					if (parentheses_heredoc(&info_ptr->heredoc_names, idx, tmp_str) == FALSE)
-						resource_free_and_exit(&data, 1);
+						resource_free_and_exit(&data, 1, "here document error");
 					ft_free1((void **)&tmp_str);
 					ptr[1] = info_ptr->heredoc_names.head.back;
 				}
@@ -413,7 +452,7 @@ int main(int argc, char **argv, char **envp)
 					else  
 						result = heredoc_make1_1(&info_ptr->heredoc_names, idx, tmp_str + 3);
 					if (result == FALSE)
-						resource_free_and_exit(&data, 1);
+						resource_free_and_exit(&data, 1, "here document error");
 					ptr[0] = ptr[0]->back;
 				}
 			}
@@ -460,7 +499,7 @@ int main(int argc, char **argv, char **envp)
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 				if (retrieve_variable_value(&data, data.tkn[ao_idx][pp_idx]) == FALSE)
-					resource_free_and_exit(&data, 1);
+					resource_free_and_exit(&data, 1, "malloc error");
 			
 			if (data.pipe_cnt[ao_idx] == 1
 				&& ((t_cmd_info *)(data.tkn[ao_idx][0]->head.contents))->cp_cnt > 0)
@@ -473,7 +512,27 @@ int main(int argc, char **argv, char **envp)
 				func_type = is_builtin_func((char *)node_ptr->contents);
 				if (func_type != 0)
 				{
+					if (int_tmp != 0 && (basic_redirection_save(&data) == FALSE))
+						resource_free_and_exit(&data, 1, "redirection error");
+
+					result = sign_redirection(&data, data.tkn[ao_idx][0]);
+					if (result == 1)
+					{
+						set_last_exit_code(&data, 1);
+						break;
+					}
+					else if (result == 2)
+						resource_free_and_exit(&data, 1, "file open error");
+					else if (result == 3)
+						resource_free_and_exit(&data, 1, "redirection error");
+					else if (result == 4)
+						resource_free_and_exit(&data, 1, "stat() error");
+
 					
+
+					opened_fd_close(&data);
+					if (int_tmp != 0 && basic_redirection_recover(&data) == FALSE)
+						resource_free_and_exit(&data, 1, "redirection error");
 					continue;
 				}
 			}
@@ -481,26 +540,26 @@ int main(int argc, char **argv, char **envp)
 			
 			data.pp = (int **)ft_calloc(data.pipe_cnt[ao_idx] + 1, sizeof(int *));
 			if (data.pp == T_NULL)
-				resource_free_and_exit(&data, 1);
+				resource_free_and_exit(&data, 1, "malloc error");
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx] + 1)
 			{
 				data.pp[pp_idx] = (int *)ft_calloc(2, sizeof(int));
 				if (data.pp[pp_idx] == T_NULL)
-					on_execution_part_error(&data, 0, pp_idx);
+					on_execution_part_error(&data, 0, pp_idx, "malloc error");
 			}
 			pp_idx = 0;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 			{
 				if (pipe(data.pp[pp_idx]) == -1)
-					on_execution_part_error(&data, pp_idx, data.pipe_cnt[ao_idx] + 1);
+					on_execution_part_error(&data, pp_idx, data.pipe_cnt[ao_idx] + 1, "pipe error");
 			}
 			data.pp[0][0] = 0;
 			data.pp[data.pipe_cnt[ao_idx]][1] = 1;
 
 			data.pid_table = (pid_t *)ft_calloc(data.pipe_cnt[ao_idx], sizeof(pid_t));
 			if (data.pid_table == T_NULL)
-				on_execution_part_error(&data, data.pipe_cnt[ao_idx], data.pipe_cnt[ao_idx] + 1);
+				on_execution_part_error(&data, data.pipe_cnt[ao_idx], data.pipe_cnt[ao_idx] + 1, "malloc error");
 
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
@@ -513,7 +572,7 @@ int main(int argc, char **argv, char **envp)
 						kill(data.pid_table[pp_idx], SIGTERM);
 						wait(T_NULL);
 					}
-					on_execution_part_error(&data, data.pipe_cnt[ao_idx], data.pipe_cnt[ao_idx] + 1);
+					on_execution_part_error(&data, data.pipe_cnt[ao_idx], data.pipe_cnt[ao_idx] + 1, "fork error");
 				}
 				else if (data.pid_table[pp_idx] == 0)
 				{

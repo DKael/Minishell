@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 17:53:12 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/20 00:36:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,20 @@
 typedef int t_bool;
 typedef	struct stat t_stat;
 
+typedef	enum s_file_type
+{
+	REGULAR_FILE,
+	DIRECTORY,
+	SYMBOLIC_LINK,
+	ETC
+}	t_file_type;
+typedef struct s_file_info
+{
+	t_stat		bf;
+	t_file_type type;
+	int			mode;
+}	t_file_info;
+
 typedef	struct s_srt
 {
 	char *name;
@@ -59,6 +73,11 @@ typedef enum e_logic
 	AND = 1,
 	OR = 2
 }	t_logic;
+
+typedef	struct s_child_data
+{
+	
+}	t_child_data;
 
 typedef struct s_dollor_tmp
 {
@@ -103,6 +122,10 @@ typedef struct s_data
 	
 	int		(*builtin_func[6])(char **);
 
+	int	old_stdin;
+	int	old_stdout;
+	int	old_stderr;
+	int	opened_fd[256];
 
 	sem_t *print_sem;
 
@@ -111,8 +134,15 @@ typedef struct s_data
 void dll_str_print_func(void *content);
 void dll_env_print_func(void *content);
 
+void	close_pipes(t_data *data, int num);
+int	is_builtin_func(char *cmd);
+
 t_bool syntax_error_print(char *chr);
+void	err_msg_print1(char *m1);
+void	err_msg_print2(char *m1, char *m2);
+void	err_msg_print3(char *m1, char *m2, char *m3);
 void message_exit(const char *msg, int exit_code);
+
 void *free_2d_array(void ***arr_ptr, int num);
 void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 
@@ -144,6 +174,7 @@ char	*ft_strstr(char *str, char *to_find);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dsize);
 char	*ft_strcpy(char *dest, char *src);
 char	*ft_strncpy(char *dest, char *src, unsigned int n);
+void	ft_putnbr_fd(int n, int fd);
 
 t_bool	retrieve_variable_value(t_data *data, t_dll *tkns);
 char *ft_getenv(t_data *data, const char *name);
@@ -170,6 +201,12 @@ void *ft_free1(void **ptr);
 t_bool ft_free2(void **ptr, t_bool flag);
 
 void	child(t_data *data, int ao_idx, int pp_idx);
+
+int sign_redirection(t_data *data, t_dll *tkns);
+t_bool pipe_redirection(t_data *data, int ao_idx, int pp_idx);
+t_bool basic_redirection_save(t_data *data);
+t_bool basic_redirection_recover(t_data *data);
+void	opened_fd_close(t_data *data);
 
 int	ft_echo(char **input);
 int	ft_cd(char **input);
