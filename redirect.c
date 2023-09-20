@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/18 17:25:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/20 00:10:59 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/20 16:06:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ t_bool pipe_redirection(t_data *data, int ao_idx, int pp_idx)
 			return (TRUE);
 		}
 	}
+	close_pipes(data, data->pipe_cnt[ao_idx]);
 	return (FALSE);
 }
 

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/17 16:28:59 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/20 00:39:25 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/20 12:05:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,14 +79,14 @@ void child(t_data *data, int ao_idx, int pp_idx)
 			envp_lst = make_2d_array_from_dll(&data->envdll);
 			if (argu_lst == T_NULL || envp_lst == T_NULL)
 			{
-				free_2d_array2(argu_lst);
-				free_2d_array2(envp_lst);
+				free(argu_lst);
+				free(envp_lst);
 				resource_free_and_exit(data, 1, "malloc error");
 			}
 			if (execve(cmd_path, argu_lst, envp_lst) == -1)
 			{
-				free_2d_array2(argu_lst);
-				free_2d_array2(envp_lst);
+				free(argu_lst);
+				free(envp_lst);
 				resource_free_and_exit(data, 1, "malloc error");
 			}
 		}
