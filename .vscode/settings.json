@@ -23,6 +23,8 @@
 		"__hash_table": "c",
 		"unordered_map": "c",
 		"__string": "c",
-		"ios": "c"
+		"ios": "c",
+		"__mutex_base": "c",
+		"atomic": "c"
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/20 00:21:51 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 09:22:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,10 +263,10 @@ t_dll **tokenize(char *tkns, int *pipe_cnt)
 	if (tkn_part == T_NULL)
 		return (free_2d_array((void ***)&split_tmp, (*pipe_cnt)));
 
-	printf("\n\ntkns : %s\n", tkns);
-	for (int i = 0; i < (*pipe_cnt); i++)
-		printf("_%s_\n", split_tmp[i]);
-	printf("\n");
+	// printf("\n\ntkns : %s\n", tkns);
+	// for (int i = 0; i < (*pipe_cnt); i++)
+	// 	printf("_%s_\n", split_tmp[i]);
+	// printf("\n");
 
 	idx = -1;
 	while (++idx < (*pipe_cnt))

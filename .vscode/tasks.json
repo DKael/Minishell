@@ -21,6 +21,8 @@
                 "quick_sort.c",
                 "child.c",
                 "builtin_func.c",
+                "redirect.c",
+                "-g",
                 "-L./gnl",
                 "-lgnl",
                 "-lreadline",

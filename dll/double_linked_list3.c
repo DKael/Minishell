@@ -6,13 +6,13 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/19 22:58:16 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 09:19:04 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "double_linked_list.h"
 
-static t_bool	dll_del_node2(t_dll *dll, t_dllnode *node, void (*del)(void *));
+static t_bool	dll_del_node2(t_dllnode *node, void (*del)(void *));
 static void	dll_node_move_to_another_dll_head2(t_dllnode *node, t_dll *dll1);
 static void	dll_node_move_to_another_dll_tail2(t_dllnode *node, t_dll *dll1);
 
@@ -54,12 +54,12 @@ t_bool	dll_del_node(t_dll *dll, t_dllnode *node, void (*del)(void *))
 			node->front->back = node->back;
 			node->back->front = node->front;
 		}
-		return (dll_del_node2(dll, node, del));
+		return (dll_del_node2(node, del));
 	}
 	return (FALSE);
 }
 
-static t_bool	dll_del_node2(t_dll *dll, t_dllnode *node, void (*del)(void *))
+static t_bool	dll_del_node2(t_dllnode *node, void (*del)(void *))
 {
 	if (del != T_NULL)
 	{

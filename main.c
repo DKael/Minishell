@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/19 23:59:37 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 12:34:58 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -340,6 +340,8 @@ int main(int argc, char **argv, char **envp)
 	int	int_tmp;
 	int	func_type;
 
+	pid_t pid_result;
+
 	if (argc != 1)
 	{
 		printf("minishell: don't support file read or need any other inputs\n");
@@ -459,24 +461,24 @@ int main(int argc, char **argv, char **envp)
 		}
 
 		// Print result to check all code work fine. It will be deleted at the end.
-		printf("\n------------------------------------\n");
+		// printf("\n------------------------------------\n");
 
-		for (int i = 0; i < data.ao_cnt; i++)
-		{
-			for (int j = 0; j < data.pipe_cnt[i]; j++)
-			{
-				printf("<heredoc %d_%d>\n", i, j);
-				dll_print(&((t_cmd_info *)(data.tkn[i][j]->head.contents))->heredoc_names, dll_str_print_func);
-				printf("------------------------\n");
-				ptr[0] = data.tkn[i][j]->head.back;
-				while (ptr[0] != &data.tkn[i][j]->tail)
-				{
-					printf("%s\n", (char *)ptr[0]->contents);
-					ptr[0] = ptr[0]->back;
-				}
-				printf("\n\n");
-			}
-		}
+		// for (int i = 0; i < data.ao_cnt; i++)
+		// {
+		// 	for (int j = 0; j < data.pipe_cnt[i]; j++)
+		// 	{
+		// 		printf("<heredoc %d_%d>\n", i, j);
+		// 		dll_print(&((t_cmd_info *)(data.tkn[i][j]->head.contents))->heredoc_names, dll_str_print_func);
+		// 		printf("------------------------\n");
+		// 		ptr[0] = data.tkn[i][j]->head.back;
+		// 		while (ptr[0] != &data.tkn[i][j]->tail)
+		// 		{
+		// 			printf("%s\n", (char *)ptr[0]->contents);
+		// 			ptr[0] = ptr[0]->back;
+		// 		}
+		// 		printf("\n\n");
+		// 	}
+		// }
 
 		// execution part
 
@@ -585,8 +587,11 @@ int main(int argc, char **argv, char **envp)
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 			{
-				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == wait(&data.last_exit_code))
+				pid_result = wait(&data.last_exit_code);
+				printf("%d_%d process's exit code : %d\n", ao_idx, pp_idx, (data.last_exit_code >> 8) & 0xFF);
+				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == pid_result)
 					set_last_exit_code(&data, (data.last_exit_code >> 8) & 0xFF);
+				
 			}
 			free_2d_array((void ***)&data.pp, data.pipe_cnt[ao_idx] + 1);
 			ft_free1((void **)&data.pid_table);
@@ -608,10 +613,10 @@ int main(int argc, char **argv, char **envp)
 		ft_free1((void **)&data.tkn);
 		ft_free1((void **)&data.pipe_cnt);
 		ft_free1((void **)&data.logic_table);
-		printf("syntax ok\n\n");
+		//printf("syntax ok\n\n");
 
-		printf("\n\n----------------------<7>----------------------\n\n");
-		system("leaks minishell");
-		printf("\n\n----------------------<7>----------------------\n\n");
+		// printf("\n\n----------------------<7>----------------------\n\n");
+		// system("leaks minishell");
+		// printf("\n\n----------------------<7>----------------------\n\n");
 	}
 }

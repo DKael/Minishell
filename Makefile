@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/19 18:24:00 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/21 10:42:04 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,7 +45,7 @@ LDFLAGS = -lreadline -L./${LIBDLL_DIR} -L./${LIBGNL_DIR} -ldll -lgnl
 ${NAME} : ${TOTAL_OBJS}
 	@make -C ${LIBDLL_DIR} all
 	@make -C ${LIBGNL_DIR} all
-	${CC} ${CFLAGS} ${TOTAL_OBJS} ${INCLUDE} ${LDFLAGS} -o $@
+	${CC} ${CFLAGS} ${TOTAL_OBJS} -g ${INCLUDE} ${LDFLAGS} -o $@
 
 %.o :%.c
 	${CC} ${CFLAGS} -c -I. $< -o $@

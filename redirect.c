@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/18 17:25:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/20 16:06:30 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 12:53:02 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,18 +37,19 @@ static int get_rd_sign(char *str, int idx)
 	}
 	else
 	{
-		if (idx - 2 >= 0 && str[idx - 2] == '<')
+		if (idx - 2 >= 0 && str[idx - 2] == '>')
 			return (2);
 		else
 			return (3);
 	}
 }
 
-int	get_file_info(char *name, t_file_info *info)
+int get_file_info(char *name, t_file_info *info, int mode)
 {
 	if (access(name, F_OK) == -1)
 	{
-		err_msg_print2(name, ": No such file or directory");
+		if (mode == 0)
+			err_msg_print2(name, ": No such file or directory");
 		return (1);
 	}
 	if (stat(name, &info->bf) == -1)
@@ -74,12 +75,12 @@ int case_heredoc(t_dll *heredoc_names, int tmp_fd)
 
 	node_ptr = heredoc_names->head.back;
 	tmp_str = (char *)(node_ptr->contents);
-	tmp = get_file_info(tmp_str, &f_info);
+	tmp = get_file_info(tmp_str, &f_info, 0);
 	if (tmp != 0)
 		return (tmp);
-	if (f_info.type == DIRECTORY)
-		return (0);
-	if (f_info.mode | 0400 != 0400)
+	// if (f_info.type == DIRECTORY)
+	// 	return (0);
+	if ((f_info.mode & 0400) != 0400)
 	{
 		err_msg_print2(tmp_str, ": Permission denied");
 		return (1);
@@ -99,12 +100,12 @@ int case_in_redirect(char *file_name, int tmp_fd)
 	int tmp;
 	t_file_info f_info;
 
-	tmp = get_file_info(file_name, &f_info);
+	tmp = get_file_info(file_name, &f_info, 0);
 	if (tmp != 0)
 		return (tmp);
-	if (f_info.type == DIRECTORY)
-		return (0);
-	if (f_info.mode | 0400 != 0400)
+	// if (f_info.type == DIRECTORY)
+	// 	return (0);
+	if ((f_info.mode & 0400) != 0400)
 	{
 		err_msg_print2(file_name, ": Permission denied");
 		return (1);
@@ -120,22 +121,24 @@ int case_in_redirect(char *file_name, int tmp_fd)
 
 int case_out_redirect(char *file_name, int tmp_fd, int mode)
 {
-	int tmp_fd2;
 	int tmp;
 	t_file_info f_info;
 
-	tmp = get_file_info(file_name, &f_info);
-	if (tmp != 0)
+	tmp = get_file_info(file_name, &f_info, 1);
+	if (tmp == 4)
 		return (tmp);
-	if (f_info.type == DIRECTORY)
+	if (tmp == 0)
 	{
-		err_msg_print2(file_name, ": Is a directory");
-		return (1);
-	}
-	if (f_info.mode | 0200 != 0200)
-	{
-		err_msg_print2(file_name, ": Permission denied");
-		return (1);
+		if (f_info.type == DIRECTORY)
+		{
+			err_msg_print2(file_name, ": Is a directory");
+			return (1);
+		}
+		if ((f_info.mode & 0200) != 0200)
+		{
+			err_msg_print2(file_name, ": Permission denied");
+			return (1);
+		}
 	}
 	if (tmp_fd == 0)
 		tmp_fd = STDOUT_FILENO;
@@ -180,6 +183,7 @@ int sign_redirection(t_data *data, t_dll *tkns)
 		while (tmp_str[++idx] != '\0' && tmp_str[idx] != ' ')
 			;
 		rd_sign = get_rd_sign(tmp_str, idx);
+		printf("rd_sign : %d\n", rd_sign);
 		if (rd_sign == 0)
 			result = case_heredoc(&(((t_cmd_info *)(tkns->head.contents))->heredoc_names), tmp_fd);
 		else if (rd_sign == 1)

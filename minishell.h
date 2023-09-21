@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/20 00:36:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 09:15:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ void dll_env_print_func(void *content);
 void	close_pipes(t_data *data, int num);
 int	is_builtin_func(char *cmd);
 
+void resource_free_and_exit(t_data *data, int exit_code, char *msg);
 t_bool syntax_error_print(char *chr);
 void	err_msg_print1(char *m1);
 void	err_msg_print2(char *m1, char *m2);
@@ -144,6 +145,7 @@ void	err_msg_print3(char *m1, char *m2, char *m3);
 void message_exit(const char *msg, int exit_code);
 
 void *free_2d_array(void ***arr_ptr, int num);
+void *free_2d_array2(void ***arr_ptr);
 void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 
 t_bool case_lts_gts(char *cmd, int *idx);
