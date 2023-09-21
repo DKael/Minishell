@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 20:31:37 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 23:05:12 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,14 +204,15 @@ t_bool pipe_redirection(t_data *data, int ao_idx, int pp_idx);
 t_bool basic_redirection_save(t_data *data);
 t_bool basic_redirection_recover(t_data *data);
 void	opened_fd_close(t_data *data);
+int get_file_info(char *name, t_file_info *info, int mode);
 
 char **make_2d_array_from_dll(t_dll *dll);
 char **make_2d_envp_from_dll(t_dll *dll);
 
 int	ft_echo(char **input);
-int	ft_cd(t_data *data, char **input);
-int	ft_export(t_data *data, char **input);
-int	ft_unset(t_data *data, char **input);
+int	ft_cd(t_dll *env, char **input);
+int	ft_export(t_dll *env, t_dll *s_env, char **args);
+int	ft_unset(t_dll *env, t_dll *s_env, char **args);
 int	ft_pwd(char **input);
 int	ft_exit(char **input);
 int	ft_env(t_data *data);

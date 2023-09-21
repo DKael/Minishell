@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/17 16:28:59 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 20:59:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 21:58:22 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,10 @@ char **make_2d_envp_from_dll(t_dll *dll)
 	while (node_ptr != &(dll->tail))
 	{
 		ptr = (t_envval *)node_ptr->contents;
-		tmp2 = ft_strjoin2(ptr->name, ptr->value, "=");
+		if (ptr->value != T_NULL)
+			tmp2 = ft_strjoin2(ptr->name, ptr->value, "=");
+		else
+			tmp2 = ft_strdup(ptr->name);
 		if (tmp2 == T_NULL)
 			return (free_2d_array2((void ***)&tmp));
 		tmp[++idx] = tmp2;

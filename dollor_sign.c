@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 20:59:35 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 21:59:54 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ t_bool	retrieve_variable_value(t_data *data, t_dll *tkns)
 					dll_clear(&temp_dll, T_NULL);
 					return (ft_free2((void **)dtmp, FALSE));
 				}
-				dtmp->value = ft_getenv(data, tmp);
+				dtmp = ft_getenv(data, tmp);
 				ft_free1((void **)&tmp);
 				if (dtmp->value == T_NULL)
 					dtmp->value = "";

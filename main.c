@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 21:01:29 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 22:41:49 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,16 +99,13 @@ void store_env_in_dll(t_data *data, char **envp)
 					env->value = ft_itoa(1);
 			}
 			else if (ft_strncmp((*envp), "OLDPWD", idx) == 0)
-				env->value = ft_strdup("");
+				;
 			else
 				env->value = ft_strdup(&(*envp)[idx + 1]);
 		}
-		else if ((*envp)[idx] == '\0')
-		{
+		else
 			env->name = ft_strdup(*envp);
-			env->value = ft_strdup("");
-		}
-		if (env->name == T_NULL || env->value == T_NULL)
+		if (env->name == T_NULL || ((*envp)[idx] == '=' && env->value == T_NULL))
 		{
 			dll_clear(&data->envdll, envval_delete_func);
 			envval_delete_func((void *)env);
@@ -201,7 +198,7 @@ void dll_env_print_func(void *content)
 	t_envval *tmp;
 
 	tmp = (t_envval *)content;
-	if (tmp != T_NULL && tmp->value[0] != '\0')
+	if (tmp != T_NULL && tmp->value	!= T_NULL)
 		printf("%s=%s\n", tmp->name, tmp->value);
 }
 
@@ -214,7 +211,7 @@ void dll_export_print_func(void *content)
 	tmp2 = (t_envval *)(tmp1->contents);
 	if (tmp2 != T_NULL)
 	{
-		if (tmp2->value[0] != '\0')
+		if (tmp2->value != T_NULL)
 			printf("%s=\"%s\"\n", tmp2->name, tmp2->value);
 		else
 			printf("%s\n", tmp2->name);
@@ -301,11 +298,11 @@ int execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
 	if (func_idx == 1)
 		return (ft_echo(argu_lst));
 	else if (func_idx == 2)
-		return (ft_cd(data, argu_lst));
+		return (ft_cd(data->envdll, argu_lst));
 	else if (func_idx == 3)
-		return (ft_export(data, argu_lst));
+		return (ft_export(data->envdll, data->sorted_envdll, argu_lst));
 	else if (func_idx == 4)
-		return (ft_unset(data, argu_lst));
+		return (ft_unset(data->envdll, data->sorted_envdll, argu_lst));
 	else if (func_idx == 5)
 		return (ft_pwd(argu_lst));
 	else if (func_idx == 6)

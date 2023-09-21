@@ -48,7 +48,12 @@ t_bool change_pwd_oldpwd(t_dll *env, char *path)
 	return (TRUE);
 }
 
-int	ft_cd(t_data *data, char **input)
+int	check_path(char *path)
+{
+
+}
+
+int	ft_cd(t_dll *dll, char **input)
 {
 	int	idx;
 	t_dllnode *ptr;
@@ -61,7 +66,7 @@ int	ft_cd(t_data *data, char **input)
 		err_msg_print3("cd: ", input[2], ": No such file or directory");
 	else if (idx == 1)
 	{
-		ptr = data->envdll.head.back;
+		ptr = dll->head.back;
 		while (ptr != &(data->envdll.tail))
 		{
 			tmp_env = (t_envval *)(ptr->contents);
