@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/17 16:28:59 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 17:42:37 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 20:59:57 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void child(t_data *data, int ao_idx, int pp_idx)
 			free_2d_array2((void ***)&split_path);
 			if (cmd_path == (char *)-1)
 				resource_free_and_exit(data, 1, "malloc error");
-			fprintf(stderr, "%d_%d cmd's path is : %s\n", ao_idx, pp_idx, cmd_path);
+			//fprintf(stderr, "%d_%d cmd's path is : %s\n", ao_idx, pp_idx, cmd_path);
 			if (cmd_path == T_NULL && split_path != T_NULL)
 			{
 				err_msg_print2(cmd, ": command not found");
@@ -99,7 +99,7 @@ void child(t_data *data, int ao_idx, int pp_idx)
 		}
 		else
 		{
-			argu_lst = make_2d_array_from_dll(data->tkn[ao_idx][0]);
+			argu_lst = make_2d_array_from_dll(data->tkn[ao_idx][pp_idx]);
 			if (argu_lst == T_NULL)
 				resource_free_and_exit(data, 1, "malloc error");
 			result = execute_builtin_func(idx, argu_lst, data);
@@ -125,10 +125,10 @@ char **make_2d_array_from_dll(t_dll *dll)
 	node_ptr = dll->head.back;
 	idx = -1;
 	while (node_ptr != &(dll->tail))
-{
-	tmp[++idx] = (char *)node_ptr->contents;
-	node_ptr = node_ptr->back;
-}
+	{
+		tmp[++idx] = (char *)node_ptr->contents;
+		node_ptr = node_ptr->back;
+	}
 		
 	return (tmp);
 }

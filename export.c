@@ -36,7 +36,7 @@ char	*ft_strndup_value(const char *s1, int n)
 char	*make_env_name(char *str)
 {
 	if(!(find_equal(str, '=')))
-		return(str);
+		return(ft_strdup(str));
 	else
 		return(ft_strndup(str, find_equal(str, '=')));
 }
@@ -71,7 +71,7 @@ int	check_start_char_export(char *str)
 {
 	if (!(str[0] >= 'a' && str[0] <= 'z') && !(str[0] >= 'A' && str[0] <= 'Z'))
 	{
-		printf("bash: export: %s: not a valid identifier\n\n", str);
+		printf("bash: export: %s: not a valid identifier\n", str);
 		return (1);
 	}
 	return(0);
@@ -80,16 +80,22 @@ int	check_start_char_export(char *str)
 int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 {
 	int	flag;
+	int	work;
 	t_dllnode	*dllnode;
 	t_dllnode	*dllnode1;
 	t_envval	*tmp;
 	t_dllnode	*ptr;
 
 	flag = 0;
+	work = 0;
 	if (dll)
 	{
 		if (check_start_char_export(str) == 1)
+		{
+			envval_delete_func(env);
 			return (1);
+		}
+			
 		dllnode = dll->head.back;
 		while (dllnode != &(dll->tail))
 		{
@@ -102,6 +108,7 @@ int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 					tmp->value = env->value;
 					free(env->name);
 					free(env);
+					work++;
 				}
 				break ;
 			}
@@ -129,6 +136,8 @@ int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 				if (dll_content_add2(sorted_env, (void *)ptr, dllnode1, 1) == FALSE)
 					return (-1);
 		}
+		else if (work == 0)
+			envval_delete_func(env);
 	}
 	return (flag);
 }
@@ -146,8 +155,6 @@ int	ft_export(t_data *data, char **str)
 		dll_print(&data->sorted_envdll, dll_export_print_func);
 		return (0);
 	}
-
-
 	dll = &data->envdll;
 	flag = 0;
 	i = 1;

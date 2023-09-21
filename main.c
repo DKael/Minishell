@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 17:51:55 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 21:01:29 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,8 @@ void store_env_in_dll(t_data *data, char **envp)
 				else
 					env->value = ft_itoa(1);
 			}
+			else if (ft_strncmp((*envp), "OLDPWD", idx) == 0)
+				env->value = ft_strdup("");
 			else
 				env->value = ft_strdup(&(*envp)[idx + 1]);
 		}
@@ -213,7 +215,7 @@ void dll_export_print_func(void *content)
 	if (tmp2 != T_NULL)
 	{
 		if (tmp2->value[0] != '\0')
-			printf("%s=%s\n", tmp2->name, tmp2->value);
+			printf("%s=\"%s\"\n", tmp2->name, tmp2->value);
 		else
 			printf("%s\n", tmp2->name);
 	}
@@ -299,7 +301,7 @@ int execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
 	if (func_idx == 1)
 		return (ft_echo(argu_lst));
 	else if (func_idx == 2)
-		return (ft_cd(argu_lst));
+		return (ft_cd(data, argu_lst));
 	else if (func_idx == 3)
 		return (ft_export(data, argu_lst));
 	else if (func_idx == 4)
@@ -508,9 +510,6 @@ int main(int argc, char **argv, char **envp)
 
 		// execution part
 
-		sem_unlink("print_sem");
-		data.print_sem = sem_open("print_sem", O_EXCL | O_CREAT, 0644, 1);
-
 		ao_idx = -1;
 		while (++ao_idx < data.ao_cnt)
 		{
@@ -617,7 +616,7 @@ int main(int argc, char **argv, char **envp)
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 			{
 				pid_result = wait(&data.last_exit_code);
-				printf("%d_%d process's exit code : %d\n", ao_idx, pp_idx, (data.last_exit_code >> 8) & 0xFF);
+				//printf("%d_%d process's exit code : %d\n", ao_idx, pp_idx, (data.last_exit_code >> 8) & 0xFF);
 				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == pid_result)
 					set_last_exit_code(&data, (data.last_exit_code >> 8) & 0xFF);
 			}
@@ -625,8 +624,6 @@ int main(int argc, char **argv, char **envp)
 			ft_free1((void **)&data.pid_table);
 		}
 
-		sem_close(data.print_sem);
-		sem_unlink("print_sem");
 
 		// printf("\n\n----------------------<6>----------------------\n\n");
 		// system("leaks minishell");

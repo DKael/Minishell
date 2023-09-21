@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 17:42:58 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 20:31:37 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,7 @@
 # include <fcntl.h>
 # include "dll/double_linked_list.h"
 # include "gnl/get_next_line.h"
-# include "quick_sort.h"
-
-
-#include <semaphore.h>
+# include "quick_sort.h" 
 
 
 #if !defined(TRUE) && !defined(FALSE)
@@ -125,8 +122,6 @@ typedef struct s_data
 	int	old_stderr;
 	int	opened_fd[256];
 
-	sem_t *print_sem;
-
 } t_data;
 
 void dll_str_print_func(void *content);
@@ -214,7 +209,7 @@ char **make_2d_array_from_dll(t_dll *dll);
 char **make_2d_envp_from_dll(t_dll *dll);
 
 int	ft_echo(char **input);
-int	ft_cd(char **input);
+int	ft_cd(t_data *data, char **input);
 int	ft_export(t_data *data, char **input);
 int	ft_unset(t_data *data, char **input);
 int	ft_pwd(char **input);
