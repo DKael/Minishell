@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cd.c                                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/22 00:19:39 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/09/22 02:46:32 by hyungdki         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_bool change_pwd_oldpwd(t_dll *env, char *path)
 {
 	t_dllnode *ptr;
-	t_envval	*tmp_env[3];
+	t_envval *tmp_env[3];
 
 	tmp_env[1] = T_NULL;
 	tmp_env[2] = T_NULL;
@@ -48,51 +60,153 @@ t_bool change_pwd_oldpwd(t_dll *env, char *path)
 	return (TRUE);
 }
 
-int	check_path(char *path)
+char *make_path(char *raw_path)
 {
+	char *wd;
+	char	*tmp;
+	int	idx;
 
+	wd = getcwd(0, 0);
+	if (wd == T_NULL)
+		return (T_NULL);
+	if (raw_path[0] == '.' && raw_path[1] == '.' && raw_path[2] == '/')
+	{
+		idx = ft_strlen(wd);
+		while (wd[--idx] != '/')
+			;
+		wd[idx] = '\0';
+		tmp = ft_strjoin(wd, &raw_path[2]);
+	}
+	else if (raw_path[0] == '.' && raw_path[1] == '/')
+		tmp = ft_strjoin(wd, &raw_path[1]);
+	else
+		tmp = ft_strjoin2(wd, raw_path, "/");
+	return (tmp);
 }
 
-int	ft_cd(t_dll *dll, char **input)
+char *remove_duplicate_slashs(char *str)
 {
-	int	idx;
-	t_dllnode *ptr;
-	t_envval	*tmp_env;
+	int len;
+	char *tmp;
+	int idx1;
+	int idx2;
+
+	len = ft_strlen(str);
+	tmp = (char *)ft_calloc(len, sizeof(char));
+	if (tmp == T_NULL)
+		return (T_NULL);
+	idx1 = -1;
+	idx2 = -1;
+	while (str[++idx1] != '\0')
+	{
+		if (str[idx1] == '/' && idx1 > 1)
+		{
+			tmp[++idx2] = str[idx1];
+			while (str[++idx1] == '/')
+				;
+			idx1--;
+		}
+		else
+			tmp[++idx2] = str[idx1];
+	}
+	return (tmp);
+}
+
+int ft_cd(t_data *data, t_dll *dll, char **input)
+{
+	int idx;
+	char *raw_path;
+	char *path;
+	char	*env_name;
+	int	result;
+	t_file_info info;
 
 	idx = -1;
 	while (input[++idx] != T_NULL)
 		;
 	if (idx >= 3)
-		err_msg_print3("cd: ", input[2], ": No such file or directory");
-	else if (idx == 1)
+		err_msg_print3("cd: ", input[2], ": Too many arguments");
+	else if (idx == 2 && input[1][0] == '\0')
+		return (0);
+	if (idx == 1 || (input[1][0] == '-' && input[1][1] == '\0'))
 	{
-		ptr = dll->head.back;
-		while (ptr != &(data->envdll.tail))
+		if (idx == 1)
+			env_name = "HOME";
+		else
+			env_name = "OLDPWD";
+		raw_path = ft_getenv(data, env_name);
+		if (raw_path == T_NULL)
 		{
-			tmp_env = (t_envval *)(ptr->contents);
-			if (ft_strcmp(tmp_env->name, "HOME") == 0)
-			{
-				if (tmp_env->value[0] == '\0')
-				{
-					err_msg_print1("cd: HOME not set");
-					return (1);
-				}
-				if (change_pwd_oldpwd(&data->envdll, (char *)tmp_env->value) == FALSE
-					|| chdir((char *)tmp_env->value) == -1)
-					return (-1);
-				break;
-			}
-			ptr = ptr->back;
-		}
-		if (ptr == &(data->envdll.tail))
-		{
-			err_msg_print1("cd: HOME not set");
+			err_msg_print3("cd: ", env_name, " not set");
 			return (1);
 		}
+		result = get_file_info(raw_path, &info, 1);
+		if (result != 0)
+		{
+			if (result == 1)
+				err_msg_print3("cd: ", raw_path, ": No such file or directory");
+			return (result);
+		}
+		if (info.type == REGULAR_FILE)
+		{
+			err_msg_print3("cd: ", raw_path, ": Not a directory");
+			return (1);
+		}
+		if ((info.mode & 0700) != 0700)
+		{
+			err_msg_print3("cd: ", raw_path, ": Permission denied");
+			return (1);
+		}
+		path = remove_duplicate_slashs(raw_path);
+		if (path == T_NULL)
+			return (-1);
+		if (chdir(path) == -1 || change_pwd_oldpwd(dll, path) == FALSE)
+		{
+			free(path);
+			return (-1);
+		}
+		free(path);
 	}
 	else
 	{
-
+		result = get_file_info(input[1], &info, 1);
+		if (result != 0)
+		{
+			if (result == 1)
+				err_msg_print3("cd: ", input[1], ": No such file or directory");
+			return (result);
+		}
+		if (info.type == REGULAR_FILE)
+		{
+			err_msg_print3("cd: ", input[1], ": Not a directory");
+			return (1);
+		}
+		if ((info.mode & 0700) != 0700)
+		{
+			err_msg_print3("cd: ", input[1], ": Permission denied");
+			return (1);
+		}
+		raw_path = remove_duplicate_slashs(input[1]);
+		if (raw_path == T_NULL)
+			return (-1);
+		if (raw_path[0] != '/')
+		{
+			path = make_path(raw_path);
+			free(raw_path);
+			if (path == T_NULL)
+			{
+				err_msg_print1("cd: malloc error");
+				return (1);
+			}
+		}
+		else
+			path = raw_path;
+		if (chdir(path) == -1 || change_pwd_oldpwd(dll, path) == FALSE)
+		{
+			free(path);
+			return (-1);
+		}
+		free(path);
 	}
 	return (0);
 }

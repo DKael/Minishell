@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 22:41:49 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/22 02:37:47 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ void store_env_in_dll(t_data *data, char **envp)
 		}
 		else
 			env->name = ft_strdup(*envp);
-		if (env->name == T_NULL || ((*envp)[idx] == '=' && env->value == T_NULL))
+		if (env->name == T_NULL || ((*envp)[idx] == '=' && ft_strncmp((*envp), "OLDPWD", idx) != 0 && env->value == T_NULL))
 		{
 			dll_clear(&data->envdll, envval_delete_func);
 			envval_delete_func((void *)env);
@@ -298,13 +298,13 @@ int execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
 	if (func_idx == 1)
 		return (ft_echo(argu_lst));
 	else if (func_idx == 2)
-		return (ft_cd(data->envdll, argu_lst));
+		return (ft_cd(data, &data->envdll, argu_lst));
 	else if (func_idx == 3)
-		return (ft_export(data->envdll, data->sorted_envdll, argu_lst));
+		return (ft_export(&data->envdll, &data->sorted_envdll, argu_lst));
 	else if (func_idx == 4)
-		return (ft_unset(data->envdll, data->sorted_envdll, argu_lst));
+		return (ft_unset(&data->envdll, &data->sorted_envdll, argu_lst));
 	else if (func_idx == 5)
-		return (ft_pwd(argu_lst));
+		return (ft_pwd());
 	else if (func_idx == 6)
 		return (ft_exit(argu_lst));
 	else

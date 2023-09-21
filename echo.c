@@ -25,9 +25,6 @@ void    print_str(char **str, int i)
 
 int    ft_echo(char **str)
 {
-    int i;
-
-    i = 2;
     if (!(ft_strcmp(str[1], "-n")))
         print_str(str, 2);
     else

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/18 17:25:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 13:19:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/22 02:45:20 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,9 @@ int get_file_info(char *name, t_file_info *info, int mode)
 	info->mode = info->bf.st_mode;
 	if (((info->bf.st_mode) & S_IFMT) == S_IFDIR)
 		info->type = DIRECTORY;
-	else if (((info->bf.st_mode) & S_IFREG) == S_IFDIR)
+	else if (((info->bf.st_mode) & S_IFMT) == S_IFREG)
 		info->type = REGULAR_FILE;
-	else if (((info->bf.st_mode) & S_IFREG) == S_IFLNK)
+	else if (((info->bf.st_mode) & S_IFMT) == S_IFLNK)
 		info->type = SYMBOLIC_LINK;
 	else
 		info->type = ETC;
