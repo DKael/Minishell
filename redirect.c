@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/18 17:25:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 12:53:02 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 13:19:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,6 @@ int case_heredoc(t_dll *heredoc_names, int tmp_fd)
 	tmp = get_file_info(tmp_str, &f_info, 0);
 	if (tmp != 0)
 		return (tmp);
-	// if (f_info.type == DIRECTORY)
-	// 	return (0);
 	if ((f_info.mode & 0400) != 0400)
 	{
 		err_msg_print2(tmp_str, ": Permission denied");
@@ -103,8 +101,6 @@ int case_in_redirect(char *file_name, int tmp_fd)
 	tmp = get_file_info(file_name, &f_info, 0);
 	if (tmp != 0)
 		return (tmp);
-	// if (f_info.type == DIRECTORY)
-	// 	return (0);
 	if ((f_info.mode & 0400) != 0400)
 	{
 		err_msg_print2(file_name, ": Permission denied");
@@ -183,7 +179,6 @@ int sign_redirection(t_data *data, t_dll *tkns)
 		while (tmp_str[++idx] != '\0' && tmp_str[idx] != ' ')
 			;
 		rd_sign = get_rd_sign(tmp_str, idx);
-		printf("rd_sign : %d\n", rd_sign);
 		if (rd_sign == 0)
 			result = case_heredoc(&(((t_cmd_info *)(tkns->head.contents))->heredoc_names), tmp_fd);
 		else if (rd_sign == 1)

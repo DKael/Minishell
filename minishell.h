@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 09:15:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 17:42:58 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,8 +119,6 @@ typedef struct s_data
 	char **envp;
 	t_dll 	envdll;
 	t_dll	sorted_envdll;
-	
-	int		(*builtin_func[6])(char **);
 
 	int	old_stdin;
 	int	old_stdout;
@@ -133,9 +131,11 @@ typedef struct s_data
 
 void dll_str_print_func(void *content);
 void dll_env_print_func(void *content);
+void dll_export_print_func(void *content);
 
 void	close_pipes(t_data *data, int num);
 int	is_builtin_func(char *cmd);
+int execute_builtin_func(int func_idx, char **argu_lst, t_data *data);
 
 void resource_free_and_exit(t_data *data, int exit_code, char *msg);
 t_bool syntax_error_print(char *chr);
@@ -210,10 +210,15 @@ t_bool basic_redirection_save(t_data *data);
 t_bool basic_redirection_recover(t_data *data);
 void	opened_fd_close(t_data *data);
 
+char **make_2d_array_from_dll(t_dll *dll);
+char **make_2d_envp_from_dll(t_dll *dll);
+
 int	ft_echo(char **input);
 int	ft_cd(char **input);
-int	ft_export(char **input);
-int	ft_unset(char **input);
+int	ft_export(t_data *data, char **input);
+int	ft_unset(t_data *data, char **input);
 int	ft_pwd(char **input);
 int	ft_exit(char **input);
+int	ft_env(t_data *data);
+
 #endif

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/17 16:28:59 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 12:55:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/21 17:42:37 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,16 @@ void child(t_data *data, int ao_idx, int pp_idx)
 		}
 		else
 		{
-			// have to make
+			argu_lst = make_2d_array_from_dll(data->tkn[ao_idx][0]);
+			if (argu_lst == T_NULL)
+				resource_free_and_exit(data, 1, "malloc error");
+			result = execute_builtin_func(idx, argu_lst, data);
+			if (result == -1)
+			{
+				free(argu_lst);
+				resource_free_and_exit(data, 1, "malloc error");
+			}
+			exit (result);
 		}
 	}
 }
@@ -110,22 +119,17 @@ char **make_2d_array_from_dll(t_dll *dll)
 	int idx;
 	t_dllnode *node_ptr;
 
-	fprintf(stderr, "------------------------------3_0------------------------------\n");
-
 	tmp = (char **)ft_calloc(dll->size + 1, sizeof(char *));
 	if (tmp == T_NULL)
 		return (T_NULL);
-	fprintf(stderr, "------------------------------3_1------------------------------\n");
 	node_ptr = dll->head.back;
 	idx = -1;
 	while (node_ptr != &(dll->tail))
 {
-	fprintf(stderr, "------------------------------3_1_%d------------------------------\n", idx);
 	tmp[++idx] = (char *)node_ptr->contents;
 	node_ptr = node_ptr->back;
 }
 		
-	fprintf(stderr, "------------------------------3_2------------------------------\n");
 	return (tmp);
 }
 

@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/21 10:42:04 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/21 15:45:12 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,8 +22,14 @@ SRCS =	main.c \
 		heredoc.c \
 		child.c \
 		quick_sort.c \
-		builtin_func.c \
-		redirect.c
+		redirect.c \
+		exit.c \
+		echo.c \
+		pwd.c \
+		env.c \
+		unset.c \
+		export.c \
+		cd.c \
 		
 OBJS = 	${SRCS:.c=.o}
 

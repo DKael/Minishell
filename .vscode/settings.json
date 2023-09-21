@@ -25,6 +25,7 @@
 		"__string": "c",
 		"ios": "c",
 		"__mutex_base": "c",
-		"atomic": "c"
+		"atomic": "c",
+		"minishell.h": "c"
 	}
 }
