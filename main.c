@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 09:48:31 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/22 11:32:25 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -383,8 +383,6 @@ int main(int argc, char **argv, char **envp)
 
 	char **argu_lst;
 
-	// int		idx10;
-
 	pid_t pid_result;
 
 	if (argc != 1)
@@ -392,52 +390,7 @@ int main(int argc, char **argv, char **envp)
 		printf("minishell: don't support file read or need any other inputs\n");
 		return (1);
 	}
-
-	// t_envval test[3];
-	// t_dllnode *tmp_node_ptr;
-
-	// test[0].name = "a";
-	// test[0].value = "a";
-	// test[1].name = "b";
-	// test[1].value = "b";
-	// test[2].name = "c";
-	// test[2].value = "c";
-
-	/*
-	t_envval *tmp;
-
-	tmp = (t_envval *)ft_calloc(sizeof(t_envval), 1);
-	tmp.name = fwefewf;
-	tmp.value =fwefwe;
-	dll_contents_add(&data.envdll, (void *)&tmp, 0);
-	*/
-
-	// dll_content_add(&data.envdll, &test[0], 0);
-	// dll_content_add(&data.envdll, &test[1], 0);
-	// dll_content_add(&data.envdll, &test[2], 0);
-
-	// tmp_node_ptr = data.envdll.tail.front->front->front;
-	// dll_content_add(&data.sorted_envdll, tmp_node_ptr, 0);
-	// tmp_node_ptr = tmp_node_ptr->back;
-	// dll_content_add(&data.sorted_envdll, tmp_node_ptr, 0);
-	// tmp_node_ptr = tmp_node_ptr->back;
-	// dll_content_add(&data.sorted_envdll, tmp_node_ptr, 0);
-
-	// printf("envdll size : %d, sorted_envdll size : %d\n", data.envdll.size, data.sorted_envdll.size);
 	data_init(&data, argv[0], envp);
-	// printf("\n------------------------env---------------------------\n");
-	// dll_print(&data.envdll, dll_env_print_func);
-
-	// printf("\n------------------------export---------------------------\n");
-	// dll_print(&data.sorted_envdll, dll_export_print_func);
-
-	// dll_del_node(&data.envdll, data.envdll.tail.front, envval_delete_func);
-
-	// printf("\n------------------------env---------------------------\n");
-	// dll_print(&data.envdll, dll_env_print_func);
-
-	// printf("\n------------------------export---------------------------\n");
-	// dll_print(&data.sorted_envdll, dll_export_print_func);
 	while (1)
 	{
 		data_cycle_init(&data);
@@ -639,11 +592,6 @@ int main(int argc, char **argv, char **envp)
 			ft_free1((void **)&data.pid_table);
 		}
 
-
-		// printf("\n\n----------------------<6>----------------------\n\n");
-		// system("leaks minishell");
-		// printf("\n\n----------------------<6>----------------------\n\n");
-
 		ft_free1((void **)&data.cmd);
 		free_2d_array((void ***)&data.ao_split, data.ao_cnt);
 		idx[0] = -1;
@@ -652,7 +600,6 @@ int main(int argc, char **argv, char **envp)
 		ft_free1((void **)&data.tkn);
 		ft_free1((void **)&data.pipe_cnt);
 		ft_free1((void **)&data.logic_table);
-		// printf("syntax ok\n\n");
 
 		printf("\n\n----------------------<7>----------------------\n\n");
 		system("leaks main");
