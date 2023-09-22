@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/22 00:19:39 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 02:46:32 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/22 10:51:47 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,18 +69,29 @@ char *make_path(char *raw_path)
 	wd = getcwd(0, 0);
 	if (wd == T_NULL)
 		return (T_NULL);
-	if (raw_path[0] == '.' && raw_path[1] == '.' && raw_path[2] == '/')
+	if (raw_path[0] == '.' && raw_path[1] == '.' && (raw_path[2] == '/' || raw_path[2] == '\0'))
 	{
 		idx = ft_strlen(wd);
 		while (wd[--idx] != '/')
 			;
 		wd[idx] = '\0';
-		tmp = ft_strjoin(wd, &raw_path[2]);
+		if (raw_path[2] == '/')
+			tmp = ft_strjoin(wd, &raw_path[2]);
+		else
+		{
+			if (idx == 0)
+				tmp = ft_strdup("/");
+			else
+				tmp = ft_strdup(wd);
+		}
 	}
 	else if (raw_path[0] == '.' && raw_path[1] == '/')
 		tmp = ft_strjoin(wd, &raw_path[1]);
+	else if (raw_path[0] == '.' && raw_path[1] == '\0')
+		tmp = ft_strdup(wd);
 	else
 		tmp = ft_strjoin2(wd, raw_path, "/");
+	free(wd);
 	return (tmp);
 }
 
@@ -99,7 +110,7 @@ char *remove_duplicate_slashs(char *str)
 	idx2 = -1;
 	while (str[++idx1] != '\0')
 	{
-		if (str[idx1] == '/' && idx1 > 1)
+		if (str[idx1] == '/')
 		{
 			tmp[++idx2] = str[idx1];
 			while (str[++idx1] == '/')
@@ -125,7 +136,10 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 	while (input[++idx] != T_NULL)
 		;
 	if (idx >= 3)
+	{
 		err_msg_print3("cd: ", input[2], ": Too many arguments");
+		return (1);
+	}
 	else if (idx == 2 && input[1][0] == '\0')
 		return (0);
 	if (idx == 1 || (input[1][0] == '-' && input[1][1] == '\0'))
@@ -162,10 +176,12 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 			return (-1);
 		if (chdir(path) == -1 || change_pwd_oldpwd(dll, path) == FALSE)
 		{
-			free(path);
+			ft_free1((void **)&path);
 			return (-1);
 		}
-		free(path);
+		if (idx == 2 && input[1][0] == '-' && input[1][1] == '\0')
+			printf("%s\n", path);
+		ft_free1((void **)&path);
 	}
 	else
 	{
@@ -192,7 +208,7 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 		if (raw_path[0] != '/')
 		{
 			path = make_path(raw_path);
-			free(raw_path);
+			ft_free1((void **)&raw_path);
 			if (path == T_NULL)
 			{
 				err_msg_print1("cd: malloc error");
@@ -203,10 +219,10 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 			path = raw_path;
 		if (chdir(path) == -1 || change_pwd_oldpwd(dll, path) == FALSE)
 		{
-			free(path);
+			ft_free1((void **)&path);
 			return (-1);
 		}
-		free(path);
+		ft_free1((void **)&path);
 	}
 	return (0);
 }

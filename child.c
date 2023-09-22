@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/17 16:28:59 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 21:58:22 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/22 10:45:14 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,8 @@ void child(t_data *data, int ao_idx, int pp_idx)
 			else
 				split_path = T_NULL;
 			cmd_path = get_cmd_path(split_path, cmd);
-			free_2d_array2((void ***)&split_path);
 			if (cmd_path == (char *)-1)
 				resource_free_and_exit(data, 1, "malloc error");
-			//fprintf(stderr, "%d_%d cmd's path is : %s\n", ao_idx, pp_idx, cmd_path);
 			if (cmd_path == T_NULL && split_path != T_NULL)
 			{
 				err_msg_print2(cmd, ": command not found");
@@ -82,6 +80,7 @@ void child(t_data *data, int ao_idx, int pp_idx)
 				perror(cmd);
 				exit(127);
 			}
+			free_2d_array2((void ***)&split_path);
 			argu_lst = make_2d_array_from_dll(tmp);
 			envp_lst = make_2d_envp_from_dll(&data->envdll);
 			if (argu_lst == T_NULL || envp_lst == T_NULL)

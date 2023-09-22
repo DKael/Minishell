@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 02:37:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/22 09:48:31 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void store_env_in_dll(t_data *data, char **envp);
 t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd);
 t_bool heredoc_split(t_dll *dll, char *tkns);
 void set_last_exit_code(t_data *data, int input_exit_code);
+void	check_oldpwd_exist(t_data *data);
 
 void envdll_sorting(t_data *data);
 
@@ -153,6 +154,7 @@ void envdll_sorting(t_data *data)
 	t_srt *tmp;
 	t_dllnode *node_ptr;
 	int idx;
+	
 
 	tmp = (t_srt *)ft_calloc(data->envdll.size, (sizeof(t_srt)));
 	if (tmp == T_NULL)
@@ -181,6 +183,22 @@ void envdll_sorting(t_data *data)
 		}
 	}
 	ft_free1((void **)&tmp);
+	check_oldpwd_exist(data);
+}
+
+void	check_oldpwd_exist(t_data *data)
+{
+	char	*oldpwd[3];
+
+	oldpwd[0] = "export";
+	oldpwd[1] = "OLDPWD";
+	oldpwd[2] = T_NULL;
+	if (ft_export(&data->envdll, &data->sorted_envdll, oldpwd) == -1)
+	{
+		dll_clear(&data->envdll, envval_delete_func);
+		dll_clear(&data->sorted_envdll, T_NULL);
+		message_exit("minishell: malloc error!\n", 1);
+	}
 }
 
 t_bool check_syntax_error(char **cmd, int mode)
@@ -636,8 +654,8 @@ int main(int argc, char **argv, char **envp)
 		ft_free1((void **)&data.logic_table);
 		// printf("syntax ok\n\n");
 
-		// printf("\n\n----------------------<7>----------------------\n\n");
-		// system("leaks minishell");
-		// printf("\n\n----------------------<7>----------------------\n\n");
+		printf("\n\n----------------------<7>----------------------\n\n");
+		system("leaks main");
+		printf("\n\n----------------------<7>----------------------\n\n");
 	}
 }
