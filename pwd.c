@@ -2,10 +2,10 @@
 
 int ft_pwd(t_data *data)
 {
-   char path[4096];
+   char path[MAX_PATH_LEN];
    char *flag;
 
-    flag = getcwd(path, 4096);
+    flag = getcwd(path, MAX_PATH_LEN);
     if (flag == T_NULL)
     {
         if (data->wd[0] == '\0')

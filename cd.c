@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/22 00:19:39 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 17:27:31 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 01:09:26 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,17 +68,18 @@ t_bool change_pwd_oldpwd(t_dll *env, char *path)
 	return (TRUE);
 }
 
-char *make_path(char *raw_path)
+char *make_path(char *raw_path, int mode)
 {
-	char	buffer[4096];
+	char	buffer[MAX_PATH_LEN];
 	char	**split;
 	int idx;
 	int	idx2;
 	int bf_idx;
 
-	if (getcwd(buffer, 4096) == T_NULL)
+	if (getcwd(buffer, MAX_PATH_LEN) == T_NULL)
 	{
-		write(2, "cd: error retrieving current directory: \
+		if (mode == 0)
+			write(2, "cd: error retrieving current directory: \
 getcwd: cannot access parent directories: No such file or directory\n", 108);
 		return ((char *)-1);
 	}
@@ -104,7 +105,7 @@ getcwd: cannot access parent directories: No such file or directory\n", 108);
 			continue;
 		else
 		{
-			if (bf_idx + 2 + ft_strlen(split[idx]) > 4096)
+			if (bf_idx + 2 + ft_strlen(split[idx]) > MAX_PATH_LEN)
 			{
 				err_msg_print3("cd: ", split[idx], ": File name too long");
 				free_2d_array2((void ***)&split);
@@ -144,6 +145,7 @@ char *remove_duplicate_slashs(char *str)
 		else
 			tmp[++idx2] = str[idx1];
 	}
+	tmp[++idx2] = '\0';
 	return (tmp);
 }
 
@@ -236,11 +238,11 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 			return (-1);
 		if (raw_path[0] != '/')
 		{
-			path = make_path(raw_path);
+			path = make_path(raw_path, 0);
 			ft_free1((void **)&raw_path);
 			if (path == T_NULL)
 			{
-				err_msg_print1("cd: malloc error");
+				err_msg_print1("cd: malloc error1");
 				return (-1);
 			}
 			else if (path == (char *)-1)

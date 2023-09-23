@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 10:55:11 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 17:31:10 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ static t_bool wait_for_additional_cmd(char **cmd_ptr, char *cmd)
 		*cmd_ptr = temp;
 		if (temp == T_NULL)
 		{
-			printf("minishell: malloc error!\n");
+			printf("minishell: malloc error2!\n");
 			exit(1);
 		}
 		break;
@@ -166,7 +166,7 @@ t_bool case_lts_gts(char *cmd, int *idx)
 		temp = ft_strndup(&cmd[check], (*idx) - check);
 		if (temp == T_NULL)
 		{
-			printf("minishell: malloc error!\n");
+			printf("minishell: malloc error3!\n");
 			ft_free1((void **)cmd);
 			exit(1);
 		}

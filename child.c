@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/17 16:28:59 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 10:45:14 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 19:51:21 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,16 @@ void child(t_data *data, int ao_idx, int pp_idx)
 	cmd_info = (t_cmd_info *)(tmp->head.contents);
 	if (data->pipe_cnt[ao_idx] > 1)
 		if (pipe_redirection(data, ao_idx, pp_idx) == FALSE)
-			resource_free_and_exit(data, 1, "redirection error");
+			on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "redirection error");
 	result = sign_redirection(data, tmp);
 	if (result == 1)
 		exit(1);
 	else if (result == 2)
-		resource_free_and_exit(data, 1, "file open error");
+		on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "file open error");
 	else if (result == 3)
-		resource_free_and_exit(data, 1, "redirection error");
+		on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "redirection error");
 	else if (result == 4)
-		resource_free_and_exit(data, 1, "stat() error");
+		on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "stat() error");
 	node_ptr[0] = tmp->head.back;
 	if (cmd_info->parentheses_flag == TRUE)
 	{
@@ -57,28 +57,37 @@ void child(t_data *data, int ao_idx, int pp_idx)
 		idx = is_builtin_func(cmd);
 		if (idx == 0)
 		{
+			if (cmd[0] == '\0')
+			{
+				err_msg_print1(": command not found");
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 127, T_NULL);
+			}
 			raw_path = ft_getenv(data, "PATH");
 			if (raw_path != T_NULL)
 			{
 				split_path = ft_split(raw_path, ':');
 				if (split_path == T_NULL)
-					resource_free_and_exit(data, 1, "malloc error");
+					on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error4");
 			}
 			else
 				split_path = T_NULL;
 			cmd_path = get_cmd_path(split_path, cmd);
 			if (cmd_path == (char *)-1)
-				resource_free_and_exit(data, 1, "malloc error");
+			{
+				free_2d_array2((void ***)&split_path);
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error5");
+			}
 			if (cmd_path == T_NULL && split_path != T_NULL)
 			{
+				free_2d_array2((void ***)&split_path);
 				err_msg_print2(cmd, ": command not found");
-				exit(127);
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 127, T_NULL);
 			}
 			else if (cmd_path == T_NULL && split_path == T_NULL)
 			{
-				write(2, "minishell: ", 11);
+				write(STDERR_FILENO, "minishell: ", 11);
 				perror(cmd);
-				exit(127);
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 127, T_NULL);
 			}
 			free_2d_array2((void ***)&split_path);
 			argu_lst = make_2d_array_from_dll(tmp);
@@ -87,26 +96,21 @@ void child(t_data *data, int ao_idx, int pp_idx)
 			{
 				free(argu_lst);
 				free(envp_lst);
-				resource_free_and_exit(data, 1, "malloc error");
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error6");
 			}
 			if (execve(cmd_path, argu_lst, envp_lst) == -1)
 			{
 				free(argu_lst);
 				free(envp_lst);
-				resource_free_and_exit(data, 1, "malloc error");
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "execve error");
 			}
 		}
 		else
 		{
 			argu_lst = make_2d_array_from_dll(data->tkn[ao_idx][pp_idx]);
 			if (argu_lst == T_NULL)
-				resource_free_and_exit(data, 1, "malloc error");
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error8");
 			result = execute_builtin_func(idx, argu_lst, data);
-			if (result == -1)
-			{
-				free(argu_lst);
-				resource_free_and_exit(data, 1, "malloc error");
-			}
 			exit (result);
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 13:08:12 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 01:17:26 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>
+# include <dirent.h>
 # include "dll/double_linked_list.h"
 # include "gnl/get_next_line.h"
 # include "quick_sort.h" 
@@ -41,6 +42,7 @@
 #endif
 
 # define hd_path "/tmp"
+# define MAX_PATH_LEN 1025
 
 typedef int t_bool;
 typedef	struct stat t_stat;
@@ -121,7 +123,7 @@ typedef struct s_data
 	int	old_stdout;
 	int	old_stderr;
 	int	opened_fd[256];
-	char	wd[4096];
+	char	wd[MAX_PATH_LEN];
 
 } t_data;
 
@@ -131,9 +133,10 @@ void dll_export_print_func(void *content);
 
 void	close_pipes(t_data *data, int num);
 int	is_builtin_func(char *cmd);
-int execute_builtin_func(int func_idx, char **argu_lst, t_data *data);
+int	execute_builtin_func(int func_idx, char **argu_lst, t_data *data);
 
 void resource_free_and_exit(t_data *data, int exit_code, char *msg);
+void on_execution_part_err(t_data *data, int pp_make_cnt, int exit_code, char *msg);
 t_bool syntax_error_print(char *chr);
 void	err_msg_print1(char *m1);
 void	err_msg_print2(char *m1, char *m2);
@@ -215,7 +218,7 @@ int	ft_cd(t_data *data, t_dll *env, char **input);
 int	ft_export(t_dll *env, t_dll *s_env, char **args);
 int	ft_unset(t_dll *env, t_dll *s_env, char **args);
 int	ft_pwd(t_data *data);
-int	ft_exit(char **input);
+int	ft_exit(t_data *data, char **input);
 int	ft_env(t_data *data);
 
 #endif

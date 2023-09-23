@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 11:35:22 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/20 00:10:17 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 18:04:06 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,26 +20,36 @@ t_bool syntax_error_print(char *chr)
 
 void	err_msg_print1(char *m1)
 {
-	write(STDERR_FILENO, "minishell: ", 11);
-	write(STDERR_FILENO, m1, ft_strlen(m1));
-	write(STDERR_FILENO, "\n", 1);
+	if (m1 != T_NULL)
+	{
+		write(STDERR_FILENO, "minishell: ", 11);
+		write(STDERR_FILENO, m1, ft_strlen(m1));
+		write(STDERR_FILENO, "\n", 1);
+	}
+	
 }
 
 void	err_msg_print2(char *m1, char *m2)
 {
-	write(STDERR_FILENO, "minishell: ", 11);
-	write(STDERR_FILENO, m1, ft_strlen(m1));
-	write(STDERR_FILENO, m2, ft_strlen(m2));
-	write(STDERR_FILENO, "\n", 1);
+	if (m1 != T_NULL && m2 != T_NULL)
+	{
+		write(STDERR_FILENO, "minishell: ", 11);
+		write(STDERR_FILENO, m1, ft_strlen(m1));
+		write(STDERR_FILENO, m2, ft_strlen(m2));
+		write(STDERR_FILENO, "\n", 1);
+	}
 }
 
 void	err_msg_print3(char *m1, char *m2, char *m3)
 {
-	write(STDERR_FILENO, "minishell: ", 11);
-	write(STDERR_FILENO, m1, ft_strlen(m1));
-	write(STDERR_FILENO, m2, ft_strlen(m2));
-	write(STDERR_FILENO, m3, ft_strlen(m3));
-	write(STDERR_FILENO, "\n", 1);
+	if (m1 != T_NULL && m2 != T_NULL && m3 != T_NULL)
+	{
+		write(STDERR_FILENO, "minishell: ", 11);
+		write(STDERR_FILENO, m1, ft_strlen(m1));
+		write(STDERR_FILENO, m2, ft_strlen(m2));
+		write(STDERR_FILENO, m3, ft_strlen(m3));
+		write(STDERR_FILENO, "\n", 1);
+	}
 }
 
 void message_exit(const char *msg, int exit_code)

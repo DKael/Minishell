@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 16:18:07 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 00:53:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,24 @@ void	dll_clear(t_dll *dll, void (*del)(void *))
 		}
 		dll_init(dll);
 	}
-	
+}
+
+void	dll_ref_clear(t_dll *dll)
+{
+	t_dllnode	*delete;
+	t_dllnode	*next_node;
+
+	if (dll != T_NULL)
+	{
+		next_node = dll->head.back;
+		while (next_node != &(dll->tail))
+		{
+			delete = next_node;
+			next_node = next_node->back;
+			free(delete);
+		}
+		dll_init(dll);
+	}
 }
 
 t_dllnode	*dll_new_node(void *contents)

@@ -44,34 +44,35 @@ int only_num(char *str)
     {
         while (str[i])
         {
-            if (!(str[i] >= '0' && str[i] < '9'))
+            if (!(str[i] >= '0' && str[i] <= '9'))
                 return (1);
             i++;
         }
     }
     return (0);
 }
-// argc로 테스트하느라 index값들 한개씩 내려야됨
-int ft_exit(char **str)
+
+int ft_exit(t_data *data, char **str)
 {
-    if (str[1] == 0)
-        exit(0);
+    if (str[1] == T_NULL)
+        resource_free_and_exit(data, 0, T_NULL);
     else if (only_num(str[1]) == 1)
     {
         err_msg_print3("exit: ", str[1], ": numeric argument required");
-        exit(255);
+        resource_free_and_exit(data, 255, T_NULL);
     }
     else if (ft_atoll_check(str[1]) == 1)
     {
         err_msg_print3("exit: ", str[1], ": numeric argument required");
-        exit(255);
+        resource_free_and_exit(data, 255, T_NULL);
     }
     if (str[2])
     {
         write(2, "minishell: exit: too many arguments\n", 36);
-        return (1); // bash가 꺼지지않음
+        return (1); 
     }
     if (str[1])
-        exit(exit_signal(str[1]));
-    exit(0);
+        resource_free_and_exit(data, exit_signal(str[1]), T_NULL);
+    resource_free_and_exit(data, 0, T_NULL);
+    return (0);
 }

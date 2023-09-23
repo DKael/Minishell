@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 13:17:18 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 01:19:28 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd);
 t_bool heredoc_split(t_dll *dll, char *tkns);
 void set_last_exit_code(t_data *data, int input_exit_code);
 void	check_oldpwd_exist(t_data *data);
+static void builtin_func_error(t_data *data, int result);
 
 void envdll_sorting(t_data *data);
 
@@ -34,7 +35,8 @@ void data_init(t_data *data, char *program_name, char **envp)
 	while (++idx < 256)
 		data->opened_fd[idx] = -1;
 	data->wd[0] = '\0';
-	if (getcwd(data->wd, 4096) == T_NULL)
+	data->wd[MAX_PATH_LEN - 1] = '\0';
+	if (getcwd(data->wd, MAX_PATH_LEN) == T_NULL)
 	{
 		write(2, "shell-init: error retrieving current directory: \
 getcwd: cannot access parent directories: No such file or directory\n", 116);
@@ -90,7 +92,7 @@ void store_env_in_dll(t_data *data, char **envp)
 		if (env == T_NULL)
 		{
 			dll_clear(&data->envdll, envval_delete_func);
-			message_exit("minishell: malloc error!\n", 1);
+			message_exit("minishell: malloc error10!\n", 1);
 		}
 		idx = -1;
 		while ((*envp)[++idx] != '=' && (*envp)[idx] != '\0')
@@ -116,13 +118,13 @@ void store_env_in_dll(t_data *data, char **envp)
 		{
 			dll_clear(&data->envdll, envval_delete_func);
 			envval_delete_func((void *)env);
-			message_exit("minishell: malloc error!\n", 1);
+			message_exit("minishell: malloc error11!\n", 1);
 		}
 		if (dll_content_add(&data->envdll, (void *)env, 0) == FALSE)
 		{
 			dll_clear(&data->envdll, envval_delete_func);
 			envval_delete_func((void *)env);
-			message_exit("minishell: malloc error!\n", 1);
+			message_exit("minishell: malloc error12!\n", 1);
 		}
 		envp++;
 	}
@@ -166,7 +168,7 @@ void envdll_sorting(t_data *data)
 	if (tmp == T_NULL)
 	{
 		dll_clear(&data->envdll, envval_delete_func);
-		message_exit("minishell: malloc error!\n", 1);
+		message_exit("minishell: malloc error13!\n", 1);
 	}
 	idx = -1;
 	node_ptr = data->envdll.head.back;
@@ -185,7 +187,7 @@ void envdll_sorting(t_data *data)
 			ft_free1((void **)&tmp);
 			dll_clear(&data->envdll, envval_delete_func);
 			dll_clear(&data->sorted_envdll, T_NULL);
-			message_exit("minishell: malloc error!\n", 1);
+			message_exit("minishell: malloc error14!\n", 1);
 		}
 	}
 	ft_free1((void **)&tmp);
@@ -203,7 +205,7 @@ void	check_oldpwd_exist(t_data *data)
 	{
 		dll_clear(&data->envdll, envval_delete_func);
 		dll_clear(&data->sorted_envdll, T_NULL);
-		message_exit("minishell: malloc error!\n", 1);
+		message_exit("minishell: malloc error15!\n", 1);
 	}
 }
 
@@ -271,12 +273,11 @@ void close_pipes(t_data *data, int num)
 void resource_free_and_exit(t_data *data, int exit_code, char *msg)
 {
 	int idx;
+	t_dllnode *ptr;
 
 	if (msg != T_NULL)
 		err_msg_print1(msg);
 	ft_free1((void **)&data->cmd);
-	dll_clear(&data->envdll, envval_delete_func);
-	dll_clear(&data->sorted_envdll, T_NULL);
 	free_2d_array((void ***)&data->ao_split, data->ao_cnt);
 	idx = -1;
 	while (++idx < data->ao_cnt)
@@ -284,17 +285,23 @@ void resource_free_and_exit(t_data *data, int exit_code, char *msg)
 	ft_free1((void **)&data->tkn);
 	ft_free1((void **)&data->pipe_cnt);
 	ft_free1((void **)&data->logic_table);
-	ft_free1((void **)&data->pid_table);
+	dll_clear(&data->envdll, envval_delete_func);
+	ptr = data->sorted_envdll.head.back;
+	while (ptr != &(data->sorted_envdll.tail))
+	{
+		free(ptr);
+		ptr = ptr->back;
+	}
 	opened_fd_close(data);
 	exit(exit_code);
 }
 
-void on_execution_part_error(t_data *data, int pp_make_cnt, int pp_cnt, char *msg)
+void on_execution_part_err(t_data *data, int pp_make_cnt, int exit_code, char *msg)
 {
 	close_pipes(data, pp_make_cnt);
-	free_2d_array((void ***)&data->pp, pp_cnt);
+	free_2d_array2((void ***)&data->pp);
 	ft_free1((void **)&data->pid_table);
-	resource_free_and_exit(data, 1, msg);
+	resource_free_and_exit(data, exit_code, msg);
 }
 
 int is_builtin_func(char *cmd)
@@ -317,22 +324,39 @@ int is_builtin_func(char *cmd)
 		return (0);
 }
 
-int execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
+int	execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
 {
+	int	result;
+	
 	if (func_idx == 1)
-		return (ft_echo(argu_lst));
+		result = ft_echo(argu_lst);
 	else if (func_idx == 2)
-		return (ft_cd(data, &data->envdll, argu_lst));
+		result = ft_cd(data, &data->envdll, argu_lst);
 	else if (func_idx == 3)
-		return (ft_export(&data->envdll, &data->sorted_envdll, argu_lst));
+		result = ft_export(&data->envdll, &data->sorted_envdll, argu_lst);
 	else if (func_idx == 4)
-		return (ft_unset(&data->envdll, &data->sorted_envdll, argu_lst));
+		result = ft_unset(&data->envdll, &data->sorted_envdll, argu_lst);
 	else if (func_idx == 5)
-		return (ft_pwd(data));
+		result = ft_pwd(data);
 	else if (func_idx == 6)
-		return (ft_exit(argu_lst));
+		result = ft_exit(data, argu_lst);
 	else
-		return (ft_env(data));
+		result = ft_env(data);
+	if (result == 0 || result == 1)
+		return (result);
+	else
+		builtin_func_error(data, result);
+	return (1);
+}
+
+static void builtin_func_error(t_data *data, int result)
+{
+	if (result == 4)
+		resource_free_and_exit(data, 1, "stat() error");
+	else if (result == -1)
+		resource_free_and_exit(data, 1, "malloc error");
+	else if (result == -2)
+		resource_free_and_exit(data, 1, "chdir error");
 }
 
 void total_heredoc_cnt_chk(char *cmd)
@@ -357,7 +381,7 @@ void total_heredoc_cnt_chk(char *cmd)
 	}
 }
 
-void convert_minus_zero__to_whitespace(char *cmd)
+void convert_minus_value_to_whitespace(char *cmd)
 {
 	int idx;
 
@@ -389,7 +413,6 @@ int main(int argc, char **argv, char **envp)
 
 	char **argu_lst;
 
-	pid_t pid_result;
 
 	if (argc != 1)
 	{
@@ -420,7 +443,7 @@ int main(int argc, char **argv, char **envp)
 		}
 
 		total_heredoc_cnt_chk(data.cmd);
-		convert_minus_zero__to_whitespace(data.cmd);
+		convert_minus_value_to_whitespace(data.cmd);
 		split_cmd(&data, data.cmd);
 
 		idx[0] = -1;
@@ -435,7 +458,7 @@ int main(int argc, char **argv, char **envp)
 					ptr[0] = data.tkn[idx[0]][idx[1]]->tail.front;
 					tmp_str = ft_strdup((char *)(ptr[0]->contents));
 					if (tmp_str == T_NULL)
-						resource_free_and_exit(&data, 1, "malloc error");
+						resource_free_and_exit(&data, 1, "malloc error16");
 					if (parentheses_heredoc(&info_ptr->heredoc_names, idx, tmp_str) == FALSE)
 						resource_free_and_exit(&data, 1, "here document error");
 					ft_free1((void **)&tmp_str);
@@ -462,27 +485,6 @@ int main(int argc, char **argv, char **envp)
 			}
 		}
 
-		// Print result to check all code work fine. It will be deleted at the end.
-		// printf("\n------------------------------------\n");
-
-		// for (int i = 0; i < data.ao_cnt; i++)
-		// {
-		// 	for (int j = 0; j < data.pipe_cnt[i]; j++)
-		// 	{
-		// 		printf("<heredoc %d_%d>\n", i, j);
-		// 		dll_print(&((t_cmd_info *)(data.tkn[i][j]->head.contents))->heredoc_names, dll_str_print_func);
-		// 		printf("------------------------\n");
-		// 		ptr[0] = data.tkn[i][j]->head.back;
-		// 		while (ptr[0] != &data.tkn[i][j]->tail)
-		// 		{
-		// 			printf("%s\n", (char *)ptr[0]->contents);
-		// 			ptr[0] = ptr[0]->back;
-		// 		}
-		// 		printf("\n\n");
-		// 	}
-		// }
-
-		// execution part
 
 		ao_idx = -1;
 		while (++ao_idx < data.ao_cnt)
@@ -496,7 +498,7 @@ int main(int argc, char **argv, char **envp)
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 				if (retrieve_variable_value(&data, data.tkn[ao_idx][pp_idx]) == FALSE)
-					resource_free_and_exit(&data, 1, "malloc error");
+					resource_free_and_exit(&data, 1, "malloc error17");
 
 			if (data.pipe_cnt[ao_idx] == 1 && ((t_cmd_info *)(data.tkn[ao_idx][0]->head.contents))->cp_cnt > 0)
 			{
@@ -526,10 +528,8 @@ int main(int argc, char **argv, char **envp)
 
 					argu_lst = make_2d_array_from_dll(data.tkn[ao_idx][0]);
 					if (argu_lst == T_NULL)
-						resource_free_and_exit(&data, 1, "malloc error");
+						resource_free_and_exit(&data, 1, "malloc error18");
 					result = execute_builtin_func(func_type, argu_lst, &data);
-					if (result == -1)
-						resource_free_and_exit(&data, 1, "malloc error");
 					set_last_exit_code(&data, result);
 					free(argu_lst);
 
@@ -542,21 +542,21 @@ int main(int argc, char **argv, char **envp)
 
 			if (data.pipe_cnt[ao_idx] > 1)
 			{
-				data.pp = (int **)ft_calloc(data.pipe_cnt[ao_idx] + 1, sizeof(int *));
+				data.pp = (int **)ft_calloc(data.pipe_cnt[ao_idx] + 2, sizeof(int *));
 				if (data.pp == T_NULL)
-					resource_free_and_exit(&data, 1, "malloc error");
+					resource_free_and_exit(&data, 1, "malloc error20");
 				pp_idx = -1;
 				while (++pp_idx < data.pipe_cnt[ao_idx] + 1)
 				{
 					data.pp[pp_idx] = (int *)ft_calloc(2, sizeof(int));
 					if (data.pp[pp_idx] == T_NULL)
-						on_execution_part_error(&data, 0, pp_idx, "malloc error");
+						on_execution_part_err(&data, 0, 1, "malloc error21");
 				}
 				pp_idx = 0;
 				while (++pp_idx < data.pipe_cnt[ao_idx])
 				{
 					if (pipe(data.pp[pp_idx]) == -1)
-						on_execution_part_error(&data, pp_idx, data.pipe_cnt[ao_idx] + 1, "pipe error");
+						on_execution_part_err(&data, pp_idx, 1, "pipe error");
 				}
 				data.pp[0][0] = 0;
 				data.pp[data.pipe_cnt[ao_idx]][1] = 1;
@@ -564,7 +564,7 @@ int main(int argc, char **argv, char **envp)
 
 			data.pid_table = (pid_t *)ft_calloc(data.pipe_cnt[ao_idx], sizeof(pid_t));
 			if (data.pid_table == T_NULL)
-				on_execution_part_error(&data, data.pipe_cnt[ao_idx], data.pipe_cnt[ao_idx] + 1, "malloc error");
+				on_execution_part_err(&data, data.pipe_cnt[ao_idx], 1, "malloc error22");
 
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
@@ -577,7 +577,7 @@ int main(int argc, char **argv, char **envp)
 						kill(data.pid_table[pp_idx], SIGTERM);
 						wait(T_NULL);
 					}
-					on_execution_part_error(&data, data.pipe_cnt[ao_idx], data.pipe_cnt[ao_idx] + 1, "fork error");
+					on_execution_part_err(&data, data.pipe_cnt[ao_idx], 1, "fork error");
 				}
 				else if (data.pid_table[pp_idx] == 0)
 				{
@@ -589,12 +589,10 @@ int main(int argc, char **argv, char **envp)
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 			{
-				pid_result = wait(&data.last_exit_code);
-				//printf("%d_%d process's exit code : %d\n", ao_idx, pp_idx, (data.last_exit_code >> 8) & 0xFF);
-				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == pid_result)
+				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == wait(&data.last_exit_code))
 					set_last_exit_code(&data, (data.last_exit_code >> 8) & 0xFF);
 			}
-			free_2d_array((void ***)&data.pp, data.pipe_cnt[ao_idx] + 1);
+			free_2d_array2((void ***)&data.pp);
 			ft_free1((void **)&data.pid_table);
 		}
 

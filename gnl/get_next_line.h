@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/23 17:23:40 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 14:46:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 01:18:29 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1024
+#  define BUFFER_SIZE 1025
 # endif
 
 # define CLEAN_FD_ONLY	0
