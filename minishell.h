@@ -6,7 +6,7 @@
 /*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 20:19:31 by junehyle         ###   ########.fr       */
+/*   Updated: 2023/09/23 21:19:29 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,21 +141,22 @@ void	err_msg_print2(char *m1, char *m2);
 void	err_msg_print3(char *m1, char *m2, char *m3);
 void message_exit(const char *msg, int exit_code);
 
+
 void *free_2d_array(void ***arr_ptr, int num);
 void *free_2d_array2(void ***arr_ptr);
 void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 
 //check_syntax_error1.c
 t_bool	check_special_char_syntax(char **input_ptr);
+int		pipe_and_ampersand(char *cmd, int idx, char **cmd_ptr);
+int		redirect_and_quote(char *cmd, int idx);
 //check_syntax_error2.c
 t_bool	comb_redirect(char *cmd, int *idx);
 t_bool	check_redirect(char *cmd, char *temp);
 t_bool	case_lts_gts(char *cmd, int *idx);
 //syntax_util.c
-t_bool  pipe_vs_ampersand(char *cmd, int idx);
+t_bool  pipe_and_or(char *cmd, int idx);
 t_bool  unexpected_eod_print(void);
-t_bool  pipe_or_ampersand(char *cmd, int idx, char **cmd_ptr, char *sliced_part);
-int		checking_quote(char *cmd, int idx);
 
 t_bool	check_syntax_error(char **cmd, int mode);
 t_bool check_multiple_lines(const char *cmd);
