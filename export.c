@@ -1,9 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/23 15:00:06 by junehyle          #+#    #+#             */
+/*   Updated: 2023/09/23 15:01:56 by junehyle         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-
-t_envval *make_envval_from_str(char *str)
+t_envval	*make_envval_from_str(char *str)
 {
-	int	idx;
+	int			idx;
 	t_envval	*tmp;
 
 	tmp = (t_envval *)ft_calloc(1, sizeof(t_envval));
@@ -34,13 +45,13 @@ int	check_start_char_export(char *str)
 		err_msg_print3("export: ", str, ": not a valid identifier");
 		return (1);
 	}
-	return(0);
+	return (0);
 }
 
 int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 {
-	int	flag;
-	int	work;
+	int			flag;
+	int			work;
 	t_dllnode	*dllnode;
 	t_dllnode	*dllnode1;
 	t_envval	*tmp;
@@ -48,13 +59,11 @@ int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 
 	flag = 0;
 	work = 0;
-	
 	if (check_start_char_export(str) == 1)
 	{
 		envval_delete_func(env);
 		return (1);
 	}
-		
 	dllnode = dll->head.back;
 	while (dllnode != &(dll->tail))
 	{
@@ -82,12 +91,14 @@ int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 		dllnode1 = sorted_env->head.back;
 		while (dllnode1 != &(sorted_env->tail))
 		{
-			if (ft_strcmp((char *)env->name, (((t_envval *)(((t_dllnode*)(dllnode1->contents))->contents))->name)) < 0)
+			if (ft_strcmp((char *)env->name, (((t_envval *)
+				(((t_dllnode*)(dllnode1->contents))->contents))->name)) < 0)
 			{
-				if (dll_content_add2(sorted_env, (void *)ptr, dllnode1, 1) == FALSE)
+				if (dll_content_add2(sorted_env,
+					(void *)ptr, dllnode1, 1) == FALSE)
 					return (-1);
 				else
-					break;
+					break ;
 			}
 			dllnode1 = dllnode1->back;
 		}
@@ -102,10 +113,10 @@ int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 
 int	ft_export(t_dll *env, t_dll *s_env, char **args)
 {
-	int	i;
-	int	flag;
-	int	result;
-	t_envval *tmp;
+	int			i;
+	int			flag;
+	int			result;
+	t_envval	*tmp;
 
 	if (args[1] == T_NULL)
 	{

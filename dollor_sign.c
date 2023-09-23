@@ -3,36 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   dollor_sign.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 11:06:20 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 15:04:52 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// void	dll_dollor_tmp_print_func(void *content)
-// {
-// 	t_dollor_tmp *tmp;
-
-// 	tmp = (t_dollor_tmp *)content;
-// 	printf("%s\n", tmp->value);
-// }
-
 t_bool	retrieve_variable_value(t_data *data, t_dll *tkns)
 {
-	t_dll temp_dll;
-	t_dllnode *node_ptr;
-	t_dllnode *node_ptr2;
-	t_dollor_tmp *dtmp;
-	char	*tkn;
-	int		idx;
-	int		idx2;
-	int		write_idx;
-	char	*tmp;
-	int		expansion_len;
-	int		idx_chk;
+	t_dll			temp_dll;
+	t_dllnode		*node_ptr;
+	t_dllnode		*node_ptr2;
+	t_dollor_tmp	*dtmp;
+	char			*tkn;
+	int				idx;
+	int				idx2;
+	int				write_idx;
+	char			*tmp;
+	int				expansion_len;
+	int				idx_chk;
 
 	if (tkns == T_NULL)
 		return (FALSE);
@@ -76,9 +68,10 @@ t_bool	retrieve_variable_value(t_data *data, t_dll *tkns)
 		if (temp_dll.size == 0)
 		{
 			node_ptr = node_ptr->back;
-			continue;
+			continue ;
 		}
-		tmp = (char *)ft_calloc(ft_strlen(tkn) + expansion_len + 1, sizeof(char));
+		tmp = (char *)ft_calloc(ft_strlen(tkn)
+				+ expansion_len + 1, sizeof(char));
 		if (tmp == T_NULL)
 		{
 			dll_clear(&temp_dll, T_NULL);
@@ -109,9 +102,9 @@ t_bool	retrieve_variable_value(t_data *data, t_dll *tkns)
 	return (TRUE);
 }
 
-char *ft_getenv(t_data *data, const char *name)
+char	*ft_getenv(t_data *data, const char *name)
 {
-	t_dllnode *ptr;
+	t_dllnode	*ptr;
 
 	if (name[0] == '?' && name[1] == '\0')
 		return (data->last_exit_code_str);
@@ -125,10 +118,10 @@ char *ft_getenv(t_data *data, const char *name)
 	return (T_NULL);
 }
 
-char *get_dollor_parameter(char *cmd, int *idx)
+char	*get_dollor_parameter(char *cmd, int *idx)
 {
-	char *result;
-	int idx_chk;
+	char	*result;
+	int		idx_chk;
 
 	if (cmd[(*idx) + 1] == '{')
 	{
@@ -146,8 +139,9 @@ char *get_dollor_parameter(char *cmd, int *idx)
 	else
 	{
 		idx_chk = (*idx) + 1;
-		while (cmd[++(*idx)] != '\0' && cmd[(*idx)] != '{' && cmd[(*idx)] != '\"'
-		&& cmd[(*idx)] != '\'' && ft_isblank(cmd[(*idx)]) == FALSE && cmd[(*idx)] != '$')
+		while (cmd[++(*idx)] != '\0' && cmd[(*idx)] != '{'
+			&& cmd[(*idx)] != '\"' && cmd[(*idx)] != '\''
+			&& ft_isblank(cmd[(*idx)]) == FALSE && cmd[(*idx)] != '$')
 			;
 		result = (char *)ft_strndup(&cmd[idx_chk], (*idx) - idx_chk);
 		(*idx)--;

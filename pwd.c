@@ -1,22 +1,34 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pwd.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: junehyle <junehyle@student.42seoul.>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/23 14:17:56 by junehyle          #+#    #+#             */
+/*   Updated: 2023/09/23 14:19:11 by junehyle         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int ft_pwd(t_data *data)
+int	ft_pwd(t_data *data)
 {
-   char    *path;
+	char	*path;
 
-    path = getcwd(0, 0);
-    if (path == T_NULL)
-    {
-        if (data->wd[0] == '\0')
-            write(2, "pwd: error retrieving current directory: \
+	path = getcwd(0, 0);
+	if (path == T_NULL)
+	{
+		if (data->wd[0] == '\0')
+			write(2, "pwd: error retrieving current directory: \
 getcwd: cannot access parent directories: No such file or directory\n", 109);
-        else
-            printf("%s\n", data->wd);
-    }
-    else
-    {
-        printf ("%s\n", path);
-        free (path);
-    }
-    return (0);
+		else
+			printf("%s\n", data->wd);
+	}
+	else
+	{
+		printf ("%s\n", path);
+		free (path);
+	}
+	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   util1.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 16:10:15 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:35:57 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ char	*ft_strjoin2(char const *s1, char const *s2, char *between)
 	s1_size = ft_strlen(s1);
 	s2_size = ft_strlen(s2);
 	between_size = ft_strlen(between);
-	result = (char *)malloc(sizeof(char) * (s1_size + s2_size + between_size + 1));
+	result = (char *)malloc(sizeof(char)
+			* (s1_size + s2_size + between_size + 1));
 	if (result == T_NULL)
 		return (T_NULL);
 	index = -1;
@@ -230,7 +231,6 @@ int	ft_atoi(const char *str)
 	}
 	return ((int)nb * sign);
 }
-
 
 void	str_delete_func(void *str)
 {

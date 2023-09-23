@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/23 16:46:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/16 14:47:58 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:32:40 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 char	*get_next_line(int fd)
 {
 	static t_fd_node	*start;
-	t_gnldata				data;
+	t_gnldata			data;
 
 	data.fd_start = &start;
 	data.it = start;

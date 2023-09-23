@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/22 00:19:39 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 13:27:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 15:23:34 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int ft_chdir(char *path, t_data *data)
+int	ft_chdir(char *path, t_data *data)
 {
 	if (chdir(path) == -1)
 		return (-1);
@@ -20,10 +20,10 @@ int ft_chdir(char *path, t_data *data)
 	return (0);
 }
 
-t_bool change_pwd_oldpwd(t_dll *env, char *path)
+t_bool	change_pwd_oldpwd(t_dll *env, char *path)
 {
-	t_dllnode *ptr;
-	t_envval *tmp_env[3];
+	t_dllnode	*ptr;
+	t_envval	*tmp_env[3];
 
 	tmp_env[1] = T_NULL;
 	tmp_env[2] = T_NULL;
@@ -68,21 +68,15 @@ t_bool change_pwd_oldpwd(t_dll *env, char *path)
 	return (TRUE);
 }
 
-char *make_path(t_data *data, char *raw_path)
+char	*make_path(t_data *data, char *raw_path)
 {
-	char *wd;
-	char *tmp;
-	int idx;
+	char	*wd;
+	char	*tmp;
+	int		idx;
 
 	wd = getcwd(0, 0);
-// 	if (wd == T_NULL)
-// 	{
-// 		write(2, "cd: error retrieving current directory: \
-// getcwd: cannot access parent directories: No such file or directory\n",
-// 			  108);
-// 		return ((char *)-1);
-// 	}
-	if (raw_path[0] == '.' && raw_path[1] == '.' && (raw_path[2] == '/' || raw_path[2] == '\0'))
+	if (raw_path[0] == '.' && raw_path[1] == '.'
+		&& (raw_path[2] == '/' || raw_path[2] == '\0'))
 	{
 		if (wd == T_NULL)
 		{
@@ -133,17 +127,16 @@ getcwd: cannot access parent directories: No such file or directory\n", 108);
 				return (T_NULL);
 		}
 		tmp = ft_strjoin2(wd, raw_path, "/");
-	}
-		
+	}	
 	free(wd);
 	return (tmp);
 }
 
-char *remove_duplicate_slashs(char *str)
+char	*remove_duplicate_slashs(char *str)
 {
-	char *tmp;
-	int idx1;
-	int idx2;
+	char	*tmp;
+	int		idx1;
+	int		idx2;
 
 	tmp = ft_strdup(str);
 	if (tmp == T_NULL)
@@ -165,14 +158,14 @@ char *remove_duplicate_slashs(char *str)
 	return (tmp);
 }
 
-int ft_cd(t_data *data, t_dll *dll, char **input)
+int	ft_cd(t_data *data, t_dll *dll, char **input)
 {
-	int idx;
-	char *raw_path;
-	char *path;
-	char *env_name;
-	int result;
-	t_file_info info;
+	int			idx;
+	char		*raw_path;
+	char		*path;
+	char		*env_name;
+	int			result;
+	t_file_info	info;
 
 	idx = -1;
 	while (input[++idx] != T_NULL)
@@ -200,7 +193,8 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 		if (result != 0)
 		{
 			if (result == 1)
-				err_msg_print3("cd: ", raw_path, ": No such file or directory");
+				err_msg_print3("cd: ", raw_path,
+					": No such file or directory");
 			return (result);
 		}
 		if (info.type == REGULAR_FILE)
@@ -236,7 +230,8 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 		if (result != 0)
 		{
 			if (result == 1)
-				err_msg_print3("cd: ", input[1], ": No such file or directory");
+				err_msg_print3("cd: ", input[1],
+					": No such file or directory");
 			return (result);
 		}
 		if (info.type == REGULAR_FILE)

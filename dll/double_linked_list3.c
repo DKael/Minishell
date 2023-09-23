@@ -3,18 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   double_linked_list3.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 09:19:04 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:15:16 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "double_linked_list.h"
 
 static t_bool	dll_del_node2(t_dllnode *node, void (*del)(void *));
-static void	dll_node_move_to_another_dll_head2(t_dllnode *node, t_dll *dll1);
-static void	dll_node_move_to_another_dll_tail2(t_dllnode *node, t_dll *dll1);
+static void		dll_node_move_to_another_dll_head2(t_dllnode *node,
+					t_dll *dll1);
+static void		dll_node_move_to_another_dll_tail2(t_dllnode *node,
+					t_dll *dll1);
 
 int	dll_node_compare(t_dllnode *n1, t_dllnode *n2,
 	int (*compare)(t_dllnode *, t_dllnode *))
@@ -199,7 +201,7 @@ else, add back of head.
 */
 t_bool	dll_content_add(t_dll *dll, void *content, int mode)
 {
-	t_dllnode *node_ptr;
+	t_dllnode	*node_ptr;
 
 	node_ptr = dll_new_node(content);
 	if (node_ptr == T_NULL)

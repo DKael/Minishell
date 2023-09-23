@@ -3,18 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/15 09:26:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/19 18:15:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:59:25 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-t_bool heredoc_split(t_dll *dll, char *tkns);
+
+t_bool		heredoc_split(t_dll *dll, char *tkns);
 static char	*make_name2(char *make_path, char *bf1, char *bf2);
-t_bool	heredoc_make2(char *name, char *del);
-void	heredoc_make3(int fd, char *paste_nl);
+t_bool		heredoc_make2(char *name, char *del);
+void		heredoc_make3(int fd, char *paste_nl);
 
 char	*make_name(char *make_path, int idx1, int idx2, int size)
 {
@@ -38,11 +39,12 @@ char	*make_name(char *make_path, int idx1, int idx2, int size)
 	ft_free1((void **)&tmp[2]);
 	return (make_name2(make_path, bf1, bf2));
 }
+
 static char	*make_name2(char *make_path, char *bf1, char *bf2)
 {
 	char	*tmp;
 	char	*result;
-	
+
 	if (bf1 == T_NULL || bf2 == T_NULL)
 	{
 		ft_free1((void **)&bf1);
@@ -58,13 +60,13 @@ static char	*make_name2(char *make_path, char *bf1, char *bf2)
 	return (result);
 }
 
-t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd)
+t_bool	parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd)
 {
-	int idx;
-	int p_idx[2];
-	char *tmp;
-	t_dllnode *ptr[2];
-	t_dll tmp_dll;
+	int			idx;
+	int			p_idx[2];
+	char		*tmp;
+	t_dllnode	*ptr[2];
+	t_dll		tmp_dll;
 
 	cmd[0] = ' ';
 	cmd[ft_strlen(cmd) - 1] = ' ';
@@ -99,7 +101,7 @@ t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd)
 		if (tmp == T_NULL)
 		{
 			ptr[0] = ptr[0]->back;
-			continue;
+			continue ;
 		}
 		if (heredoc_make1_2(heredoc_names, ptr[1], tkn_idx, tmp + 3) == FALSE)
 		{
@@ -112,11 +114,11 @@ t_bool parentheses_heredoc(t_dll *heredoc_names, int *tkn_idx, char *cmd)
 	return (TRUE);
 }
 
-t_bool heredoc_split(t_dll *dll, char *tkns)
+t_bool	heredoc_split(t_dll *dll, char *tkns)
 {
-	int idx;
-	int pos[4];
-	char *con;
+	int		idx;
+	int		pos[4];
+	char	*con;
 
 	idx = -1;
 	while (tkns[++idx] != '\0')
@@ -125,7 +127,8 @@ t_bool heredoc_split(t_dll *dll, char *tkns)
 		{
 			find_front(tkns, pos, idx);
 			find_back_and_calc_blank_quote(tkns, pos, idx);
-			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2] - pos[3] + 2, sizeof(char));
+			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2]
+					- pos[3] + 2, sizeof(char));
 			if (con == T_NULL)
 				return (FALSE);
 			redirect_split2_1(tkns, con, pos, TRUE);
@@ -141,17 +144,17 @@ t_bool heredoc_split(t_dll *dll, char *tkns)
 	return (TRUE);
 }
 
-// heredoc name will be {idx1}_{idx2}_{dll's size}.heredoc
 t_bool	heredoc_make1_1(t_dll *dll, int *idx, char *del)
 {
-	t_stat bf;
+	t_stat	bf;
 	char	*make_path;
 	char	*name;
-	
+
 	make_path = ft_strdup(hd_path);
 	if (make_path == T_NULL)
 		return (FALSE);
-	if (stat(hd_path, &bf) == -1 || !(((bf.st_mode) & S_IFMT) == S_IFDIR && bf.st_mode == 041777))
+	if (stat(hd_path, &bf) == -1 || !(((bf.st_mode) & S_IFMT)
+			== S_IFDIR && bf.st_mode == 041777))
 	{
 		ft_free1((void **)&make_path);
 		make_path = ft_strdup(".");
@@ -171,16 +174,18 @@ t_bool	heredoc_make1_1(t_dll *dll, int *idx, char *del)
 	}
 	return (TRUE);
 }
+
 t_bool	heredoc_make1_2(t_dll *dll, t_dllnode *ptr, int *idx, char *del)
 {
-	t_stat bf;
+	t_stat	bf;
 	char	*make_path;
 	char	*name;
-	
+
 	make_path = ft_strdup(hd_path);
 	if (make_path == T_NULL)
 		return (FALSE);
-	if (stat(hd_path, &bf) == -1 || !(((bf.st_mode) & S_IFMT) == S_IFDIR && bf.st_mode == 041777))
+	if (stat(hd_path, &bf) == -1 || !(((bf.st_mode) & S_IFMT)
+			== S_IFDIR && bf.st_mode == 041777))
 	{
 		ft_free1((void **)&make_path);
 		make_path = ft_strdup(".");

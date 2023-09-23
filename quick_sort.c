@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   quick_sort.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/14 15:01:17 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/17 20:15:29 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:54:12 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	sorting(void *lst, int size,
 
 void	quick_sort(t_srt_data data)
 {
-	int		pivot;
+	int			pivot;
 	t_srt_data	left_srt_data;
 	t_srt_data	right_srt_data;
 

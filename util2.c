@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   util2.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:31:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 18:23:39 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:35:16 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ long long	ft_atoll(const char *str)
 {
 	long long	sign;
 	long long	nb;
-	int	idx;
+	int			idx;
 
 	nb = 0;
 	sign = 1;
@@ -112,8 +112,8 @@ long long	ft_atoll(const char *str)
 			sign = -1;
 	while (str[idx] >= '0' && str[idx] <= '9')
 	{
-		if (nb > 922337203685477580
-			|| (nb == 922337203685477580 && str[idx] - '0' > 7 + ((1 - sign) / 2)))
+		if (nb > 922337203685477580 || (nb == 922337203685477580
+				&& str[idx] - '0' > 7 + ((1 - sign) / 2)))
 		{
 			if (sign == -1)
 				return (-9223372036854775807 - 1);

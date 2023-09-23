@@ -3,36 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   split_cmd.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/21 20:28:58 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 15:21:19 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
-int count_ao_in_cmd(char *cmd);
-char **split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table);
-t_dll **tokenize(char *tkns, int *pipe_cnt);
-int count_pipe_in_tkns(char *tkns);
-char **split_tkns_by_pipe(char *tkns, int pipe_cnt);
-t_dll **make_dlls(int pipe_cnt);
-void redirect_count(t_dll *dll, char *tkns);
-void find_front(char *tkns, int *pos, int idx);
-void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx);
-t_bool redirect_split(t_dll *dll, char *tkns);
-void redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
-void redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
-t_bool parentheses_split(t_dll *dll, char *tkns);
-void remain_count(t_dll *dll, char *tkns);
-t_bool remain_split(t_dll *dll, char *tkns);
-t_bool remain_split2(t_dll *dll, char *tkns, int *idx);
+void	*free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
+int		count_ao_in_cmd(char *cmd);
+char	**split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table);
+t_dll	**tokenize(char *tkns, int *pipe_cnt);
+int		count_pipe_in_tkns(char *tkns);
+char	**split_tkns_by_pipe(char *tkns, int pipe_cnt);
+t_dll	**make_dlls(int pipe_cnt);
+void	redirect_count(t_dll *dll, char *tkns);
+void	find_front(char *tkns, int *pos, int idx);
+void	find_back_and_calc_blank_quote(char *tkns, int *pos, int idx);
+t_bool	redirect_split(t_dll *dll, char *tkns);
+void	redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
+void	redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
+t_bool	parentheses_split(t_dll *dll, char *tkns);
+void	remain_count(t_dll *dll, char *tkns);
+t_bool	remain_split(t_dll *dll, char *tkns);
+t_bool	remain_split2(t_dll *dll, char *tkns, int *idx);
 
-void cmd_split_error(t_data *data, char *cmd, char *msg)
+void	cmd_split_error(t_data *data, char *cmd, char *msg)
 {
-	int idx1;
+	int	idx1;
 
 	printf("minishell: %s\n", msg);
 	ft_free1((void **)&cmd);
@@ -44,14 +44,13 @@ void cmd_split_error(t_data *data, char *cmd, char *msg)
 	ft_free1((void **)&data->tkn);
 	ft_free1((void **)&data->pipe_cnt);
 	ft_free1((void **)&data->logic_table);
-	
 	exit(1);
 }
 
-void *free_2d_array(void ***arr_ptr, int num)
+void	*free_2d_array(void ***arr_ptr, int num)
 {
-	int idx;
-	void **tmp;
+	int		idx;
+	void	**tmp;
 
 	if (*arr_ptr != T_NULL)
 	{
@@ -65,10 +64,10 @@ void *free_2d_array(void ***arr_ptr, int num)
 	return (T_NULL);
 }
 
-void *free_2d_array2(void ***arr_ptr)
+void	*free_2d_array2(void ***arr_ptr)
 {
-	int idx;
-	void **tmp;
+	int		idx;
+	void	**tmp;
 
 	if (*arr_ptr != T_NULL)
 	{
@@ -82,24 +81,25 @@ void *free_2d_array2(void ***arr_ptr)
 	return (T_NULL);
 }
 
-void *ft_free1(void **ptr)
+void	*ft_free1(void **ptr)
 {
 	free(*ptr);
 	*ptr = T_NULL;
 	return (T_NULL);
 }
 
-t_bool ft_free2(void **ptr, t_bool flag)
+t_bool	ft_free2(void **ptr, t_bool flag)
 {
 	free(*ptr);
 	*ptr = T_NULL;
 	return (flag);
 }
 
-void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *))
+void	*free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *))
 {
-	int idx;
-	t_dll **tmp;
+	int		idx;
+	t_dll	**tmp;
+
 	if (*dll_ptr != T_NULL)
 	{
 		tmp = *dll_ptr;
@@ -108,7 +108,8 @@ void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *))
 		{
 			if (tmp[idx] != T_NULL)
 			{
-				dll_clear(&((t_cmd_info *)(tmp[idx]->head.contents))->heredoc_names, del);
+				dll_clear(&((t_cmd_info *)
+						(tmp[idx]->head.contents))->heredoc_names, del);
 				ft_free1((void **)&tmp[idx]->head.contents);
 				dll_clear(tmp[idx], del);
 				ft_free1((void **)&tmp[idx]);
@@ -120,16 +121,16 @@ void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *))
 	return (T_NULL);
 }
 
-void ignore_quote(char *cmd, int *idx)
+void	ignore_quote(char *cmd, int *idx)
 {
-	char quote;
+	char	quote;
 
 	quote = cmd[*idx];
 	while (cmd[++(*idx)] != quote)
 		;
 }
 
-void ignore_parentheses(char *cmd, int *idx)
+void	ignore_parentheses(char *cmd, int *idx)
 {
 	int	layer;
 
@@ -140,7 +141,7 @@ void ignore_parentheses(char *cmd, int *idx)
 		if (cmd[(*idx)] == ')')
 		{
 			if (layer == 0)
-				break;
+				break ;
 			else
 				layer--;
 		}
@@ -151,9 +152,9 @@ void ignore_parentheses(char *cmd, int *idx)
 	}
 }
 
-void split_cmd(t_data *data, char *cmd)
+void	split_cmd(t_data *data, char *cmd)
 {
-	int idx;
+	int	idx;
 
 	data->ao_cnt = count_ao_in_cmd(cmd) + 1;
 	data->logic_table = (t_logic *)ft_calloc(data->ao_cnt - 1, sizeof(t_logic));
@@ -163,21 +164,10 @@ void split_cmd(t_data *data, char *cmd)
 		exit(1);
 	}
 	data->ao_split = split_cmd_by_ao(cmd, data->ao_cnt, data->logic_table);
-
-	// for (int i = 0; i < data->ao_cnt - 1; i++)
-	// {
-	// 	if (data->logic_table[i] == OR)
-	// 		printf("OR ");
-	// 	else
-	// 		printf("AND ");
-	// }
-	// printf("\n\n");
-	// for (int i = 0; i < data->ao_cnt; i++)
-	// 	printf("data->ao_split[%d] : %s\n", i, data->ao_split[i]);
-
 	data->tkn = (t_dll ***)ft_calloc(data->ao_cnt, sizeof(t_dll **));
 	data->pipe_cnt = (int *)ft_calloc(data->ao_cnt, sizeof(int));
-	if (data->ao_split == T_NULL || data->tkn == T_NULL || data->pipe_cnt == T_NULL)
+	if (data->ao_split == T_NULL || data->tkn == T_NULL
+		|| data->pipe_cnt == T_NULL)
 		cmd_split_error(data, cmd, "malloc error");
 	idx = -1;
 	while (++idx < data->ao_cnt)
@@ -188,16 +178,17 @@ void split_cmd(t_data *data, char *cmd)
 	}
 }
 
-int count_ao_in_cmd(char *cmd)
+int	count_ao_in_cmd(char *cmd)
 {
-	int idx;
-	int ao_cnt;
+	int	idx;
+	int	ao_cnt;
 
 	idx = -1;
 	ao_cnt = 0;
 	while (cmd[++idx] != '\0')
 	{
-		if ((cmd[idx] == '|' && cmd[idx + 1] == '|') || (cmd[idx] == '&' && cmd[idx + 1] == '&'))
+		if ((cmd[idx] == '|' && cmd[idx + 1] == '|')
+			|| (cmd[idx] == '&' && cmd[idx + 1] == '&'))
 		{
 			ao_cnt++;
 			idx++;
@@ -210,12 +201,12 @@ int count_ao_in_cmd(char *cmd)
 	return (ao_cnt);
 }
 
-char **split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table)
+char	**split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table)
 {
-	char **tmp;
-	int ao_idx;
-	int idx_chk;
-	int idx;
+	char	**tmp;
+	int		ao_idx;
+	int		idx_chk;
+	int		idx;
 
 	tmp = (char **)ft_calloc(ao_cnt, sizeof(char *));
 	if (tmp == T_NULL)
@@ -225,7 +216,8 @@ char **split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table)
 	idx = -1;
 	while (cmd[++idx] != '\0')
 	{
-		if ((cmd[idx] == '|' && cmd[idx + 1] == '|') || (cmd[idx] == '&' && cmd[idx + 1] == '&'))
+		if ((cmd[idx] == '|' && cmd[idx + 1] == '|')
+			|| (cmd[idx] == '&' && cmd[idx + 1] == '&'))
 		{
 			if (cmd[idx] == '|' && cmd[idx + 1] == '|')
 				logic_table[ao_idx] = OR;
@@ -249,11 +241,11 @@ char **split_cmd_by_ao(char *cmd, int ao_cnt, t_logic *logic_table)
 	return (tmp);
 }
 
-t_dll **tokenize(char *tkns, int *pipe_cnt)
+t_dll	**tokenize(char *tkns, int *pipe_cnt)
 {
-	char **split_tmp;
-	t_dll **tkn_part;
-	int idx;
+	char	**split_tmp;
+	t_dll	**tkn_part;
+	int		idx;
 
 	(*pipe_cnt) = count_pipe_in_tkns(tkns) + 1;
 	split_tmp = split_tkns_by_pipe(tkns, (*pipe_cnt));
@@ -262,34 +254,15 @@ t_dll **tokenize(char *tkns, int *pipe_cnt)
 	tkn_part = make_dlls((*pipe_cnt));
 	if (tkn_part == T_NULL)
 		return (free_2d_array((void ***)&split_tmp, (*pipe_cnt)));
-
-	// printf("\n\ntkns : %s\n", tkns);
-	// for (int i = 0; i < (*pipe_cnt); i++)
-	// 	printf("_%s_\n", split_tmp[i]);
-	// printf("\n");
-
 	idx = -1;
 	while (++idx < (*pipe_cnt))
 	{
-		// redirect_count(tkn_part[idx], split_tmp[idx]);
 		if (redirect_split(tkn_part[idx], split_tmp[idx]) == FALSE)
-			break;
-		// printf("after redirection split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
-
+			break ;
 		if (parentheses_split(tkn_part[idx], split_tmp[idx]) == FALSE)
-			break;
-		// printf("after parentheses split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
-
-		// remain_count(tkn_part[idx], split_tmp[idx]);
+			break ;
 		if (remain_split(tkn_part[idx], split_tmp[idx]) == FALSE)
-			break;
-		// printf("after remain split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
+			break ;
 	}
 	free_2d_array((void ***)&split_tmp, (*pipe_cnt));
 	if (idx < (*pipe_cnt))
@@ -297,10 +270,10 @@ t_dll **tokenize(char *tkns, int *pipe_cnt)
 	return (tkn_part);
 }
 
-int count_pipe_in_tkns(char *tkns)
+int	count_pipe_in_tkns(char *tkns)
 {
-	int idx;
-	int pipe_cnt;
+	int	idx;
+	int	pipe_cnt;
 
 	idx = -1;
 	pipe_cnt = 0;
@@ -316,12 +289,12 @@ int count_pipe_in_tkns(char *tkns)
 	return (pipe_cnt);
 }
 
-char **split_tkns_by_pipe(char *tkns, int pipe_cnt)
+char	**split_tkns_by_pipe(char *tkns, int pipe_cnt)
 {
-	char **tmp;
-	int pipe_idx;
-	int idx_chk;
-	int idx;
+	char	**tmp;
+	int		pipe_idx;
+	int		idx_chk;
+	int		idx;
 
 	tmp = (char **)ft_calloc(pipe_cnt, sizeof(char *));
 	if (tmp == T_NULL)
@@ -351,10 +324,10 @@ char **split_tkns_by_pipe(char *tkns, int pipe_cnt)
 	return (tmp);
 }
 
-t_dll **make_dlls(int pipe_cnt)
+t_dll	**make_dlls(int pipe_cnt)
 {
-	int idx;
-	t_dll **tmp;
+	int		idx;
+	t_dll	**tmp;
 
 	tmp = (t_dll **)ft_calloc(pipe_cnt, sizeof(t_dll *));
 	if (tmp == T_NULL)
@@ -377,38 +350,11 @@ t_dll **make_dlls(int pipe_cnt)
 	return (tmp);
 }
 
-// void redirect_count(t_dll *dll, char *tkns)
-// {
-// 	int idx;
-// 	t_cmd_info *tmp;
-
-// 	tmp = (t_cmd_info *)(dll->head.contents);
-// 	idx = -1;
-// 	while (tkns[++idx] != '\0')
-// 	{
-// 		if (tkns[idx] == '<' || tkns[idx] == '>')
-// 		{
-// 			tmp->redir_cnt++;
-// 			if (tkns[idx + 1] == '<')
-// 				tmp->heredoc_cnt++;
-// 			if (tkns[idx + 1] == '<' || tkns[idx + 1] == '>')
-// 				idx++;
-// 		}
-// 		else if (tkns[idx] == '\"' || tkns[idx] == '\'')
-// 			ignore_quote(tkns, &idx);
-// 		else if (tkns[idx] == '(')
-// 			ignore_parentheses(tkns, &idx);
-// 	}
-// }
-
-// pos[0] = front
-// pos[1] = back
-// pos[2] = blank
-// pos[3] = quote_cnt
-void find_front(char *tkns, int *pos, int idx)
+void	find_front(char *tkns, int *pos, int idx)
 {
 	pos[0] = idx;
-	while (--pos[0] >= 0 && ft_isblank(tkns[pos[0]]) == FALSE && ('0' <= tkns[pos[0]] && tkns[pos[0]] < '9'))
+	while (--pos[0] >= 0 && ft_isblank(tkns[pos[0]])
+		== FALSE && ('0' <= tkns[pos[0]] && tkns[pos[0]] < '9'))
 		;
 	if (pos[0] >= 0 && ft_isblank(tkns[pos[0]]) == FALSE)
 		pos[0] = idx;
@@ -416,13 +362,9 @@ void find_front(char *tkns, int *pos, int idx)
 		pos[0]++;
 }
 
-// pos[0] = front
-// pos[1] = back
-// pos[2] = blank
-// pos[3] = quote_cnt
-void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx)
+void	find_back_and_calc_blank_quote(char *tkns, int *pos, int idx)
 {
-	char char_tmp;
+	char	char_tmp;
 
 	pos[1] = idx;
 	pos[2] = 0;
@@ -431,7 +373,8 @@ void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx)
 		pos[1]++;
 	while (ft_isblank(tkns[++pos[1]]) == TRUE)
 		pos[2]++;
-	while (tkns[pos[1]] != '\0' && ft_isblank(tkns[pos[1]]) == FALSE && tkns[pos[1]] != '<' && tkns[pos[1]] != '>')
+	while (tkns[pos[1]] != '\0' && ft_isblank(tkns[pos[1]])
+		== FALSE && tkns[pos[1]] != '<' && tkns[pos[1]] != '>')
 	{
 		if (tkns[pos[1]] == '\"' || tkns[pos[1]] == '\'')
 		{
@@ -444,17 +387,13 @@ void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx)
 	}
 }
 
-// pos[0] = front
-// pos[1] = back
-// pos[2] = blank
-// pos[3] = quote_cnt
-t_bool redirect_split(t_dll *dll, char *tkns)
+t_bool	redirect_split(t_dll *dll, char *tkns)
 {
-	int idx;
-	int pos[4];
-	char *con;
-	t_cmd_info *tmp;
-	t_bool	heredoc_flag;
+	int			idx;
+	int			pos[4];
+	char		*con;
+	t_cmd_info	*tmp;
+	t_bool		heredoc_flag;
 
 	tmp = (t_cmd_info *)(dll->head.contents);
 	idx = -1;
@@ -469,7 +408,8 @@ t_bool redirect_split(t_dll *dll, char *tkns)
 			tmp->redir_cnt++;
 			find_front(tkns, pos, idx);
 			find_back_and_calc_blank_quote(tkns, pos, idx);
-			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2] - pos[3] + 2, sizeof(char));
+			con = (char *)ft_calloc(pos[1] - pos[0] - pos[2]
+					- pos[3] + 2, sizeof(char));
 			if (con == T_NULL)
 				return (FALSE);
 			redirect_split2_1(tkns, con, pos, heredoc_flag);
@@ -485,10 +425,10 @@ t_bool redirect_split(t_dll *dll, char *tkns)
 	return (TRUE);
 }
 
-void redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag)
+void	redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag)
 {
-	char char_tmp;
-	int idx_chk;
+	int		idx_chk;
+	char	char_tmp;
 
 	idx_chk = pos[0];
 	pos[2] = -1;
@@ -512,7 +452,7 @@ void redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag)
 		tkns[idx_chk++] = ' ';
 }
 
-void redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag)
+void	redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag)
 {
 	if (tkns[pos[0]] == '$' && !heredoc_flag)
 		tkns[pos[0]] = -1;
@@ -525,12 +465,12 @@ void redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag)
 	}
 }
 
-t_bool parentheses_split(t_dll *dll, char *tkns)
+t_bool	parentheses_split(t_dll *dll, char *tkns)
 {
-	int idx;
-	int idx_chk;
-	char *tmp;
-	int layer;
+	int		idx;
+	int		idx_chk;
+	char	*tmp;
+	int		layer;
 
 	idx = -1;
 	layer = 0;
@@ -546,7 +486,7 @@ t_bool parentheses_split(t_dll *dll, char *tkns)
 				if (tkns[idx] == ')')
 				{
 					if (layer == 0)
-						break;
+						break ;
 					else
 						layer--;
 				}
@@ -567,35 +507,10 @@ t_bool parentheses_split(t_dll *dll, char *tkns)
 	return (TRUE);
 }
 
-// void remain_count(t_dll *dll, char *tkns)
-// {
-// 	int idx;
-// 	t_cmd_info *tmp;
-
-// 	tmp = (t_cmd_info *)(dll->head.contents);
-// 	idx = -1;
-// 	while (tkns[++idx] != '\0')
-// 	{
-// 		if (ft_isblank(tkns[idx]) == FALSE)
-// 		{
-// 			tmp->cp_cnt++;
-// 			while (ft_isblank(tkns[idx]) == FALSE && tkns[idx] != '\0')
-// 			{
-// 				if (tkns[idx] == '\"' || tkns[idx] == '\'')
-// 					ignore_quote(tkns, &idx);
-// 				idx++;
-// 			}
-// 			if (tkns[idx] == '\0')
-// 				break;
-// 		}
-// 	}
-// 	tmp->size = tmp->redir_cnt + tmp->cp_cnt;
-// }
-
-t_bool remain_split(t_dll *dll, char *tkns)
+t_bool	remain_split(t_dll *dll, char *tkns)
 {
-	int idx[3];
-	t_cmd_info *tmp;
+	int			idx[3];
+	t_cmd_info	*tmp;
 
 	tmp = (t_cmd_info *)(dll->head.contents);
 	idx[0] = 0;
@@ -625,11 +540,11 @@ t_bool remain_split(t_dll *dll, char *tkns)
 	return (TRUE);
 }
 
-t_bool remain_split2(t_dll *dll, char *tkns, int *idx)
+t_bool	remain_split2(t_dll *dll, char *tkns, int *idx)
 {
-	char *tmp;
-	int idx2;
-	char char_tmp;
+	char	*tmp;
+	int		idx2;
+	char	char_tmp;
 
 	tmp = (char *)ft_calloc(idx[0] - idx[1] - idx[2] + 1, sizeof(char));
 	if (tmp == T_NULL)
@@ -653,7 +568,6 @@ t_bool remain_split2(t_dll *dll, char *tkns, int *idx)
 				tkns[idx[1]] = -1;
 			tmp[++idx2] = tkns[idx[1]];
 		}
-
 		idx[1]++;
 	}
 	if (dll_content_add(dll, (void *)tmp, 0) == FALSE)

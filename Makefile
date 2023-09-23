@@ -3,16 +3,18 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
+#    By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/21 15:45:12 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/23 19:48:56 by junehyle         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS =	main.c \
 		check_syntax_error1.c \
 		check_syntax_error2.c \
+		check_syntax_error3.c \
+		syntax_util.c \
 		util1.c \
 		util2.c \
 		util3.c \
@@ -30,6 +32,7 @@ SRCS =	main.c \
 		unset.c \
 		export.c \
 		cd.c \
+		signal.c \
 		
 OBJS = 	${SRCS:.c=.o}
 

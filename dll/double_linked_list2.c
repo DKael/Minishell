@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   double_linked_list2.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 16:18:07 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 14:13:13 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ void	dll_clear(t_dll *dll, void (*del)(void *))
 		}
 		dll_init(dll);
 	}
-	
 }
 
 t_dllnode	*dll_new_node(void *contents)

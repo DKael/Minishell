@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 13:17:18 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 18:05:03 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -396,6 +396,9 @@ int main(int argc, char **argv, char **envp)
 		printf("minishell: don't support file read or need any other inputs\n");
 		return (1);
 	}
+	erase_signal_str();
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, SIG_IGN);
 	data_init(&data, argv[0], envp);
 	while (1)
 	{
@@ -403,8 +406,10 @@ int main(int argc, char **argv, char **envp)
 		data.cmd = readline("minishell$ ");
 		if (data.cmd == T_NULL)
 		{
+			printf("\033[1A\033[11C");
 			printf("exit\n");
-			return (0);
+			//set_last_exit_code(&data, data.last_exit_code);
+			return (data.last_exit_code);
 		}
 		else if (data.cmd[0] == '\0')
 		{

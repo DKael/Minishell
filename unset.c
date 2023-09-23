@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   unset.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/23 14:36:20 by junehyle          #+#    #+#             */
+/*   Updated: 2023/09/23 14:37:37 by junehyle         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	check_start_char_unset(char *str)
@@ -7,14 +19,14 @@ int	check_start_char_unset(char *str)
 		printf("bash: unset: '%s': not a valid identifier\n", str);
 		return (1);
 	}
-	return(0);
+	return (0);
 }
 
 int	do_unset(t_dll *s_env, t_dll *env, char *str)
 {
-	int	flag;
+	int			flag;
 	t_dllnode	*dllnode;
-	char	*tmp;
+	char		*tmp;
 
 	flag = 0;
 	if (s_env)
@@ -23,12 +35,13 @@ int	do_unset(t_dll *s_env, t_dll *env, char *str)
 		dllnode = s_env->head.back;
 		while (dllnode != &(s_env->tail))
 		{
-			tmp = (char *)((t_envval *)((((t_dllnode *)(dllnode->contents))->contents)))->name;
+			tmp = (char *)((t_envval *)
+					((((t_dllnode *)(dllnode->contents))->contents)))->name;
 			if (!(ft_strcmp(tmp, str)))
 			{
 				dll_del_node(env, dllnode->contents, envval_delete_func);
 				dll_del_node(s_env, dllnode, T_NULL);
-				break;
+				break ;
 			}
 			dllnode = dllnode->back;
 		}
@@ -40,7 +53,7 @@ int	ft_unset(t_dll *env, t_dll *s_env, char **args)
 {
 	int	i;
 	int	flag;
-	
+
 	flag = 0;
 	i = 1;
 	while (args[i])

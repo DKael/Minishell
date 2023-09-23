@@ -3,20 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   redirect.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/18 17:25:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 02:45:20 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 15:25:32 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_bool pipe_redirection(t_data *data, int ao_idx, int pp_idx)
+t_bool	pipe_redirection(t_data *data, int ao_idx, int pp_idx)
 {
 	if (data->pp != T_NULL)
 	{
-		if (dup2(data->pp[pp_idx][0], STDIN_FILENO) != -1 && dup2(data->pp[pp_idx + 1][1], STDOUT_FILENO) != -1)
+		if (dup2(data->pp[pp_idx][0], STDIN_FILENO)
+			!= -1 && dup2(data->pp[pp_idx + 1][1], STDOUT_FILENO) != -1)
 		{
 			close_pipes(data, data->pipe_cnt[ao_idx]);
 			return (TRUE);
@@ -26,7 +27,7 @@ t_bool pipe_redirection(t_data *data, int ao_idx, int pp_idx)
 	return (FALSE);
 }
 
-static int get_rd_sign(char *str, int idx)
+static int	get_rd_sign(char *str, int idx)
 {
 	if (str[idx - 1] == '<')
 	{
@@ -44,7 +45,7 @@ static int get_rd_sign(char *str, int idx)
 	}
 }
 
-int get_file_info(char *name, t_file_info *info, int mode)
+int	get_file_info(char *name, t_file_info *info, int mode)
 {
 	if (access(name, F_OK) == -1)
 	{
@@ -66,12 +67,12 @@ int get_file_info(char *name, t_file_info *info, int mode)
 	return (0);
 }
 
-int case_heredoc(t_dll *heredoc_names, int tmp_fd)
+int	case_heredoc(t_dll *heredoc_names, int tmp_fd)
 {
-	t_dllnode *node_ptr;
-	char *tmp_str;
-	int tmp;
-	t_file_info f_info;
+	t_dllnode	*node_ptr;
+	char		*tmp_str;
+	int			tmp;
+	t_file_info	f_info;
 
 	node_ptr = heredoc_names->head.back;
 	tmp_str = (char *)(node_ptr->contents);
@@ -93,10 +94,10 @@ int case_heredoc(t_dll *heredoc_names, int tmp_fd)
 	return (0);
 }
 
-int case_in_redirect(char *file_name, int tmp_fd)
+int	case_in_redirect(char *file_name, int tmp_fd)
 {
-	int tmp;
-	t_file_info f_info;
+	int			tmp;
+	t_file_info	f_info;
 
 	tmp = get_file_info(file_name, &f_info, 0);
 	if (tmp != 0)
@@ -115,10 +116,10 @@ int case_in_redirect(char *file_name, int tmp_fd)
 	return (0);
 }
 
-int case_out_redirect(char *file_name, int tmp_fd, int mode)
+int	case_out_redirect(char *file_name, int tmp_fd, int mode)
 {
-	int tmp;
-	t_file_info f_info;
+	int			tmp;
+	t_file_info	f_info;
 
 	tmp = get_file_info(file_name, &f_info, 1);
 	if (tmp == 4)
@@ -150,16 +151,16 @@ int case_out_redirect(char *file_name, int tmp_fd, int mode)
 	return (0);
 }
 
-int sign_redirection(t_data *data, t_dll *tkns)
+int	sign_redirection(t_data *data, t_dll *tkns)
 {
-	int redir_cnt;
-	int redir_idx;
-	char *tmp_str;
-	int tmp_fd;
-	int idx;
-	int rd_sign;
-	t_dllnode *node_ptr;
-	int result;
+	int			redir_cnt;
+	int			redir_idx;
+	char		*tmp_str;
+	int			tmp_fd;
+	int			idx;
+	int			rd_sign;
+	t_dllnode	*node_ptr;
+	int			result;
 
 	redir_cnt = ((t_cmd_info *)(tkns->head.contents))->redir_cnt;
 	redir_idx = -1;
@@ -180,7 +181,8 @@ int sign_redirection(t_data *data, t_dll *tkns)
 			;
 		rd_sign = get_rd_sign(tmp_str, idx);
 		if (rd_sign == 0)
-			result = case_heredoc(&(((t_cmd_info *)(tkns->head.contents))->heredoc_names), tmp_fd);
+			result = case_heredoc(&(((t_cmd_info *)
+							(tkns->head.contents))->heredoc_names), tmp_fd);
 		else if (rd_sign == 1)
 			result = case_in_redirect(&tmp_str[idx + 1], tmp_fd);
 		else if (rd_sign == 2 || rd_sign == 3)
@@ -199,17 +201,21 @@ int sign_redirection(t_data *data, t_dll *tkns)
 	return (0);
 }
 
-t_bool basic_redirection_save(t_data *data)
+t_bool	basic_redirection_save(t_data *data)
 {
-	if (dup2(STDIN_FILENO, data->old_stdin) == -1 || dup2(STDOUT_FILENO, data->old_stdout) == -1 || dup2(STDERR_FILENO, data->old_stderr) == -1)
+	if (dup2(STDIN_FILENO, data->old_stdin) == -1
+		|| dup2(STDOUT_FILENO, data->old_stdout) == -1
+		|| dup2(STDERR_FILENO, data->old_stderr) == -1)
 		return (FALSE);
 	else
 		return (TRUE);
 }
 
-t_bool basic_redirection_recover(t_data *data)
+t_bool	basic_redirection_recover(t_data *data)
 {
-	if (dup2(data->old_stdin, STDIN_FILENO) == -1 || dup2(data->old_stdout, STDOUT_FILENO) == -1 || dup2(data->old_stderr, STDERR_FILENO) == -1)
+	if (dup2(data->old_stdin, STDIN_FILENO) == -1
+		|| dup2(data->old_stdout, STDOUT_FILENO) == -1
+		|| dup2(data->old_stderr, STDERR_FILENO) == -1)
 		return (FALSE);
 	close(data->old_stdin);
 	close(data->old_stdout);
@@ -217,9 +223,9 @@ t_bool basic_redirection_recover(t_data *data)
 	return (TRUE);
 }
 
-void opened_fd_close(t_data *data)
+void	opened_fd_close(t_data *data)
 {
-	int idx;
+	int	idx;
 
 	idx = -1;
 	while (data->opened_fd[++idx] != -1)

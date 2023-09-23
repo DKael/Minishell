@@ -3,82 +3,86 @@
 /*                                                        :::      ::::::::   */
 /*   check_syntax_error1.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/18 10:55:11 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 20:38:04 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static t_bool case_pipe_and_or(char **cmd_ptr, int *idx);
-static t_bool wait_for_additional_cmd(char **cmd_ptr, char *cmd);
+static t_bool	case_pipe_and_or(char **cmd_ptr, int *idx);
+static t_bool	wait_for_additional_cmd(char **cmd_ptr, char *cmd);
 
-
-t_bool check_special_char_syntax(char **cmd_ptr)
+int	check_pipe_and_or(char *cmd, int idx, char **cmd_ptr)
 {
-	char *cmd;
-	char *sliced_part;
-	int idx;
-	int save_idx;
-	char char_tmp;
+	int	save_idx;
+	char	*sliced_part;
+
+	save_idx = idx;
+	if ((cmd[idx] == '&' && cmd[idx + 1] == '&')
+		|| (cmd[idx] == '|' && cmd[idx + 1] == '|'))
+		idx++;
+	if (case_pipe_and_or(cmd_ptr, &idx) == FALSE)
+		return (FALSE);
+	if (*cmd_ptr != cmd)
+	{
+		cmd = *cmd_ptr;
+		idx = save_idx;
+		sliced_part = &cmd[idx];
+		if (check_syntax_error(&sliced_part, 1) == FALSE)
+			return (FALSE);
+	}
+	return (idx);
+}
+
+int	
+{
+	if ((cmd[idx] == '<' && cmd[idx + 1] == '<')
+		|| (cmd[idx] == '>' && cmd[idx + 1] == '>'))
+		idx++;
+	if (case_lts_gts(cmd, &idx) == FALSE)
+		return (FALSE);
+	
+}
+
+t_bool	check_special_char_syntax(char **cmd_ptr)
+{
+	char	*cmd;
+	int		idx;
 
 	cmd = *cmd_ptr;
 	idx = 0;
 	while (ft_isblank(cmd[idx]) == TRUE)
 		idx++;
-	if (cmd[idx] == '|')
-	{
-		if (cmd[idx + 1] == '|')
-			return (syntax_error_print("||"));
-		else
-			return (syntax_error_print("|"));
-	}
-	else if (cmd[idx] == '&' && cmd[idx + 1] == '&')
-		return (syntax_error_print("&&"));
-
+	if (pipe_vs_ampersand(cmd, idx) == FALSE)
+		return (FALSE);
 	while (cmd[idx] != '\0')
 	{
 		if (cmd[idx] == '|' || (cmd[idx] == '&' && cmd[idx + 1] == '&'))
 		{
-			save_idx = idx;
-			if ((cmd[idx] == '&' && cmd[idx + 1] == '&') || (cmd[idx] == '|' && cmd[idx + 1] == '|'))
-				idx++;
-			if (case_pipe_and_or(cmd_ptr, &idx) == FALSE)
+			if (check_pipe_and_or(cmd, idx, cmd_ptr) == FALSE)
 				return (FALSE);
-			if (*cmd_ptr != cmd)
-			{
-				cmd = *cmd_ptr;
-				idx = save_idx;
-				sliced_part = &cmd[idx];
-				if (check_syntax_error(&sliced_part, 1) == FALSE)
-					return (FALSE);
-			}
+			idx = check_pipe_and_or(cmd, idx, cmd_ptr);
 		}
 		else if (cmd[idx] == '<' || cmd[idx] == '>')
 		{
-			if ((cmd[idx] == '<' && cmd[idx + 1] == '<') || (cmd[idx] == '>' && cmd[idx + 1] == '>'))
-				idx++;
-			if (case_lts_gts(cmd, &idx) == FALSE)
+			if (check_pipe_and_or(cmd, idx, cmd_ptr) == FALSE)
 				return (FALSE);
+			idx = check_redirect_left_right(cmd, idx, cmd_ptr);
 		}
 		else if (cmd[idx] == '\"' || cmd[idx] == '\'')
-		{
-			char_tmp = cmd[idx];
-			while (cmd[++idx] != char_tmp)
-				;
-			idx++;
-		}
+			idx = checking_quote(cmd, idx);//syntax_util.c맨위에 만들어 두었음
 		else
 			idx++;
 	}
 	return (TRUE);
 }
 
-static t_bool case_pipe_and_or(char **cmd_ptr, int *idx)
+static t_bool	case_pipe_and_or(char **cmd_ptr, int *idx)
 {
-	char *cmd;
+	char	*cmd;
 
 	cmd = *cmd_ptr;
 	while (ft_isblank(cmd[++(*idx)]) == TRUE)
@@ -97,23 +101,20 @@ static t_bool case_pipe_and_or(char **cmd_ptr, int *idx)
 	return (TRUE);
 }
 
-static t_bool wait_for_additional_cmd(char **cmd_ptr, char *cmd)
+static t_bool	wait_for_additional_cmd(char **cmd_ptr, char *cmd)
 {
-	char *buffer;
-	char *temp;
+	char	*buffer;
+	char	*temp;
 
 	while (1)
 	{
 		buffer = readline("> ");
 		if (buffer == T_NULL)
-		{
-			printf("minishell: syntax error: unexpected end of file\n");
-			return (FALSE);
-		}
+			unexpected_eod_print();//syntax_util.c에 있음 25줄 제한때문에 만들었음
 		else if (buffer[0] == '\0')
 		{
 			ft_free1((void **)&buffer);
-			continue;
+			continue ;
 		}
 		temp = ft_strjoin(cmd, buffer);
 		ft_free1((void **)buffer);
@@ -124,59 +125,7 @@ static t_bool wait_for_additional_cmd(char **cmd_ptr, char *cmd)
 			printf("minishell: malloc error!\n");
 			exit(1);
 		}
-		break;
-	}
-	return (TRUE);
-}
-
-t_bool case_lts_gts(char *cmd, int *idx)
-{
-	int check;
-	char *temp;
-
-	while (ft_isblank(cmd[++(*idx)]) == TRUE)
-		;
-	if (cmd[(*idx)] == '>' && cmd[(*idx) + 1] != '>')
-		return (syntax_error_print(">"));
-	else if (cmd[(*idx)] == '>' && cmd[(*idx) + 1] == '>')
-		return (syntax_error_print(">>"));
-	else if (cmd[(*idx)] == '<' && cmd[(*idx) + 1] != '<')
-		return (syntax_error_print("<"));
-	else if (cmd[(*idx)] == '<' && cmd[(*idx) + 1] == '<')
-		return (syntax_error_print("<<"));
-	else if (cmd[(*idx)] == '|' && cmd[(*idx) + 1] != '|')
-		return (syntax_error_print("|"));
-	else if (cmd[(*idx)] == '|' && cmd[(*idx) + 1] == '|')
-		return (syntax_error_print("||"));
-	else if (cmd[(*idx)] == '&' && cmd[(*idx) + 1] == '&')
-		return (syntax_error_print("&&"));
-	else if (cmd[(*idx)] == ')')
-		return (syntax_error_print(")"));
-	else if (cmd[(*idx)] == '\0')
-		return (syntax_error_print("newline"));
-	check = (*idx);
-	while (cmd[++(*idx)] != '<' && cmd[(*idx)] != '>'
-		&& cmd[(*idx)] != '\0' && cmd[(*idx)] != '|'
-		&& !(cmd[(*idx)] == '&' && cmd[(*idx) + 1] == '&')
-		&& cmd[(*idx)] != '(' && cmd[(*idx)] != ')'
-		&& ft_isblank(cmd[(*idx)]) == FALSE)
-		;
-	if (cmd[(*idx)] == '<' || cmd[(*idx)] == '>')
-	{
-		temp = ft_strndup(&cmd[check], (*idx) - check);
-		if (temp == T_NULL)
-		{
-			printf("minishell: malloc error!\n");
-			ft_free1((void **)cmd);
-			exit(1);
-		}
-		if (ft_isdecimal(temp) == TRUE)
-		{
-			syntax_error_print(temp);
-			ft_free1((void **)temp);
-			return (FALSE);
-		}
-		ft_free1((void **)temp);
+		break ;
 	}
 	return (TRUE);
 }

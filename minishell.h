@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 13:08:12 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 20:19:31 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,7 @@ int	is_builtin_func(char *cmd);
 int execute_builtin_func(int func_idx, char **argu_lst, t_data *data);
 
 void resource_free_and_exit(t_data *data, int exit_code, char *msg);
+//error.c
 t_bool syntax_error_print(char *chr);
 void	err_msg_print1(char *m1);
 void	err_msg_print2(char *m1, char *m2);
@@ -144,14 +145,24 @@ void *free_2d_array(void ***arr_ptr, int num);
 void *free_2d_array2(void ***arr_ptr);
 void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 
-t_bool case_lts_gts(char *cmd, int *idx);
+//check_syntax_error1.c
+t_bool	check_special_char_syntax(char **input_ptr);
+//check_syntax_error2.c
+t_bool	comb_redirect(char *cmd, int *idx);
+t_bool	check_redirect(char *cmd, char *temp);
+t_bool	case_lts_gts(char *cmd, int *idx);
+//syntax_util.c
+t_bool  pipe_vs_ampersand(char *cmd, int idx);
+t_bool  unexpected_eod_print(void);
+t_bool  pipe_or_ampersand(char *cmd, int idx, char **cmd_ptr, char *sliced_part);
+int		checking_quote(char *cmd, int idx);
 
 t_bool	check_syntax_error(char **cmd, int mode);
 t_bool check_multiple_lines(const char *cmd);
 t_bool check_quote_closed(const char *cmd);
 t_bool check_parentheses_syntax(char *cmd);
 t_bool check_dollor_braces(char *cmd);;
-t_bool check_special_char_syntax(char **input_ptr);
+
 
 char *ft_strjoin(char const *s1, char const *s2);
 char	*ft_strjoin2(char const *s1, char const *s2, char *between);
@@ -209,7 +220,9 @@ int get_file_info(char *name, t_file_info *info, int mode);
 
 char **make_2d_array_from_dll(t_dll *dll);
 char **make_2d_envp_from_dll(t_dll *dll);
-
+//signal
+void	signal_handler(int signum);
+void	erase_signal_str(void);
 int	ft_echo(char **input);
 int	ft_cd(t_data *data, t_dll *env, char **input);
 int	ft_export(t_dll *env, t_dll *s_env, char **args);
