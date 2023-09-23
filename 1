@@ -6,7 +6,7 @@
 /*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 17:25:34 by junehyle          #+#    #+#             */
-/*   Updated: 2023/09/23 21:53:42 by junehyle         ###   ########.fr       */
+/*   Updated: 2023/09/23 21:46:47 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,10 @@ void	erase_signal_str(void)
 		perror("tcgetattr");
 		exit (1);
 	}
+
+// ECHOCTL 비트 비활성화
 	term.c_lflag &= ~ECHOCTL;
-	if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
+    if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
 	{
 		perror("tcsetattr");
 		exit (1);

@@ -6,7 +6,7 @@
 /*   By: junehyle <junehyle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 21:19:25 by junehyle         ###   ########.fr       */
+/*   Updated: 2023/09/23 21:35:52 by junehyle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,14 @@
 static t_bool	case_pipe_and_or(char **cmd_ptr, int *idx);
 static t_bool	wait_for_additional_cmd(char **cmd_ptr, char *cmd);
 
-int  pipe_and_ampersand(char *cmd, int idx, char **cmd_ptr)
+int	pipe_and_ampersand(char *cmd, int idx, char **cmd_ptr)
 {
 	int		save_idx;
 	char	*sliced_part;
 
 	save_idx = idx;
-	if ((cmd[idx] == '&' && cmd[idx + 1] == '&') || (cmd[idx] == '|' && cmd[idx + 1] == '|'))
+	if ((cmd[idx] == '&' && cmd[idx + 1] == '&')
+		|| (cmd[idx] == '|' && cmd[idx + 1] == '|'))
 		idx++;
 	if (case_pipe_and_or(cmd_ptr, &idx) == FALSE)
 		return (FALSE);
@@ -38,11 +39,12 @@ int  pipe_and_ampersand(char *cmd, int idx, char **cmd_ptr)
 
 int	redirect_and_quote(char *cmd, int idx)
 {
-	char char_tmp;
+	char	char_tmp;
 
 	if (cmd[idx] == '<' || cmd[idx] == '>')
 	{
-		if ((cmd[idx] == '<' && cmd[idx + 1] == '<') || (cmd[idx] == '>' && cmd[idx + 1] == '>'))
+		if ((cmd[idx] == '<' && cmd[idx + 1] == '<')
+			|| (cmd[idx] == '>' && cmd[idx + 1] == '>'))
 			idx++;
 		if (case_lts_gts(cmd, &idx) == FALSE)
 			return (FALSE);
@@ -115,7 +117,7 @@ static t_bool	wait_for_additional_cmd(char **cmd_ptr, char *cmd)
 	{
 		buffer = readline("> ");
 		if (buffer == T_NULL)
-			unexpected_eod_print();//error2.c에 있음 25줄 제한때문에 만들었음
+			unexpected_eod_print();
 		else if (buffer[0] == '\0')
 		{
 			ft_free1((void **)&buffer);
