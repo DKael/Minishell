@@ -2,10 +2,11 @@
 
 int ft_pwd(t_data *data)
 {
-   char    *path;
+   char path[4096];
+   char *flag;
 
-    path = getcwd(0, 0);
-    if (path == T_NULL)
+    flag = getcwd(path, 4096);
+    if (flag == T_NULL)
     {
         if (data->wd[0] == '\0')
             write(2, "pwd: error retrieving current directory: \
@@ -14,9 +15,8 @@ getcwd: cannot access parent directories: No such file or directory\n", 109);
             printf("%s\n", data->wd);
     }
     else
-    {
         printf ("%s\n", path);
-        free (path);
-    }
     return (0);
 }
+
+

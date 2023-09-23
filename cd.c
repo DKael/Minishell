@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/22 00:19:39 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 13:27:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 17:27:31 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,75 +68,57 @@ t_bool change_pwd_oldpwd(t_dll *env, char *path)
 	return (TRUE);
 }
 
-char *make_path(t_data *data, char *raw_path)
+char *make_path(char *raw_path)
 {
-	char *wd;
-	char *tmp;
+	char	buffer[4096];
+	char	**split;
 	int idx;
+	int	idx2;
+	int bf_idx;
 
-	wd = getcwd(0, 0);
-// 	if (wd == T_NULL)
-// 	{
-// 		write(2, "cd: error retrieving current directory: \
-// getcwd: cannot access parent directories: No such file or directory\n",
-// 			  108);
-// 		return ((char *)-1);
-// 	}
-	if (raw_path[0] == '.' && raw_path[1] == '.' && (raw_path[2] == '/' || raw_path[2] == '\0'))
+	if (getcwd(buffer, 4096) == T_NULL)
 	{
-		if (wd == T_NULL)
+		write(2, "cd: error retrieving current directory: \
+getcwd: cannot access parent directories: No such file or directory\n", 108);
+		return ((char *)-1);
+	}
+	bf_idx = -1;
+	while (buffer[++bf_idx] != '\0')
+		;
+	split = ft_split(raw_path, '/');
+	if (split == T_NULL)
+		return (T_NULL);
+	idx = -1;
+	while (split[++idx] != T_NULL)
+	{
+		if (split[idx][0] == '.' && split[idx][1] == '.' && split[idx][2] == '\0')
 		{
-			wd = ft_strdup(data->wd);
-			if (wd == T_NULL)
-				return (T_NULL);
+			while (buffer[--bf_idx] != '/')
+				;
+			if (bf_idx == 0)
+				buffer[++bf_idx] = '\0';
+			else
+				buffer[bf_idx] = '\0';
 		}
-		idx = ft_strlen(wd);
-		while (wd[--idx] != '/')
-			;
-		wd[idx] = '\0';
-		if (raw_path[2] == '/')
-			tmp = ft_strjoin(wd, &raw_path[2]);
+		else if ((split[idx][0] == '.' && split[idx][1] == '\0') || split[idx][0] == '\0')
+			continue;
 		else
 		{
-			if (idx == 0)
-				tmp = ft_strdup("/");
-			else
-				tmp = ft_strdup(wd);
+			if (bf_idx + 2 + ft_strlen(split[idx]) > 4096)
+			{
+				err_msg_print3("cd: ", split[idx], ": File name too long");
+				free_2d_array2((void ***)&split);
+				return ((char *)-1);
+			}
+			buffer[bf_idx] = '/';
+			idx2 = -1;
+			while (split[idx][++idx2] != '\0')
+				buffer[++bf_idx] = split[idx][idx2];
+			buffer[++bf_idx] = '\0';
 		}
 	}
-	else if (raw_path[0] == '.' && raw_path[1] == '/')
-	{
-		if (wd == T_NULL)
-		{
-			wd = ft_strdup(data->wd);
-			if (wd == T_NULL)
-				return (T_NULL);
-		}
-		tmp = ft_strjoin(wd, &raw_path[1]);
-	}
-	else if (raw_path[0] == '.' && raw_path[1] == '\0')
-	{
-		if (wd == T_NULL)
-		{
-			write(2, "cd: error retrieving current directory: \
-getcwd: cannot access parent directories: No such file or directory\n", 108);
-			return ((char *)-1);
-		}
-		tmp = ft_strdup(wd);
-	}
-	else
-	{
-		if (wd == T_NULL)
-		{
-			wd = ft_strdup(data->wd);
-			if (wd == T_NULL)
-				return (T_NULL);
-		}
-		tmp = ft_strjoin2(wd, raw_path, "/");
-	}
-		
-	free(wd);
-	return (tmp);
+	free_2d_array2((void ***)&split);
+	return (ft_strdup(buffer));
 }
 
 char *remove_duplicate_slashs(char *str)
@@ -254,7 +236,7 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 			return (-1);
 		if (raw_path[0] != '/')
 		{
-			path = make_path(data, raw_path);
+			path = make_path(raw_path);
 			ft_free1((void **)&raw_path);
 			if (path == T_NULL)
 			{
