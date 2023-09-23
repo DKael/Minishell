@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 02:47:02 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 13:08:12 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,7 @@ typedef struct s_data
 	int	old_stdout;
 	int	old_stderr;
 	int	opened_fd[256];
+	char	wd[4096];
 
 } t_data;
 
@@ -213,7 +214,7 @@ int	ft_echo(char **input);
 int	ft_cd(t_data *data, t_dll *env, char **input);
 int	ft_export(t_dll *env, t_dll *s_env, char **args);
 int	ft_unset(t_dll *env, t_dll *s_env, char **args);
-int	ft_pwd(void);
+int	ft_pwd(t_data *data);
 int	ft_exit(char **input);
 int	ft_env(t_data *data);
 

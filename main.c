@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 11:32:25 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/23 13:17:18 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,12 @@ void data_init(t_data *data, char *program_name, char **envp)
 	idx = -1;
 	while (++idx < 256)
 		data->opened_fd[idx] = -1;
+	data->wd[0] = '\0';
+	if (getcwd(data->wd, 4096) == T_NULL)
+	{
+		write(2, "shell-init: error retrieving current directory: \
+getcwd: cannot access parent directories: No such file or directory\n", 116);
+	}
 	dll_init(&data->envdll);
 	dll_init(&data->sorted_envdll);
 	store_env_in_dll(data, envp);
@@ -322,7 +328,7 @@ int execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
 	else if (func_idx == 4)
 		return (ft_unset(&data->envdll, &data->sorted_envdll, argu_lst));
 	else if (func_idx == 5)
-		return (ft_pwd());
+		return (ft_pwd(data));
 	else if (func_idx == 6)
 		return (ft_exit(argu_lst));
 	else
@@ -601,8 +607,8 @@ int main(int argc, char **argv, char **envp)
 		ft_free1((void **)&data.pipe_cnt);
 		ft_free1((void **)&data.logic_table);
 
-		printf("\n\n----------------------<7>----------------------\n\n");
-		system("leaks main");
-		printf("\n\n----------------------<7>----------------------\n\n");
+		// printf("\n\n----------------------<7>----------------------\n\n");
+		// system("leaks minishell");
+		// printf("\n\n----------------------<7>----------------------\n\n");
 	}
 }
