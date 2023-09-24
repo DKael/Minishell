@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 01:19:28 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 17:39:58 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,7 +249,7 @@ void dll_str_print_func(void *content)
 	char *tmp;
 
 	tmp = (char *)content;
-	printf("%s\n", tmp);
+	printf("%s\t", tmp);
 }
 
 void close_pipes(t_data *data, int num)
@@ -499,6 +499,16 @@ int main(int argc, char **argv, char **envp)
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 				if (retrieve_variable_value(&data, data.tkn[ao_idx][pp_idx]) == FALSE)
 					resource_free_and_exit(&data, 1, "malloc error17");
+			pp_idx = -1;
+			while (++pp_idx < data.pipe_cnt[ao_idx])
+			{
+				result = wildcard(data.tkn[ao_idx][pp_idx]);
+				if (result == -1)
+					resource_free_and_exit(&data, 1, "malloc error");
+				else if (result == -2)
+					resource_free_and_exit(&data, 1, "opendir error");
+			}
+				
 
 			if (data.pipe_cnt[ao_idx] == 1 && ((t_cmd_info *)(data.tkn[ao_idx][0]->head.contents))->cp_cnt > 0)
 			{

@@ -26,6 +26,7 @@
 		"ios": "c",
 		"__mutex_base": "c",
 		"atomic": "c",
-		"minishell.h": "c"
+		"minishell.h": "c",
+		"iterator": "c"
 	}
 }

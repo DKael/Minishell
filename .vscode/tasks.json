@@ -28,6 +28,7 @@
                 "env.c",
                 "echo.c",
                 "exit.c",
+                "wildcard.c",
                 "-L./gnl",
                 "-lgnl",
                 "-lreadline",

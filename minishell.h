@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 01:17:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 13:33:14 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,6 +200,7 @@ void find_front(char *tkns, int *pos, int idx);
 
 void *ft_free1(void **ptr);
 t_bool ft_free2(void **ptr, t_bool flag);
+int	ft_free3(void **ptr, int return_num);
 
 void	child(t_data *data, int ao_idx, int pp_idx);
 
@@ -220,5 +221,9 @@ int	ft_unset(t_dll *env, t_dll *s_env, char **args);
 int	ft_pwd(t_data *data);
 int	ft_exit(t_data *data, char **input);
 int	ft_env(t_data *data);
+
+char *make_path(char *raw_path, int mode);
+
+int	wildcard(t_dll *dll);
 
 #endif
