@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 00:09:12 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 10:43:00 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,13 @@ t_bool ft_free2(void **ptr, t_bool flag)
 	free(*ptr);
 	*ptr = T_NULL;
 	return (flag);
+}
+
+int	ft_free3(void **ptr, int return_num)
+{
+	free(*ptr);
+	*ptr = T_NULL;
+	return (return_num);
 }
 
 void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *))

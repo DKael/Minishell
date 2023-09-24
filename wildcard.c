@@ -6,29 +6,65 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 13:27:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 01:30:24 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 17:44:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 static int	pattern_matching(t_dll *dll, char *tkn);
+static t_bool pattern_matching2(char *part, char *file);
+
+static int wildcard_redirection_check(t_dll *dll, t_dll *tmp_dll, t_dllnode **ptr)
+{
+	int			idx[2];
+	char*		tkn;
+	int			result;
+
+	idx[0] = -1;
+	while (++idx[0] < ((t_cmd_info *)(dll->head.contents))->redir_cnt)
+	{
+		tkn = (char *)(*ptr)->contents;
+		if (ft_strstr(tkn, "*") != T_NULL && ft_strstr(tkn, "<<") == T_NULL)
+		{
+			tkn = ft_strstr(tkn, " ");
+			result = pattern_matching(tmp_dll, ++tkn) == -1;
+			if (result != 0)
+				return (result);
+			if (tmp_dll->size != 0)
+			{
+				err_msg_print2(&tkn[idx[1] + 1], ": ambiguous redirect");
+				dll_clear(tmp_dll, str_delete_func);
+				return (1);
+			}
+		}
+		(*ptr) = (*ptr)->back;
+	}
+	return (0);
+}
 
 int	wildcard(t_dll *dll)
 {
-	t_dll		tmp_dll;
+	
 	t_dllnode	*ptr;
 	t_dllnode	*ptr1;
 	t_dllnode	*ptr2;
 	t_dllnode	*ptr3;
 	t_dllnode	*del;
 	t_bool		first_find;
+	t_dll		tmp_dll;
+	int		result;
+	
 
 	dll_init(&tmp_dll);
-	first_find = FALSE;
 	ptr = dll->head.back;
+	result = wildcard_redirection_check(dll, &tmp_dll, &ptr);
+	if (result != 0)
+		return (result);
+	first_find = FALSE;
 	ptr1 = T_NULL;
 	ptr2 = T_NULL;
+	ptr = ptr->back;
 	while (ptr != &(dll->tail))
 	{
 		if (ft_strstr((char *)ptr->contents, "*") != T_NULL)
@@ -39,8 +75,18 @@ int	wildcard(t_dll *dll)
 				ptr1 = ptr;
 				ptr2 = ptr->back;
 			}
-			if (pattern_matching(&tmp_dll, (char *)ptr->contents) == -1)
-				return (-1);
+			result = pattern_matching(&tmp_dll, (char *)ptr->contents);
+			if (result == 2)
+			{
+				ptr = ptr->back;
+				continue;
+			}
+			else if (result != 0)
+			{
+				dll_clear(&tmp_dll, str_delete_func);
+				return (result);
+			}
+			((t_cmd_info *)(dll->head.contents))->cp_cnt += tmp_dll.size;
 			ptr3 = tmp_dll.tail.front;
 			while (ptr3 != &(tmp_dll.head))
 			{
@@ -52,16 +98,23 @@ int	wildcard(t_dll *dll)
 			{
 				del = ptr;
 				ptr = ptr->front;
-				dll_del_node(dll, ptr, str_delete_func);
+				dll_del_node(dll, del, str_delete_func);
+				((t_cmd_info *)(dll->head.contents))->cp_cnt--;
 			}
 		}
 		ptr = ptr->back;
 		if (ptr == ptr2)
 		{
 			if (ptr->front != ptr1)
+			{
 				dll_del_node(dll, ptr1, str_delete_func);
+				((t_cmd_info *)(dll->head.contents))->cp_cnt--;
+			}
 			first_find = FALSE;
 		}
+		// printf("\n\n---------------------------------------------\n");
+		// dll_print(dll, dll_str_print_func);
+		// printf("\n---------------------------------------------\n\n");
 	}
 	return (TRUE);
 }
@@ -99,105 +152,152 @@ static int	pattern_matching(t_dll *dll, char *tkn)
 	struct dirent *file;
 	char	buffer[MAX_PATH_LEN];
 	char	*path;
+	char	*tmp1;
 	char	*tmp2;
+	char	*tmp3;
 	int		idx1;
-	int		idx2;
-	t_bool	matching;
+	char	*part;
+	int		s_chk[2];
+	t_file_info f_info;
 
-	if (tkn[0] != '/')
+	tmp2 = remove_duplicate_asterisk_slash(tkn);
+	if (tmp2 == T_NULL)
+		return (-1);
+	if (tmp2[0] != '/')
 	{
-		path = make_path(tkn, 1);
+		path = make_path(tmp2, 1);
 		if (path == T_NULL)
 		{
-			err_msg_print1("cd: malloc error");
-			return (-1);
+			err_msg_print1("malloc error");
+			return (ft_free3((void **)&tmp2, -1));
 		}
 		else if (path == (char *)-1)
-			return (0);
+			return (ft_free3((void **)&tmp2, 0));
+		else if (path == (char *)-2)
+		{
+			err_msg_print2(tkn, ": File name too long");
+			return (ft_free3((void **)&tmp2, 0));
+		}
 		ft_strlcpy(buffer, path, MAX_PATH_LEN);
 		free(path);
 	}
 	else
 	{
-		if (ft_strlcpy(buffer, tkn, MAX_PATH_LEN) >= MAX_PATH_LEN)
+		if (ft_strlcpy(buffer, tmp2, MAX_PATH_LEN) >= MAX_PATH_LEN)
 		{
-			err_msg_print3("cd: ", tkn, ": File name too long");
-			return (0);
+			err_msg_print2(tkn, ": File name too long");
+			return (ft_free3((void **)&tmp2, 0));
 		}
 	}
+	tmp3 = ft_strstr(buffer, tmp2);
+	free(tmp2);
 
-
-	
-	
-	dir = opendir(tmp);
-	if (dir == T_NULL)
+	idx1 = -1;
+	while (buffer[++idx1] != '*')
+		;
+	s_chk[0] = idx1;
+	while (buffer[--s_chk[0]] != '/')
+		;
+	s_chk[1] = idx1;
+	while (buffer[++s_chk[1]] != '/' && buffer[s_chk[1]] != '\0')
+		;
+	if (buffer[s_chk[1]] == '/')
 	{
-		free(tmp);
-		return (-2);
-	}
-	free(tmp);
-	tmp = (char *)ptr->contents;
-	tmp2 = remove_duplicate_asterisk(tmp);
-	if (tmp2 == T_NULL)
-		return (-1);
-	if (tmp2[0] == '*' && tmp2[1] == '\0')
-	{
-		ptr = ptr->back;
-		file = readdir(dir);
-		while (file != T_NULL)
-		{
-			tmp = ft_strdup(file->d_name);
-			if (tmp == T_NULL)
-			{
-				free(tmp2);
-				return (-1);
-			}
-			if (dll_content_add2(dll, (void *)tmp, ptr, 1) == FALSE)
-			{
-				free(tmp);
-				free(tmp2);
-				return (-1);
-			}
-			file = readdir(dir);
-		}
-		dll_del_node(dll, ptr, str_delete_func);
+		buffer[s_chk[1]] = '\0';
+		part = ft_strdup(&buffer[s_chk[0] + 1]);
+		buffer[s_chk[1]] = '/';
 	}
 	else
-	{
+		part = ft_strdup(&buffer[s_chk[0] + 1]);
+	if (part == T_NULL)
+		return (-1);
 		
-		file = readdir(dir);
-		while (file != T_NULL)
-		{
-			
-			matching = TRUE;
-			idx1 = ft_strlen(tmp);
-			idx2 = ft_strlen(tmp2);
-			if ((tmp[0] != '*' && tmp[0] != tmp2[0])
-				|| (tmp[idx1 - 1] != '*' && tmp[idx1 - 1] != tmp2[idx2 - 1]))
-				matching = FALSE;
-			idx1 = -1;
-			idx2 = -1;
-			if (tmp[0] != '*')
-			{
-				idx1 = 0;
-				idx2 = 0;
-			}
-			while (tmp[++idx1] != '\0' && matching == TRUE)
-			{
-				if (tmp[idx1] != '*')
-				{
-					
-				}
-			}
-			if (matching == TRUE)
-			{
+	if (s_chk[0] == 0)
+		buffer[++s_chk[0]] = '\0';
+	else
+		buffer[s_chk[0]] = '\0';
+	
+	if (get_file_info(buffer, &f_info, 1) == 4)
+		return (-3);
+	if (f_info.type != DIRECTORY)
+		return (ft_free3((void **)&part, 0));
+	
+	if ((f_info.mode & 0700) != 0700)
+		return (ft_free3((void **)&part, 2));
 
+	dir = opendir(buffer);
+	if (dir == T_NULL)
+		return (ft_free3((void **)&part, -2));
+		
+	file = readdir(dir);
+	while (file != T_NULL)
+	{
+		if (part[0] == '*' && part[1] == '\0' && file->d_name[0] == '.')
+			;
+		else if (pattern_matching2(part, file->d_name) == TRUE)
+		{
+			// if (s_chk[0] - 1 == 0)
+			// 	tmp1 = ft_strjoin2("/", &buffer[s_chk[1]], file->d_name);
+			// else
+			// {
+			// 	buffer[s_chk[0]] = '/';
+			// 	buffer[s_chk[0] + 1] = '\0';
+			// 	tmp1 = ft_strjoin2(buffer, &buffer[s_chk[1]], file->d_name);
+			// }
+			if (tmp3 == &buffer[0])
+				tmp1 = ft_strjoin2("/", &buffer[s_chk[1]], file->d_name);
+			else
+			{
+				buffer[s_chk[0]] = '/';
+				buffer[s_chk[0] + 1] = '\0';
+				tmp1 = ft_strjoin2(tmp3, &buffer[s_chk[1]], file->d_name);
 			}
-			free(tmp2);
-			file = readdir(dir);
+			if (tmp1 == T_NULL)
+			{
+				closedir(dir);
+				return (ft_free3((void **)&part, -1));
+			}
+			if (dll_content_add(dll, tmp1, 0) == FALSE)
+			{
+				closedir(dir);
+				free(part);
+				return (ft_free3((void **)&part, -1));
+			}
+		}
+		file = readdir(dir);
+	}
+	closedir(dir);
+	return (ft_free3((void **)&part, 0));
+}
+
+static t_bool pattern_matching2(char *part, char *file)
+{
+	int		idx1;
+	int		idx2;
+
+	idx1 = ft_strlen(part);
+	idx2 = ft_strlen(file);
+	if ((part[0] != '*' && part[0] != file[0])
+		|| (part[idx1 - 1] != '*' && part[idx1 - 1] != file[idx2 - 1]))
+		return (FALSE);
+	idx1 = 0;
+	idx2 = 0;
+	if (part[0] == '*')
+		idx2 = -1;
+	while (part[++idx1] != '\0')
+	{
+		if (part[idx1] != '*' && part[idx1 - 1] != '*')
+		{
+			if (part[idx1] != file[++idx2])
+				return (FALSE);
+		}
+		else if (part[idx1] != '*' && part[idx1 - 1] == '*')
+		{
+			while (file[++idx2] != part[idx1] && file[idx2] != '\0')
+				;
+			if (file[idx2] == '\0')
+				return (FALSE);
 		}
 	}
-	free(tmp2);
-	closedir(dir);
-	return (0);
+	return (TRUE);
 }

@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/21 15:45:12 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/24 13:39:47 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,7 @@ SRCS =	main.c \
 		unset.c \
 		export.c \
 		cd.c \
+		wildcard.c
 		
 OBJS = 	${SRCS:.c=.o}
 

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/22 00:19:39 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 01:09:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 10:33:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,9 +107,10 @@ getcwd: cannot access parent directories: No such file or directory\n", 108);
 		{
 			if (bf_idx + 2 + ft_strlen(split[idx]) > MAX_PATH_LEN)
 			{
-				err_msg_print3("cd: ", split[idx], ": File name too long");
+				if (mode == 0)
+					err_msg_print3("cd: ", split[idx], ": File name too long");
 				free_2d_array2((void ***)&split);
-				return ((char *)-1);
+				return ((char *)-2);
 			}
 			buffer[bf_idx] = '/';
 			idx2 = -1;
@@ -245,7 +246,7 @@ int ft_cd(t_data *data, t_dll *dll, char **input)
 				err_msg_print1("cd: malloc error1");
 				return (-1);
 			}
-			else if (path == (char *)-1)
+			else if (path == (char *)-1 || path == (char *)-2)
 				return (0);
 		}
 		else

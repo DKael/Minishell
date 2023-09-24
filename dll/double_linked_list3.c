@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:15:28 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 00:53:45 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 16:20:18 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 static t_bool	dll_del_node2(t_dllnode *node, void (*del)(void *));
 static void	dll_node_move_to_another_dll_head2(t_dllnode *node, t_dll *dll1);
 static void	dll_node_move_to_another_dll_tail2(t_dllnode *node, t_dll *dll1);
+static void	dll_node_insert2(t_dllnode *node, t_dllnode *pos, int mode);
 
 int	dll_node_compare(t_dllnode *n1, t_dllnode *n2,
 	int (*compare)(t_dllnode *, t_dllnode *))
@@ -223,14 +224,14 @@ t_bool	dll_node_insert(t_dllnode *node, t_dll *dll, t_dllnode *pos, int mode)
 	return (TRUE);
 }
 
-static t_bool	dll_node_insert2(t_dllnode *node, t_dllnode *pos, int mode)
+static void	dll_node_insert2(t_dllnode *node, t_dllnode *pos, int mode)
 {
 	if (mode == 1)
 		pos = pos->front;
 	node->front = pos;
 	node->back = pos->back;
 	pos->back = node;
-	node->back->front = pos;
+	node->back->front = node;
 }
 
 /*
