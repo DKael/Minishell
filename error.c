@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 11:35:22 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 18:04:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 21:58:41 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_bool syntax_error_print(char *chr)
 {
-	printf("minishell: syntax error near unexpected token `%s'\n", chr);
+	err_msg_print3("syntax error near unexpected token `", chr, "'\n");
 	return (FALSE);
 }
 
@@ -55,6 +55,6 @@ void	err_msg_print3(char *m1, char *m2, char *m3)
 void message_exit(const char *msg, int exit_code)
 {
 	exit_code = exit_code % 256;
-	write(2, msg, ft_strlen(msg));
+	write(STDERR_FILENO, msg, ft_strlen(msg));
 	exit(exit_code);
 }

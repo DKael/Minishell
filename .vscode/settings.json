@@ -27,6 +27,10 @@
 		"__mutex_base": "c",
 		"atomic": "c",
 		"minishell.h": "c",
-		"iterator": "c"
+		"iterator": "c",
+		"stddef.h": "c",
+		"libft.h": "c",
+		"double_linked_list.h": "c",
+		"errno.h": "c"
 	}
 }

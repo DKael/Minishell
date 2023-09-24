@@ -6,19 +6,11 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/22 11:06:20 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 23:02:45 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-// void	dll_dollor_tmp_print_func(void *content)
-// {
-// 	t_dollor_tmp *tmp;
-
-// 	tmp = (t_dollor_tmp *)content;
-// 	printf("%s\n", tmp->value);
-// }
 
 t_bool	retrieve_variable_value(t_data *data, t_dll *tkns)
 {
@@ -58,7 +50,7 @@ t_bool	retrieve_variable_value(t_data *data, t_dll *tkns)
 				if (tmp == T_NULL)
 				{
 					dll_clear(&temp_dll, T_NULL);
-					return (ft_free2((void **)dtmp, FALSE));
+					return (ft_free2((void **)&dtmp, FALSE));
 				}
 				dtmp->value = ft_getenv(data, tmp);
 				ft_free1((void **)&tmp);
@@ -68,7 +60,7 @@ t_bool	retrieve_variable_value(t_data *data, t_dll *tkns)
 				if (dll_content_add(&temp_dll, dtmp, 0) == FALSE)
 				{
 					dll_clear(&temp_dll, T_NULL);
-					return (ft_free2((void **)dtmp, FALSE));
+					return (ft_free2((void **)&dtmp, FALSE));
 				}
 				expansion_len += (ft_strlen(dtmp->value) + (idx - idx_chk + 1));
 			}

@@ -6,12 +6,12 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 13:33:14 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 01:12:27 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
-#define MINISHELL_H
+# define MINISHELL_H
 
 # include <stdio.h>
 # include <unistd.h>
@@ -28,9 +28,10 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <dirent.h>
-# include "dll/double_linked_list.h"
-# include "gnl/get_next_line.h"
-# include "quick_sort.h" 
+# include "libft/libft.h"
+# include "libdll/double_linked_list.h"
+# include "libgnl/get_next_line.h"
+# include "libsort/quick_sort.h" 
 
 
 #if !defined(TRUE) && !defined(FALSE)
@@ -41,7 +42,7 @@
 #define T_NULL (void *)0
 #endif
 
-# define hd_path "/tmp"
+# define HD_PATH "/tmp"
 # define MAX_PATH_LEN 1025
 
 typedef int t_bool;
@@ -54,6 +55,7 @@ typedef	enum s_file_type
 	SYMBOLIC_LINK,
 	ETC
 }	t_file_type;
+
 typedef struct s_file_info
 {
 	t_stat		bf;
@@ -63,8 +65,8 @@ typedef struct s_file_info
 
 typedef	struct s_srt
 {
-	char *name;
-	t_dllnode *ptr;
+	char		*name;
+	t_dllnode	*ptr;
 }	t_srt;
 
 typedef enum e_logic
@@ -73,49 +75,45 @@ typedef enum e_logic
 	OR = 2
 }	t_logic;
 
-typedef	struct s_child_data
-{
-	
-}	t_child_data;
-
 typedef struct s_dollor_tmp
 {
-	char *value;
-	int idx_jump;
+	char	*value;
+	int		idx_jump;
 }	t_dollor_tmp;
 
 typedef struct s_envval
 {
-	char *name;
-	char *value;
+	char	*name;
+	char	*value;
 }	t_envval;
+
 typedef struct s_cmd_info
 {
-	int	size;
-	int	redir_cnt;
-	t_dll	heredoc_names;
-	
-	t_bool	parentheses_flag;
-	t_bool cmd_flag;
+	int		size;
+	int		redir_cnt;
 	int		cp_cnt;
-	
+	t_dll	heredoc_names;
+	t_bool	parentheses_flag;
+	t_bool	cmd_flag;
 }	t_cmd_info;
 
 typedef struct s_data
 {
+	t_dll	***tkn;
 	char	*cmd;
-	t_dll ***tkn;
-	char **ao_split;
-	int ao_cnt;
-	int	*pipe_cnt;
+	char 	*program_name;
+	char	**ao_split;
+	char	**envp;
+	int		ao_cnt;
+	int		*pipe_cnt;
 	int		**pp;
 	pid_t *pid_table;
 	t_logic	*logic_table;
 
-	char *program_name;
+	
 	int last_exit_code;
 	char	last_exit_code_str[4];
-	char **envp;
+	
 	t_dll 	envdll;
 	t_dll	sorted_envdll;
 
@@ -126,6 +124,17 @@ typedef struct s_data
 	char	wd[MAX_PATH_LEN];
 
 } t_data;
+
+// cd_util.c
+int		ft_chdir(char *path, t_data *data);
+char	*remove_duplicate_slashs(char *str);
+int		check_file(char *path);
+// cd1.c
+int		ft_cd(t_data *data, char **input);
+// check_syntax_error1.c
+t_bool	check_syntax_error(char **cmd, int mode);
+// check_syntax_error_lts_gts.c 
+t_bool	case_lts_gts(char *cmd, int *idx);
 
 void dll_str_print_func(void *content);
 void dll_env_print_func(void *content);
@@ -150,11 +159,8 @@ void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
 t_bool case_lts_gts(char *cmd, int *idx);
 
 t_bool	check_syntax_error(char **cmd, int mode);
-t_bool check_multiple_lines(const char *cmd);
-t_bool check_quote_closed(const char *cmd);
 t_bool check_parentheses_syntax(char *cmd);
 t_bool check_dollor_braces(char *cmd);;
-t_bool check_special_char_syntax(char **input_ptr);
 
 char *ft_strjoin(char const *s1, char const *s2);
 char	*ft_strjoin2(char const *s1, char const *s2, char *between);
@@ -215,12 +221,11 @@ char **make_2d_array_from_dll(t_dll *dll);
 char **make_2d_envp_from_dll(t_dll *dll);
 
 int	ft_echo(char **input);
-int	ft_cd(t_data *data, t_dll *env, char **input);
 int	ft_export(t_dll *env, t_dll *s_env, char **args);
 int	ft_unset(t_dll *env, t_dll *s_env, char **args);
 int	ft_pwd(t_data *data);
 int	ft_exit(t_data *data, char **input);
-int	ft_env(t_data *data);
+int	ft_env(t_data *data, char **input);
 
 char *make_path(char *raw_path, int mode);
 

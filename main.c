@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 17:39:58 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 00:12:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,46 +21,7 @@ static void builtin_func_error(t_data *data, int result);
 
 void envdll_sorting(t_data *data);
 
-void data_init(t_data *data, char *program_name, char **envp)
-{
-	int idx;
 
-	data->program_name = program_name;
-	data->envp = envp;
-	set_last_exit_code(data, 0);
-	data->old_stdin = 253;
-	data->old_stdout = 254;
-	data->old_stderr = 255;
-	idx = -1;
-	while (++idx < 256)
-		data->opened_fd[idx] = -1;
-	data->wd[0] = '\0';
-	data->wd[MAX_PATH_LEN - 1] = '\0';
-	if (getcwd(data->wd, MAX_PATH_LEN) == T_NULL)
-	{
-		write(2, "shell-init: error retrieving current directory: \
-getcwd: cannot access parent directories: No such file or directory\n", 116);
-	}
-	dll_init(&data->envdll);
-	dll_init(&data->sorted_envdll);
-	store_env_in_dll(data, envp);
-}
-
-void data_cycle_init(t_data *data)
-{
-	int idx;
-
-	data->cmd = T_NULL;
-	data->tkn = T_NULL;
-	data->ao_cnt = 0;
-	data->pipe_cnt = T_NULL;
-	data->pp = T_NULL;
-	data->pid_table = T_NULL;
-	data->logic_table = T_NULL;
-	idx = -1;
-	while (data->opened_fd[++idx] != -1)
-		data->opened_fd[idx] = -1;
-}
 
 void set_last_exit_code(t_data *data, int input_exit_code)
 {
@@ -81,176 +42,6 @@ void set_last_exit_code(t_data *data, int input_exit_code)
 	data->last_exit_code_str[idx] = '\0';
 }
 
-void store_env_in_dll(t_data *data, char **envp)
-{
-	t_envval *env;
-	int idx;
-
-	while (*envp)
-	{
-		env = (t_envval *)ft_calloc(1, sizeof(t_envval));
-		if (env == T_NULL)
-		{
-			dll_clear(&data->envdll, envval_delete_func);
-			message_exit("minishell: malloc error10!\n", 1);
-		}
-		idx = -1;
-		while ((*envp)[++idx] != '=' && (*envp)[idx] != '\0')
-			;
-		if ((*envp)[idx] == '=')
-		{
-			env->name = ft_strndup(*envp, idx);
-			if (ft_strncmp((*envp), "SHLVL", idx) == 0)
-			{
-				if (ft_isdecimal(&(*envp)[idx + 1]) == TRUE)
-					env->value = ft_itoa(ft_atoi(&(*envp)[idx + 1]) + 1);
-				else
-					env->value = ft_itoa(1);
-			}
-			else if (ft_strncmp((*envp), "OLDPWD", idx) == 0)
-				;
-			else
-				env->value = ft_strdup(&(*envp)[idx + 1]);
-		}
-		else
-			env->name = ft_strdup(*envp);
-		if (env->name == T_NULL || ((*envp)[idx] == '=' && ft_strncmp((*envp), "OLDPWD", idx) != 0 && env->value == T_NULL))
-		{
-			dll_clear(&data->envdll, envval_delete_func);
-			envval_delete_func((void *)env);
-			message_exit("minishell: malloc error11!\n", 1);
-		}
-		if (dll_content_add(&data->envdll, (void *)env, 0) == FALSE)
-		{
-			dll_clear(&data->envdll, envval_delete_func);
-			envval_delete_func((void *)env);
-			message_exit("minishell: malloc error12!\n", 1);
-		}
-		envp++;
-	}
-	envdll_sorting(data);
-}
-
-int srt_compare(void *input_lst, int idx1, int idx2)
-{
-	t_srt *lst;
-	int result;
-
-	lst = (t_srt *)input_lst;
-	result = ft_strcmp(lst[idx1].name, lst[idx2].name);
-	if (result > 0)
-		return (1);
-	else if (result < 0)
-		return (-1);
-	else
-		return (0);
-}
-
-void srt_swap(void *input_lst, int idx1, int idx2)
-{
-	t_srt *lst;
-	t_srt temp;
-
-	lst = (t_srt *)input_lst;
-	temp = lst[idx1];
-	lst[idx1] = lst[idx2];
-	lst[idx2] = temp;
-}
-
-void envdll_sorting(t_data *data)
-{
-	t_srt *tmp;
-	t_dllnode *node_ptr;
-	int idx;
-	
-
-	tmp = (t_srt *)ft_calloc(data->envdll.size, (sizeof(t_srt)));
-	if (tmp == T_NULL)
-	{
-		dll_clear(&data->envdll, envval_delete_func);
-		message_exit("minishell: malloc error13!\n", 1);
-	}
-	idx = -1;
-	node_ptr = data->envdll.head.back;
-	while (++idx < data->envdll.size)
-	{
-		tmp[idx].name = ((t_envval *)(node_ptr->contents))->name;
-		tmp[idx].ptr = node_ptr;
-		node_ptr = node_ptr->back;
-	}
-	sorting((void *)tmp, data->envdll.size, srt_compare, srt_swap);
-	idx = -1;
-	while (++idx < data->envdll.size)
-	{
-		if (dll_content_add(&data->sorted_envdll, tmp[idx].ptr, 0) == FALSE)
-		{
-			ft_free1((void **)&tmp);
-			dll_clear(&data->envdll, envval_delete_func);
-			dll_clear(&data->sorted_envdll, T_NULL);
-			message_exit("minishell: malloc error14!\n", 1);
-		}
-	}
-	ft_free1((void **)&tmp);
-	check_oldpwd_exist(data);
-}
-
-void	check_oldpwd_exist(t_data *data)
-{
-	char	*oldpwd[3];
-
-	oldpwd[0] = "export";
-	oldpwd[1] = "OLDPWD";
-	oldpwd[2] = T_NULL;
-	if (ft_export(&data->envdll, &data->sorted_envdll, oldpwd) == -1)
-	{
-		dll_clear(&data->envdll, envval_delete_func);
-		dll_clear(&data->sorted_envdll, T_NULL);
-		message_exit("minishell: malloc error15!\n", 1);
-	}
-}
-
-t_bool check_syntax_error(char **cmd, int mode)
-{
-	if (check_multiple_lines(*cmd) == FALSE || check_quote_closed(*cmd) == FALSE || check_parentheses_syntax(*cmd) == FALSE || check_dollor_braces(*cmd) == FALSE)
-		return (FALSE);
-	if (mode == 0)
-		if ((check_special_char_syntax(cmd) == FALSE))
-			return (FALSE);
-	return (TRUE);
-}
-
-void dll_env_print_func(void *content)
-{
-	t_envval *tmp;
-
-	tmp = (t_envval *)content;
-	if (tmp != T_NULL && tmp->value	!= T_NULL)
-		printf("%s=%s\n", tmp->name, tmp->value);
-}
-
-void dll_export_print_func(void *content)
-{
-	t_dllnode *tmp1;
-	t_envval *tmp2;
-
-	tmp1 = (t_dllnode *)content;
-	tmp2 = (t_envval *)(tmp1->contents);
-	if (tmp2 != T_NULL)
-	{
-		if (tmp2->value != T_NULL)
-			printf("%s=\"%s\"\n", tmp2->name, tmp2->value);
-		else
-			printf("%s\n", tmp2->name);
-	}
-}
-
-void dll_str_print_func(void *content)
-{
-	char *tmp;
-
-	tmp = (char *)content;
-	printf("%s\t", tmp);
-}
 
 void close_pipes(t_data *data, int num)
 {
@@ -304,60 +95,7 @@ void on_execution_part_err(t_data *data, int pp_make_cnt, int exit_code, char *m
 	resource_free_and_exit(data, exit_code, msg);
 }
 
-int is_builtin_func(char *cmd)
-{
-	if (ft_strcmp(cmd, "echo") == 0)
-		return (1);
-	else if (ft_strcmp(cmd, "cd") == 0)
-		return (2);
-	else if (ft_strcmp(cmd, "export") == 0)
-		return (3);
-	else if (ft_strcmp(cmd, "unset") == 0)
-		return (4);
-	else if (ft_strcmp(cmd, "pwd") == 0)
-		return (5);
-	else if (ft_strcmp(cmd, "exit") == 0)
-		return (6);
-	else if (ft_strcmp(cmd, "env") == 0)
-		return (7);
-	else
-		return (0);
-}
 
-int	execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
-{
-	int	result;
-	
-	if (func_idx == 1)
-		result = ft_echo(argu_lst);
-	else if (func_idx == 2)
-		result = ft_cd(data, &data->envdll, argu_lst);
-	else if (func_idx == 3)
-		result = ft_export(&data->envdll, &data->sorted_envdll, argu_lst);
-	else if (func_idx == 4)
-		result = ft_unset(&data->envdll, &data->sorted_envdll, argu_lst);
-	else if (func_idx == 5)
-		result = ft_pwd(data);
-	else if (func_idx == 6)
-		result = ft_exit(data, argu_lst);
-	else
-		result = ft_env(data);
-	if (result == 0 || result == 1)
-		return (result);
-	else
-		builtin_func_error(data, result);
-	return (1);
-}
-
-static void builtin_func_error(t_data *data, int result)
-{
-	if (result == 4)
-		resource_free_and_exit(data, 1, "stat() error");
-	else if (result == -1)
-		resource_free_and_exit(data, 1, "malloc error");
-	else if (result == -2)
-		resource_free_and_exit(data, 1, "chdir error");
-}
 
 void total_heredoc_cnt_chk(char *cmd)
 {
@@ -497,12 +235,16 @@ int main(int argc, char **argv, char **envp)
 
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
-				if (retrieve_variable_value(&data, data.tkn[ao_idx][pp_idx]) == FALSE)
-					resource_free_and_exit(&data, 1, "malloc error17");
+			{
+				if (data.tkn[ao_idx][pp_idx]->size != 0)
+					if (retrieve_variable_value(&data, data.tkn[ao_idx][pp_idx]) == FALSE)
+						resource_free_and_exit(&data, 1, "malloc error17");
+			}
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 			{
-				result = wildcard(data.tkn[ao_idx][pp_idx]);
+				if (data.tkn[ao_idx][pp_idx]->size != 0)
+					result = wildcard(data.tkn[ao_idx][pp_idx]);
 				if (result == -1)
 					resource_free_and_exit(&data, 1, "malloc error");
 				else if (result == -2)

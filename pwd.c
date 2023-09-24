@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pwd.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/25 00:06:50 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/09/25 02:41:27 by hyungdki         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int ft_pwd(t_data *data)
@@ -18,5 +30,3 @@ getcwd: cannot access parent directories: No such file or directory\n", 109);
         printf ("%s\n", path);
     return (0);
 }
-
-

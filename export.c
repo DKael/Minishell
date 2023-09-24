@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/24 21:40:27 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/09/24 21:40:27 by hyungdki         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 
@@ -39,14 +51,12 @@ int	check_start_char_export(char *str)
 
 int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 {
-	int	flag;
 	int	work;
 	t_dllnode	*dllnode;
 	t_dllnode	*dllnode1;
 	t_envval	*tmp;
 	t_dllnode	*ptr;
 
-	flag = 0;
 	work = 0;
 	
 	if (check_start_char_export(str) == 1)
@@ -97,7 +107,7 @@ int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 	}
 	else if (work == 0)
 		envval_delete_func(env);
-	return (flag);
+	return (0);
 }
 
 int	ft_export(t_dll *env, t_dll *s_env, char **args)

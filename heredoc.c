@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/15 09:26:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 10:39:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/24 19:23:22 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,10 +148,10 @@ t_bool	heredoc_make1_1(t_dll *dll, int *idx, char *del)
 	char	*make_path;
 	char	*name;
 	
-	make_path = ft_strdup(hd_path);
+	make_path = ft_strdup(HD_PATH);
 	if (make_path == T_NULL)
 		return (FALSE);
-	if (stat(hd_path, &bf) == -1 || !(((bf.st_mode) & S_IFMT) == S_IFDIR && bf.st_mode == 041777))
+	if (stat(HD_PATH, &bf) == -1 || !(((bf.st_mode) & S_IFMT) == S_IFDIR && bf.st_mode == 041777))
 	{
 		ft_free1((void **)&make_path);
 		make_path = ft_strdup(".");
@@ -177,10 +177,10 @@ t_bool	heredoc_make1_2(t_dll *dll, t_dllnode *ptr, int *idx, char *del)
 	char	*make_path;
 	char	*name;
 	
-	make_path = ft_strdup(hd_path);
+	make_path = ft_strdup(HD_PATH);
 	if (make_path == T_NULL)
 		return (FALSE);
-	if (stat(hd_path, &bf) == -1 || !(((bf.st_mode) & S_IFMT) == S_IFDIR && bf.st_mode == 041777))
+	if (stat(HD_PATH, &bf) == -1 || !(((bf.st_mode) & S_IFMT) == S_IFDIR && bf.st_mode == 041777))
 	{
 		ft_free1((void **)&make_path);
 		make_path = ft_strdup(".");

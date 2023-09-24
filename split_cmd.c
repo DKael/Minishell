@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/04 19:50:55 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 10:43:00 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 02:41:37 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,37 +127,6 @@ void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *))
 	return (T_NULL);
 }
 
-void ignore_quote(char *cmd, int *idx)
-{
-	char quote;
-
-	quote = cmd[*idx];
-	while (cmd[++(*idx)] != quote)
-		;
-}
-
-void ignore_parentheses(char *cmd, int *idx)
-{
-	int	layer;
-
-	layer = 0;
-	while (1)
-	{
-		(*idx)++;
-		if (cmd[(*idx)] == ')')
-		{
-			if (layer == 0)
-				break;
-			else
-				layer--;
-		}
-		else if (cmd[(*idx)] == '(')
-			layer++;
-		else if (cmd[(*idx)] == '\'' || cmd[(*idx)] == '\"')
-			ignore_quote(cmd, idx);
-	}
-}
-
 void split_cmd(t_data *data, char *cmd)
 {
 	int idx;
@@ -170,18 +139,6 @@ void split_cmd(t_data *data, char *cmd)
 		exit(1);
 	}
 	data->ao_split = split_cmd_by_ao(cmd, data->ao_cnt, data->logic_table);
-
-	// for (int i = 0; i < data->ao_cnt - 1; i++)
-	// {
-	// 	if (data->logic_table[i] == OR)
-	// 		printf("OR ");
-	// 	else
-	// 		printf("AND ");
-	// }
-	// printf("\n\n");
-	// for (int i = 0; i < data->ao_cnt; i++)
-	// 	printf("data->ao_split[%d] : %s\n", i, data->ao_split[i]);
-
 	data->tkn = (t_dll ***)ft_calloc(data->ao_cnt, sizeof(t_dll **));
 	data->pipe_cnt = (int *)ft_calloc(data->ao_cnt, sizeof(int));
 	if (data->ao_split == T_NULL || data->tkn == T_NULL || data->pipe_cnt == T_NULL)
@@ -270,33 +227,16 @@ t_dll **tokenize(char *tkns, int *pipe_cnt)
 	if (tkn_part == T_NULL)
 		return (free_2d_array((void ***)&split_tmp, (*pipe_cnt)));
 
-	// printf("\n\ntkns : %s\n", tkns);
-	// for (int i = 0; i < (*pipe_cnt); i++)
-	// 	printf("_%s_\n", split_tmp[i]);
-	// printf("\n");
 
 	idx = -1;
 	while (++idx < (*pipe_cnt))
 	{
-		// redirect_count(tkn_part[idx], split_tmp[idx]);
 		if (redirect_split(tkn_part[idx], split_tmp[idx]) == FALSE)
 			break;
-		// printf("after redirection split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
-
 		if (parentheses_split(tkn_part[idx], split_tmp[idx]) == FALSE)
 			break;
-		// printf("after parentheses split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
-
-		// remain_count(tkn_part[idx], split_tmp[idx]);
 		if (remain_split(tkn_part[idx], split_tmp[idx]) == FALSE)
 			break;
-		// printf("after remain split\n");
-		// printf("split_tmp[%d] : %s\n", idx, split_tmp[idx]);
-		// dll_print(tkn_part[idx], dll_str_print_func);
 	}
 	free_2d_array((void ***)&split_tmp, (*pipe_cnt));
 	if (idx < (*pipe_cnt))
@@ -383,30 +323,6 @@ t_dll **make_dlls(int pipe_cnt)
 	}
 	return (tmp);
 }
-
-// void redirect_count(t_dll *dll, char *tkns)
-// {
-// 	int idx;
-// 	t_cmd_info *tmp;
-
-// 	tmp = (t_cmd_info *)(dll->head.contents);
-// 	idx = -1;
-// 	while (tkns[++idx] != '\0')
-// 	{
-// 		if (tkns[idx] == '<' || tkns[idx] == '>')
-// 		{
-// 			tmp->redir_cnt++;
-// 			if (tkns[idx + 1] == '<')
-// 				tmp->heredoc_cnt++;
-// 			if (tkns[idx + 1] == '<' || tkns[idx + 1] == '>')
-// 				idx++;
-// 		}
-// 		else if (tkns[idx] == '\"' || tkns[idx] == '\'')
-// 			ignore_quote(tkns, &idx);
-// 		else if (tkns[idx] == '(')
-// 			ignore_parentheses(tkns, &idx);
-// 	}
-// }
 
 // pos[0] = front
 // pos[1] = back
@@ -573,31 +489,6 @@ t_bool parentheses_split(t_dll *dll, char *tkns)
 	}
 	return (TRUE);
 }
-
-// void remain_count(t_dll *dll, char *tkns)
-// {
-// 	int idx;
-// 	t_cmd_info *tmp;
-
-// 	tmp = (t_cmd_info *)(dll->head.contents);
-// 	idx = -1;
-// 	while (tkns[++idx] != '\0')
-// 	{
-// 		if (ft_isblank(tkns[idx]) == FALSE)
-// 		{
-// 			tmp->cp_cnt++;
-// 			while (ft_isblank(tkns[idx]) == FALSE && tkns[idx] != '\0')
-// 			{
-// 				if (tkns[idx] == '\"' || tkns[idx] == '\'')
-// 					ignore_quote(tkns, &idx);
-// 				idx++;
-// 			}
-// 			if (tkns[idx] == '\0')
-// 				break;
-// 		}
-// 	}
-// 	tmp->size = tmp->redir_cnt + tmp->cp_cnt;
-// }
 
 t_bool remain_split(t_dll *dll, char *tkns)
 {

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 13:27:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 17:44:34 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 02:41:51 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static int wildcard_redirection_check(t_dll *dll, t_dll *tmp_dll, t_dllnode **pt
 				return (result);
 			if (tmp_dll->size != 0)
 			{
-				err_msg_print2(&tkn[idx[1] + 1], ": ambiguous redirect");
+				err_msg_print2(tkn, ": ambiguous redirect");
 				dll_clear(tmp_dll, str_delete_func);
 				return (1);
 			}
