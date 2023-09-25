@@ -6,13 +6,15 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 00:09:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 00:10:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 11:30:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int is_builtin_func(char *cmd)
+static void	builtin_func_error(t_data *data, int result);
+
+int	is_builtin_func(char *cmd)
 {
 	if (ft_strcmp(cmd, "echo") == 0)
 		return (1);
@@ -35,7 +37,7 @@ int is_builtin_func(char *cmd)
 int	execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
 {
 	int	result;
-	
+
 	if (func_idx == 1)
 		result = ft_echo(argu_lst);
 	else if (func_idx == 2)
@@ -57,7 +59,7 @@ int	execute_builtin_func(int func_idx, char **argu_lst, t_data *data)
 	return (1);
 }
 
-static void builtin_func_error(t_data *data, int result)
+static void	builtin_func_error(t_data *data, int result)
 {
 	if (result == 4)
 		resource_free_and_exit(data, 1, "stat() error");

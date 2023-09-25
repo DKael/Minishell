@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/03 20:28:09 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 22:59:39 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:07:42 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #  define T_NULL (void *)0
 # endif
 
-typedef int t_bool;
+typedef int	t_bool;
 
 int			ft_atoi_int(const char *str);
 int			ft_atoi(const char *str);

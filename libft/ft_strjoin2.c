@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/24 22:36:17 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 22:36:47 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:08:51 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ char	*ft_strjoin2(char const *s1, char const *s2, char *between)
 	s1_size = ft_strlen(s1);
 	s2_size = ft_strlen(s2);
 	between_size = ft_strlen(between);
-	result = (char *)malloc(sizeof(char) *
-		(s1_size + s2_size + between_size + 1));
+	result = (char *)malloc(sizeof(char)
+			* (s1_size + s2_size + between_size + 1));
 	if (result == T_NULL)
 		return (T_NULL);
 	index = -1;

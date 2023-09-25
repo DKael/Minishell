@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/24 22:51:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/24 22:53:13 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:09:00 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ long long	ft_atoll(const char *str)
 {
 	long long	sign;
 	long long	nb;
-	int	idx;
+	int			idx;
 
 	nb = 0;
 	sign = 1;

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 01:12:27 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:20:52 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,22 @@
 
 # define HD_PATH "/tmp"
 # define MAX_PATH_LEN 1025
+# define MAX_FD 250
+
+# ifndef GLOBAL_VAL
+#  define GLOBAL_VAL
+int	g_exit_code = 0;
+# endif
 
 typedef int t_bool;
+
 typedef	struct stat t_stat;
+
+typedef struct s_dir
+{
+	DIR				*dir;
+	t_dll			*dll;
+}	t_dir;
 
 typedef	enum s_file_type
 {
@@ -111,8 +124,8 @@ typedef struct s_data
 	t_logic	*logic_table;
 
 	
-	int last_exit_code;
-	char	last_exit_code_str[4];
+	int 	exit_code;
+	char	exit_code_str[4];
 	
 	t_dll 	envdll;
 	t_dll	sorted_envdll;
@@ -120,115 +133,80 @@ typedef struct s_data
 	int	old_stdin;
 	int	old_stdout;
 	int	old_stderr;
-	int	opened_fd[256];
+	int	opened_fd[MAX_FD];
 	char	wd[MAX_PATH_LEN];
 
 } t_data;
 
-// cd_util.c
+// cd*.c
 int		ft_chdir(char *path, t_data *data);
 char	*remove_duplicate_slashs(char *str);
 int		check_file(char *path);
-// cd1.c
 int		ft_cd(t_data *data, char **input);
-// check_syntax_error1.c
+// check_syntax_error*.c
 t_bool	check_syntax_error(char **cmd, int mode);
-// check_syntax_error_lts_gts.c 
 t_bool	case_lts_gts(char *cmd, int *idx);
+// child.c
 
-void dll_str_print_func(void *content);
-void dll_env_print_func(void *content);
-void dll_export_print_func(void *content);
-
-void	close_pipes(t_data *data, int num);
-int	is_builtin_func(char *cmd);
-int	execute_builtin_func(int func_idx, char **argu_lst, t_data *data);
-
-void resource_free_and_exit(t_data *data, int exit_code, char *msg);
-void on_execution_part_err(t_data *data, int pp_make_cnt, int exit_code, char *msg);
-t_bool syntax_error_print(char *chr);
+// data_init.c
+void	data_cycle_init(t_data *data);
+void	data_init(t_data *data, char *program_name, char **envp);
+// delete_functions.c  
+void	str_delete_func(void *str);
+void	envval_delete_func(void *envval);
+// dll_argument_functions.c 
+void	dll_env_print_func(void *content);
+void	dll_export_print_func(void *content);
+void	dll_str_print_func(void *content);
+// dollor_sign.c
+t_bool	retrieve_variable_value(t_data *data, t_dll *tkns);
+char 	*ft_getenv(t_data *data, const char *name);
+// echo.c
+int		ft_echo(char **str);
+// env.c
+int		ft_env(t_data *data, char **input);
+// error.c
+t_bool	syntax_error_print(char *chr);
 void	err_msg_print1(char *m1);
 void	err_msg_print2(char *m1, char *m2);
 void	err_msg_print3(char *m1, char *m2, char *m3);
-void message_exit(const char *msg, int exit_code);
-
-void *free_2d_array(void ***arr_ptr, int num);
-void *free_2d_array2(void ***arr_ptr);
-void *free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
-
-t_bool case_lts_gts(char *cmd, int *idx);
-
-t_bool	check_syntax_error(char **cmd, int mode);
-t_bool check_parentheses_syntax(char *cmd);
-t_bool check_dollor_braces(char *cmd);;
-
-char *ft_strjoin(char const *s1, char const *s2);
-char	*ft_strjoin2(char const *s1, char const *s2, char *between);
-void split_cmd(t_data *data, char *cmd);
-size_t ft_strlen(const char *s);
-t_bool ft_isdecimal(char *str);
-t_bool	ft_isndecimal(char *str, int n);
-char *ft_strndup(char *src, size_t n);
-int	ft_strcmp(const char *s1, const char *s2);
-int	ft_strncmp(const char *s1, const char *s2, size_t n);
-void	*ft_calloc(size_t count, size_t size);
-char	*ft_itoa(int n);
-int	ft_atoi(const char *str);
-t_bool	ft_isblank(char c);
-char	**ft_split(char const *s, char c);
-long long	ft_atoll(const char *str);
-char	*ft_strstr(char *str, char *to_find);
-size_t	ft_strlcpy(char *dst, const char *src, size_t dsize);
-char	*ft_strcpy(char *dest, char *src);
-char	*ft_strncpy(char *dest, char *src, unsigned int n);
-void	ft_putnbr_fd(int n, int fd);
-
-t_bool	retrieve_variable_value(t_data *data, t_dll *tkns);
-char *ft_getenv(t_data *data, const char *name);
-char *get_dollor_parameter(char *cmd, int *origin_idx);
-
-void	str_delete_func(void *log);
-char	*ft_strdup(char *src);
-
-void ignore_quote(char *cmd, int *idx);
-void ignore_parentheses(char *cmd, int *idx);
-
-void	envval_delete_func(void *str);
-
+void	message_exit(const char *msg, int exit_code);
+// execute_builtin.c
+int		is_builtin_func(char *cmd);
+int		execute_builtin_func(int func_idx, char **argu_lst, t_data *data);
+// exit.c
+int		ft_exit(t_data *data, char **str);
+// export.c
+int		ft_export(t_dll *env, t_dll *s_env, char **args);
+// heredoc*.c
 t_bool	heredoc_make1_1(t_dll *dll, int *idx, char *del);
 t_bool	heredoc_make1_2(t_dll *dll, t_dllnode *ptr, int *idx, char *del);
+t_bool	heredoc_split(t_dll *dll, char *tkns);
+t_bool	parentheses_heredoc(t_dll *h_names, int *tkn_idx, char *cmd);
+// make_path.c
+char	*make_path(char *raw_path, int mode);
+// minishell.c
+int		minishell(int argc, char **argv, char **envp);
+// pwd.c
+int		ft_pwd(t_data *data);
+// redirect*.c
+int		sign_redirection(t_data *data, t_dll *tkns);
+t_bool	pipe_redirection(t_data *data, int ao_idx, int pp_idx);
+t_bool	basic_redirection_save(t_data *data);
+t_bool	basic_redirection_recover(t_data *data);
+t_bool	opened_fd_close(t_data *data);
+// split_cmd*.c
+void	cmd_split_error(t_data *data, char *cmd, char *msg);
+void	split_cmd(t_data *data, char *cmd);
+t_bool	redirect_split(t_dll *dll, char *tkns);
+t_bool	parentheses_split(t_dll *dll, char *tkns);
+t_bool	remain_split(t_dll *dll, char *tkns);
+
+// srt_functions.c
+int		srt_compare(void *input_lst, int idx1, int idx2);
+void	srt_swap(void *input_lst, int idx1, int idx2);
 
 
-void redirect_split2_1(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
-void redirect_split2_2(char *tkns, char *tmp, int *pos, t_bool heredoc_flag);
-void find_back_and_calc_blank_quote(char *tkns, int *pos, int idx);
-void find_front(char *tkns, int *pos, int idx);
 
-void *ft_free1(void **ptr);
-t_bool ft_free2(void **ptr, t_bool flag);
-int	ft_free3(void **ptr, int return_num);
-
-void	child(t_data *data, int ao_idx, int pp_idx);
-
-int sign_redirection(t_data *data, t_dll *tkns);
-t_bool pipe_redirection(t_data *data, int ao_idx, int pp_idx);
-t_bool basic_redirection_save(t_data *data);
-t_bool basic_redirection_recover(t_data *data);
-void	opened_fd_close(t_data *data);
-int get_file_info(char *name, t_file_info *info, int mode);
-
-char **make_2d_array_from_dll(t_dll *dll);
-char **make_2d_envp_from_dll(t_dll *dll);
-
-int	ft_echo(char **input);
-int	ft_export(t_dll *env, t_dll *s_env, char **args);
-int	ft_unset(t_dll *env, t_dll *s_env, char **args);
-int	ft_pwd(t_data *data);
-int	ft_exit(t_data *data, char **input);
-int	ft_env(t_data *data, char **input);
-
-char *make_path(char *raw_path, int mode);
-
-int	wildcard(t_dll *dll);
 
 #endif

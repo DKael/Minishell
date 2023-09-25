@@ -31,6 +31,10 @@
 		"stddef.h": "c",
 		"libft.h": "c",
 		"double_linked_list.h": "c",
-		"errno.h": "c"
+		"errno.h": "c",
+		"__functional_base": "c",
+		"algorithm": "c",
+		"functional": "c",
+		"memory": "c"
 	}
 }
