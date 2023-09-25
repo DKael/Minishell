@@ -6,13 +6,18 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 12:17:54 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 14:14:04 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:50:04 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static char	*make_name2(char *make_path, char *bf1, char *bf2);
+static char		*make_name2(char *make_path, char *bf1, char *bf2);
+extern void		find_front(char *tkns, int *pos, int idx);
+extern void		find_back_and_calc_blank_quote(char *tkns, int *pos, int idx);
+extern void		redirect_split2_1(char *tkns, char *tmp, int *pos,
+	t_bool heredoc_flag);
+static void		heredoc_make3(int fd, char *paste_nl);
 
 t_bool	heredoc_split(t_dll *dll, char *tkns)
 {

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 00:13:46 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 02:33:48 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:34:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static t_bool	check_dollor_braces2(char *cmd, int *idx, int idx_chk)
 			return (FALSE);
 		}
 	}
-	if (bad_flag || idx - idx_chk == 2)
+	if (bad_flag || (*idx) - idx_chk == 2)
 	{
 		cmd[(*idx) + 1] = '\0';
 		err_msg_print2(&cmd[idx_chk], ": bad substitution");

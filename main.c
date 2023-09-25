@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:16:03 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:59:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,5 +19,5 @@ int	main(int argc, char **argv, char **envp)
 		err_msg_print1("don't support file read or need any other inputs");
 		return (1);
 	}
-	return (minishell(argc, argv, envp));
+	return (minishell(argv, envp));
 }

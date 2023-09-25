@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 11:57:44 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 14:12:03 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:50:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@ static	t_bool	heredoc_move(t_dll *h_names, t_dll *tmp_dll, int *tkn_idx);
 t_bool	parentheses_heredoc(t_dll *h_names, int *tkn_idx, char *cmd)
 {
 	int			p_idx[2];
-	char		*tmp;
-	t_dllnode	*ptr[2];
 	t_dll		tmp_dll;
 
 	cmd[0] = ' ';
@@ -88,7 +86,7 @@ static	t_bool	heredoc_move(t_dll *h_names, t_dll *tmp_dll, int *tkn_idx)
 		}
 		if (heredoc_make1_2(h_names, ptr[1], tkn_idx, tmp + 3) == FALSE)
 		{
-			dll_clear(&tmp_dll, str_delete_func);
+			dll_clear(tmp_dll, str_delete_func);
 			return (FALSE);
 		}
 		ptr[0] = ptr[0]->back;

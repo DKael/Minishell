@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 01:35:18 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 02:39:41 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:36:38 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static t_bool	meet_something_behind_of_parentheses2(char *cmd,
 t_bool	meet_something_behind_of_parentheses(char *cmd,
 	int *idx, t_bool *parentheses_flag)
 {
-	int	save_idx;
+	int	save_idx; 
 
 	save_idx = (*idx);
 	while (cmd[(*idx)] != '\0' && cmd[(*idx)] != '(' && cmd[(*idx)] != ')'
@@ -29,7 +29,8 @@ t_bool	meet_something_behind_of_parentheses(char *cmd,
 			ignore_quote(cmd, &(*idx));
 		(*idx)++;
 	}
-	return (cmd, idx, save_idx, parentheses_flag);
+	return (meet_something_behind_of_parentheses2(cmd, idx,
+		save_idx, parentheses_flag));
 }
 
 static t_bool	meet_something_behind_of_parentheses2(char *cmd,

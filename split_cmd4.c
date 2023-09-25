@@ -6,14 +6,12 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 18:50:15 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:06:41 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 20:03:37 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	redirect_split2_1(char *tkns, char *tmp, int *pos,
-				t_bool heredoc_flag);
 static void	redirect_split2_2(char *tkns, char *tmp, int *pos,
 				t_bool heredoc_flag);
 
@@ -86,7 +84,7 @@ char	*redirect_split2_0(char *tkns, t_cmd_info *tmp, int *pos,
 	return (con);
 }
 
-static void	redirect_split2_1(char *tkns, char *tmp, int *pos,
+void	redirect_split2_1(char *tkns, char *tmp, int *pos,
 	t_bool heredoc_flag)
 {
 	char	char_tmp;

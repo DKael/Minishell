@@ -6,11 +6,13 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 18:01:05 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 18:08:34 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:57:11 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+static t_bool	pattern_matching(char *part, char *file);
 
 int	do_convert5(t_dll *dll, char **tmp, char *buffer, int *s_chk)
 {
@@ -56,7 +58,7 @@ int	do_convert6(t_dir *dir_data, char *buffer, char **tmp, int *s_chk)
 	return (ft_free3((void **)&tmp[2], 0));
 }
 
-t_bool	pattern_matching(char *part, char *file)
+static t_bool	pattern_matching(char *part, char *file)
 {
 	int		idx[2];
 

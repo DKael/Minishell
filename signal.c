@@ -6,9 +6,10 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/24 22:24:13 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:15:51 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 20:04:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int	g_exit_code = 0;

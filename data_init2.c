@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 09:32:33 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 09:39:23 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:38:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ t_envval	*make_envval(t_data *data, char *envp, int idx)
 			dll_clear(&data->envdll, envval_delete_func);
 			message_exit("minishell: malloc error\n", 1);
 		}
-		env->name = ft_strndup(*envp, idx);
+		env->name = ft_strndup((char *)envp, idx);
 		if (ft_strncmp(envp, "SHLVL", idx) == 0)
 		{
 			if (ft_isdecimal(&envp[idx + 1]) == TRUE)

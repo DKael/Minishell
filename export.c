@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/24 21:40:27 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 11:56:53 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 20:12:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,25 @@ static t_envval	*make_envval_from_str(char *str)
 	return (tmp);
 }
 
+static int	do_export(t_dll *dll, t_dll *s_env, char *str, t_envval *env)
+{
+	int			work;
+	t_dllnode	*ptr[3];
+
+	work = 0;
+	if (ft_isalpha(str[0]) == FALSE)
+	{
+		err_msg_print3("export: ", str, ": not a valid identifier");
+		envval_delete_func(env);
+		return (1);
+	}
+	if (find_env(dll, ptr, env, &work) == FALSE)
+		return (add_new(ptr, dll, s_env, env));
+	else if (work == 0)
+		envval_delete_func(env);
+	return (0);
+}
+
 static t_bool	find_env(t_dll *dll, t_dllnode	**ptr, t_envval *env, int *work)
 {
 	t_envval	*tmp;
@@ -98,25 +117,6 @@ static t_bool	find_env(t_dll *dll, t_dllnode	**ptr, t_envval *env, int *work)
 	return (FALSE);
 }
 
-static int	do_export(t_dll *dll, t_dll *s_env, char *str, t_envval *env)
-{
-	int			work;
-	t_dllnode	*ptr[3];
-
-	work = 0;
-	if (ft_isalpha(str[0]) == TRUE)
-	{
-		err_msg_print3("export: ", str, ": not a valid identifier");
-		envval_delete_func(env);
-		return (1);
-	}
-	if (find_env(dll, ptr, env, &work) == FALSE)
-		return (add_new(ptr, dll, s_env, env));
-	else if (work == 0)
-		envval_delete_func(env);
-	return (0);
-}
-
 static int	add_new(t_dllnode **ptr, t_dll *env, t_dll *s_env, t_envval *var)
 {
 	char	*t;
@@ -124,7 +124,7 @@ static int	add_new(t_dllnode **ptr, t_dll *env, t_dll *s_env, t_envval *var)
 	ptr[2] = dll_new_node((void *)var);
 	if (ptr[2] == T_NULL)
 		return (-1);
-	dll_add_tail(var, ptr[2]);
+	dll_add_tail(env, ptr[2]);
 	ptr[1] = s_env->head.back;
 	while (ptr[1] != &(s_env->tail))
 	{

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:16:43 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 17:05:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 20:00:25 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static	int	read_cmd(t_data *data)
 	return (0);
 }
 
-int	minishell(int argc, char **argv, char **envp)
+int	minishell(char **argv, char **envp)
 {
 	t_data data;
 
@@ -154,7 +154,7 @@ int	minishell(int argc, char **argv, char **envp)
 					result = sign_redirection(&data, data.tkn[ao_idx][0]);
 					if (result == 1)
 					{
-						set_exit_code(&data, 1);
+						set_exit_code(&data);
 						break;
 					}
 					else if (result == 2)
@@ -168,7 +168,7 @@ int	minishell(int argc, char **argv, char **envp)
 					if (argu_lst == T_NULL)
 						resource_free_and_exit(&data, 1, "malloc error18");
 					result = execute_builtin_func(func_type, argu_lst, &data);
-					set_exit_code(&data, result);
+					set_exit_code(&data);
 					free(argu_lst);
 
 					opened_fd_close(&data);
@@ -228,7 +228,8 @@ int	minishell(int argc, char **argv, char **envp)
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 			{
 				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == wait(&data.exit_code))
-					set_exit_code(&data, (data.exit_code >> 8) & 0xFF);
+					set_exit_code(&data);
+					//set_exit_code(&data, (data.exit_code >> 8) & 0xFF);
 			}
 			free_2d_array2((void ***)&data.pp);
 			ft_free1((void **)&data.pid_table);

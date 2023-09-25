@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/24 23:17:00 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/25 20:04:48 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,23 +14,52 @@ SRCS =	main.c \
 		cd_util.c \
 		cd1.c \
 		cd2.c \
-		make_path.c \
-		check_syntax_error1.c \
-		check_syntax_error2.c \
-		util.c \
-		split_cmd.c \
-		error.c \
-		dollor_sign.c \
-		heredoc.c \
+		check_syntax_error_and_or.c \
+		check_syntax_error_dollor_braces.c \
+		check_syntax_error_lts_gts.c \
+		check_syntax_error_parentheses1.c \
+		check_syntax_error_parentheses2.c \
+		check_syntax_error_parentheses3.c \
+		check_syntax_error_parentheses4.c \
+		check_syntax_error.c \
 		child.c \
-		redirect.c \
-		exit.c \
+		data_init1.c \
+		data_init2.c \
+		delete_functions.c \
+		dll_argument_functions.c \
+		dollor_sign1.c \
+		dollor_sign2.c \
 		echo.c \
-		pwd.c \
 		env.c \
-		unset.c \
+		error.c \
+		execute_builtin.c \
+		exit.c \
 		export.c \
-		wildcard.c
+		heredoc1.c \
+		heredoc2.c \
+		heredoc3.c \
+		make_path.c \
+		minishell.c \
+		pwd.c \
+		redirect1.c \
+		redirect2.c \
+		redirect3.c \
+		signal.c \
+		split_cmd1.c \
+		split_cmd2.c \
+		split_cmd3.c \
+		split_cmd4.c \
+		split_cmd5.c \
+		srt_functions.c \
+		unset.c \
+		util1.c \
+		util2.c \
+		util3.c \
+		util4.c \
+		wildcard1.c \
+		wildcard2.c \
+		wildcard3.c \
+		wildcard4.c \
 		
 OBJS = 	${SRCS:.c=.o}
 

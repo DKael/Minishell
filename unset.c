@@ -6,13 +6,14 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/24 22:26:02 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 16:02:50 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:54:20 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 static int	check_start_char_unset(char *str);
+static int	do_unset(t_dll *s_env, t_dll *env, char *str);
 
 int	ft_unset(t_dll *env, t_dll *s_env, char **args)
 {

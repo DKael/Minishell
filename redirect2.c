@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:59:00 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 15:58:59 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:52:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ static int	case_out_redirect3(char *abs_file_name, int tmp_fd, int mode)
 {
 	int	tmp;
 
+	tmp = 0;
 	if (mode == 2)
 		tmp = open(abs_file_name, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else if (mode == 3)

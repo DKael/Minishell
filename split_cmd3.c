@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 18:51:15 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:20:21 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 20:05:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,12 @@ extern char	*redirect_split2_0(char *tkns, t_cmd_info *tmp,
 
 t_bool	redirect_split(t_dll *dll, char *tkns)
 {
-	int			pos[4];
+	int			pos[5];
 	char		*con;
 	t_cmd_info	*tmp;
 	t_bool		heredoc_flag;
 
+	heredoc_flag = FALSE;
 	tmp = (t_cmd_info *)(dll->head.contents);
 	pos[4] = -1;
 	while (tkns[++pos[4]] != '\0')
@@ -49,9 +50,7 @@ t_bool	redirect_split(t_dll *dll, char *tkns)
 t_bool	parentheses_split(t_dll *dll, char *tkns)
 {
 	int		i[3];
-	int		idx_chk;
 	char	*tmp;
-	int		layer;
 
 	i[0] = -1;
 	i[2] = 0;

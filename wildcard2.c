@@ -6,11 +6,13 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 17:59:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 18:07:15 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:55:36 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+extern int	do_convert(t_dll *dll, char *tkn);
 
 int	wildcard_redirection_check(t_dll *dll, t_dll *tmp_dll, t_dllnode **ptr)
 {

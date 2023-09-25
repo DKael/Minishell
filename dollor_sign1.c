@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 11:27:14 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:41:12 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ t_bool	retrieve_variable_value(t_data *data, t_dll *tkns)
 {
 	t_dll			tmp_dll;
 	t_dllnode		*node_ptr;
-	t_dollor_tmp	*dtmp;
 	int				e_len;
 
 	dll_init(&tmp_dll);

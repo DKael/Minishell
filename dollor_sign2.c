@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 11:15:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 14:43:26 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:41:24 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ char	*ft_getenv(t_data *data, const char *name)
 
 char	*get_dollor_parameter(char *cmd, int *idx)
 {
-	char	*result;
 	int		idx_chk;
 
 	if (cmd[(*idx) + 1] == '{')

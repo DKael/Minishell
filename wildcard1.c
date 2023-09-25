@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 13:27:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 18:06:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:54:54 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ static int	wildcard2(t_dll *tmp_dll, t_dllnode **ptr, t_bool *first_find)
 		ptr[1] = ptr[0];
 		ptr[2] = ptr[0]->back;
 	}
-	result = do_convert(&tmp_dll, (char *)ptr[0]->contents);
+	result = do_convert(tmp_dll, (char *)ptr[0]->contents);
 	if (result == 2)
 	{
 		ptr[0] = ptr[0]->back;
@@ -77,7 +77,7 @@ static int	wildcard2(t_dll *tmp_dll, t_dllnode **ptr, t_bool *first_find)
 	}
 	else if (result != 0)
 	{
-		dll_clear(&tmp_dll, str_delete_func);
+		dll_clear(tmp_dll, str_delete_func);
 		return (result);
 	}
 	return (0);
@@ -95,7 +95,7 @@ static void	wildcard3(t_dll *dll, t_dll *tmp_dll, t_dllnode **ptr)
 		ptr1 = ptr1->front;
 		dll_node_insert(ptr1->back, dll, ptr[0], 0);
 	}
-	dll_init(&tmp_dll);
+	dll_init(tmp_dll);
 	if (ptr[0] != ptr[1])
 	{
 		del = ptr[0];

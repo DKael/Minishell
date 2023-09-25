@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 18:00:41 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 18:08:07 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:55:44 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ extern int		do_convert5(t_dll *dll, char **tmp, char *buffer, int *s_chk);
 extern int		do_convert6(t_dir *dir_data, char *buffer, char **tmp,
 					int *s_chk);
 extern t_bool	pattern_matching(char *part, char *file);
+extern char		*remove_duplicate_asterisk_slash(char *str);
 
 int	do_convert(t_dll *dll, char *tkn)
 {

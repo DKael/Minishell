@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 02:36:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:34:32 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ static t_bool	check_front_of_parentheses(char *cmd, int idx, int *word_cnt)
 					|| ft_isblank(cmd[idx + 1]) == TRUE))
 			{
 				(*word_cnt)++;
-				if (word_cnt >= 2)
+				if ((*word_cnt) >= 2)
 					return (syntax_error_print("("));
 			}
 			if (cmd[idx] == '\"' || cmd[idx] == '\'')

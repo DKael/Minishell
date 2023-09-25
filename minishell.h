@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:20:52 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 20:05:17 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 # include "libgnl/get_next_line.h"
 # include "libsort/quick_sort.h" 
 
+extern int g_exit_code;
 
 #if !defined(TRUE) && !defined(FALSE)
 #define TRUE 1
@@ -45,11 +46,6 @@
 # define HD_PATH "/tmp"
 # define MAX_PATH_LEN 1025
 # define MAX_FD 250
-
-# ifndef GLOBAL_VAL
-#  define GLOBAL_VAL
-int	g_exit_code = 0;
-# endif
 
 typedef int t_bool;
 
@@ -147,7 +143,9 @@ int		ft_cd(t_data *data, char **input);
 t_bool	check_syntax_error(char **cmd, int mode);
 t_bool	case_lts_gts(char *cmd, int *idx);
 // child.c
-
+void child(t_data *data, int ao_idx, int pp_idx);
+char **make_2d_array_from_dll(t_dll *dll);
+char **make_2d_envp_from_dll(t_dll *dll);
 // data_init.c
 void	data_cycle_init(t_data *data);
 void	data_init(t_data *data, char *program_name, char **envp);
@@ -186,7 +184,7 @@ t_bool	parentheses_heredoc(t_dll *h_names, int *tkn_idx, char *cmd);
 // make_path.c
 char	*make_path(char *raw_path, int mode);
 // minishell.c
-int		minishell(int argc, char **argv, char **envp);
+int		minishell(char **argv, char **envp);
 // pwd.c
 int		ft_pwd(t_data *data);
 // redirect*.c
@@ -201,12 +199,33 @@ void	split_cmd(t_data *data, char *cmd);
 t_bool	redirect_split(t_dll *dll, char *tkns);
 t_bool	parentheses_split(t_dll *dll, char *tkns);
 t_bool	remain_split(t_dll *dll, char *tkns);
-
+char	*redirect_split2_0(char *tkns, t_cmd_info *tmp, int *pos,
+	t_bool heredoc_flag);
+void	redirect_split2_1(char *tkns, char *tmp, int *pos,
+				t_bool heredoc_flag);
 // srt_functions.c
 int		srt_compare(void *input_lst, int idx1, int idx2);
 void	srt_swap(void *input_lst, int idx1, int idx2);
-
-
-
+// unset.c
+int		ft_unset(t_dll *env, t_dll *s_env, char **args);
+//util*.c
+void	ignore_quote(char *cmd, int *idx);
+void	ignore_parentheses(char *cmd, int *idx);
+void	set_exit_code(t_data *data);
+void	close_pipes(t_data *data, int num);
+void	convert_minus_value_to_whitespace(char *cmd);
+void	resource_free_and_exit(t_data *data, int exit_code, char *msg);
+void	on_execution_part_err(t_data *data, int pp_make_cnt,
+	int exit_code, char *msg);
+void	total_heredoc_cnt_chk(char *cmd);
+int		get_file_info(char *name, t_file_info *info, int mode);
+void	*free_2d_array(void ***arr_ptr, int num);
+void	*free_2d_array2(void ***arr_ptr);
+void	*ft_free1(void **ptr);
+t_bool	ft_free2(void **ptr, t_bool flag);
+int		ft_free3(void **ptr, int return_num);
+void	*free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
+// wildcard.c
+int	wildcard(t_dll *dll);
 
 #endif

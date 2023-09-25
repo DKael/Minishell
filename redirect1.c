@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/18 17:25:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 16:43:37 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/25 19:52:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,11 @@
 
 static int	get_rd_sign(char *str, int idx);
 static int	case_heredoc(t_dll *heredoc_names, int tmp_fd);
+static int	check_fd(char *tmp_str);
+static int	do_redirect(t_data *data, t_dll *tkns, int tmp_fd, char *tmp_str);
 extern int	case_in_redirect(char *file_name, int tmp_fd);
-extern int	case_out_redirect(char *file_name, int tmp_fd, int mode);
+extern int	case_out_redirect(char *file_name, int *tmp_fd, int mode);
+
 
 int	sign_redirection(t_data *data, t_dll *tkns)
 {
@@ -104,6 +107,7 @@ static int	do_redirect(t_data *data, t_dll *tkns, int tmp_fd, char *tmp_str)
 	int	rd_sign;
 	int	result;
 
+	result = 0;
 	idx = -1;
 	while (tmp_str[++idx] != '\0' && tmp_str[idx] != ' ')
 		;
