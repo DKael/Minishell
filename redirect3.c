@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:47:13 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 15:59:09 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 21:56:39 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,20 @@ t_bool	opened_fd_close(t_data *data)
 		data->opened_fd[idx] = -1;
 	}
 	return (reset_flag);
+}
+
+int	check_sign_redirection_result(t_data *data, int result)
+{
+	if (result == 1)
+	{
+		set_exit_code(data, 1);
+		return (1);
+	}
+	else if (result == 2)
+		resource_free_and_exit(data, 1, "file open error");
+	else if (result == 3)
+		resource_free_and_exit(data, 1, "redirection error");
+	else if (result == 4)
+		resource_free_and_exit(data, 1, "stat() error");
+	return (0);
 }

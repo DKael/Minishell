@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/18 17:25:30 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:52:30 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 21:52:02 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ static int	check_fd(char *tmp_str);
 static int	do_redirect(t_data *data, t_dll *tkns, int tmp_fd, char *tmp_str);
 extern int	case_in_redirect(char *file_name, int tmp_fd);
 extern int	case_out_redirect(char *file_name, int *tmp_fd, int mode);
-
 
 int	sign_redirection(t_data *data, t_dll *tkns)
 {

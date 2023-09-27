@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 18:02:59 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 21:55:10 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,21 +33,20 @@
 # include "libgnl/get_next_line.h"
 # include "libsort/quick_sort.h" 
 
-#if !defined(TRUE) && !defined(FALSE)
-#define TRUE 1
-#define FALSE 0
-#endif
-#ifndef T_NULL
-#define T_NULL (void *)0
-#endif
+# if !defined(TRUE) && !defined(FALSE)
+#  define TRUE 1
+#  define FALSE 0
+# endif
+# ifndef T_NULL
+#  define T_NULL (void *)0
+# endif
 
 # define HD_PATH "/tmp"
 # define MAX_PATH_LEN 1025
 # define MAX_FD 250
 
-typedef int t_bool;
-
-typedef	struct stat t_stat;
+typedef int			t_bool;
+typedef struct stat	t_stat;
 
 typedef struct s_dir
 {
@@ -55,7 +54,7 @@ typedef struct s_dir
 	t_dll			*dll;
 }	t_dir;
 
-typedef	enum s_file_type
+typedef enum s_file_type
 {
 	REGULAR_FILE,
 	DIRECTORY,
@@ -66,11 +65,11 @@ typedef	enum s_file_type
 typedef struct s_file_info
 {
 	t_stat		bf;
-	t_file_type type;
+	t_file_type	type;
 	int			mode;
 }	t_file_info;
 
-typedef	struct s_srt
+typedef struct s_srt
 {
 	char		*name;
 	t_dllnode	*ptr;
@@ -108,29 +107,26 @@ typedef struct s_data
 {
 	t_dll	***tkn;
 	char	*cmd;
-	char 	*program_name;
+	char	*program_name;
 	char	**ao_split;
 	char	**envp;
 	int		ao_cnt;
 	int		*pipe_cnt;
 	int		**pp;
-	pid_t *pid_table;
+	pid_t	*pid_table;
 	t_logic	*logic_table;
-
 	int		w_status;
 	int		exit_code;
 	char	exit_code_str[4];
-	
-	t_dll 	envdll;
+	t_dll	envdll;
 	t_dll	sorted_envdll;
-
-	int	old_stdin;
-	int	old_stdout;
-	int	old_stderr;
-	int	opened_fd[MAX_FD];
+	int		old_stdin;
+	int		old_stdout;
+	int		old_stderr;
+	int		opened_fd[MAX_FD];
 	char	wd[MAX_PATH_LEN];
 
-} t_data;
+}	t_data;
 
 // cd*.c
 int		ft_chdir(char *path, t_data *data);
@@ -141,9 +137,9 @@ int		ft_cd(t_data *data, char **input);
 t_bool	check_syntax_error(char **cmd, int mode);
 t_bool	case_lts_gts(char *cmd, int *idx);
 // child.c
-void child(t_data *data, int ao_idx, int pp_idx);
-char **make_2d_array_from_dll(t_dll *dll);
-char **make_2d_envp_from_dll(t_dll *dll);
+void	child(t_data *data, int ao_idx, int pp_idx);
+char	**make_2d_array_from_dll(t_dll *dll);
+char	**make_2d_envp_from_dll(t_dll *dll);
 // data_init.c
 void	data_cycle_init(t_data *data);
 void	data_init(t_data *data, char *program_name, char **envp);
@@ -156,7 +152,7 @@ void	dll_export_print_func(void *content);
 void	dll_str_print_func(void *content);
 // dollor_sign.c
 t_bool	retrieve_variable_value(t_data *data, t_dll *tkns);
-char 	*ft_getenv(t_data *data, const char *name);
+char	*ft_getenv(t_data *data, const char *name);
 // echo.c
 int		ft_echo(char **str);
 // env.c
@@ -184,6 +180,16 @@ void	heredoc_unlink(t_data *data);
 char	*make_path(char *raw_path, int mode);
 // minishell.c
 int		minishell(char **argv, char **envp);
+int		read_cmd(t_data *data);
+int		read_cmd_and_syntax_check(t_data *data);
+void	heredoc_make0(t_data *data);
+int		check_next_ao_cmd(t_data *data, int ao_idx);
+void	dollor_sign_check(t_data *data, int ao_idx);
+void	wildcard_check(t_data *data, int ao_idx);
+int		case_no_pipe_check_isbuiltin(t_data *data, int ao_idx);
+void	make_pipe(t_data *data, int ao_idx);
+void	make_child(t_data *data, int ao_idx);
+void	wait_for_child(t_data *data, int ao_idx);
 // pwd.c
 int		ft_pwd(t_data *data);
 // redirect*.c
@@ -192,6 +198,7 @@ t_bool	pipe_redirection(t_data *data, int ao_idx, int pp_idx);
 t_bool	basic_redirection_save(t_data *data);
 t_bool	basic_redirection_recover(t_data *data);
 t_bool	opened_fd_close(t_data *data);
+int		check_sign_redirection_result(t_data *data, int result);
 // signal.c
 void	signal_handler(int signum);
 void	dont_make_command_str(void);
@@ -203,9 +210,9 @@ t_bool	redirect_split(t_dll *dll, char *tkns);
 t_bool	parentheses_split(t_dll *dll, char *tkns);
 t_bool	remain_split(t_dll *dll, char *tkns);
 char	*redirect_split2_0(char *tkns, t_cmd_info *tmp, int *pos,
-	t_bool heredoc_flag);
+			t_bool heredoc_flag);
 void	redirect_split2_1(char *tkns, char *tmp, int *pos,
-				t_bool heredoc_flag);
+			t_bool heredoc_flag);
 // srt_functions.c
 int		srt_compare(void *input_lst, int idx1, int idx2);
 void	srt_swap(void *input_lst, int idx1, int idx2);
@@ -219,7 +226,7 @@ void	close_pipes(t_data *data, int num);
 void	convert_minus_value_to_whitespace(char *cmd);
 void	resource_free_and_exit(t_data *data, int exit_code, char *msg);
 void	on_execution_part_err(t_data *data, int pp_make_cnt,
-	int exit_code, char *msg);
+			int exit_code, char *msg);
 void	total_heredoc_cnt_chk(char *cmd);
 int		get_file_info(char *name, t_file_info *info, int mode);
 void	*free_2d_array(void ***arr_ptr, int num);
@@ -228,12 +235,13 @@ void	*ft_free1(void **ptr);
 t_bool	ft_free2(void **ptr, t_bool flag);
 int		ft_free3(void **ptr, int return_num);
 void	*free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
+void	end_one_cycle(t_data *data);
 // waitpid_macro_functions.c
 t_bool	ft_wifexited(int status);
 int		ft_wexitstatus(int status);
 t_bool	ft_wifsignaled(int status);
 int		ft_wtermsig(int status);
 // wildcard.c
-int	wildcard(t_dll *dll);
+int		wildcard(t_dll *dll);
 
 #endif

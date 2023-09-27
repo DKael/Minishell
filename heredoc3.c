@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 11:57:44 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 14:43:56 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 21:51:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,8 @@ void	heredoc_unlink(t_data *data)
 		idx2 = -1;
 		while (++idx2 < data->pipe_cnt[idx1])
 		{
-			ptr = &(((t_cmd_info *)((data->tkn[idx1][idx2])->head.contents))->heredoc_names);
+			ptr = &(((t_cmd_info *)((data->tkn[idx1][idx2])
+							->head.contents))->heredoc_names);
 			node_ptr = ptr->head.back;
 			while (node_ptr != &(ptr->tail))
 			{

@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/27 18:03:43 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/27 21:53:34 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,10 @@ SRCS =	main.c \
 		heredoc2.c \
 		heredoc3.c \
 		make_path.c \
-		minishell.c \
+		minishell1.c \
+		minishell2.c \
+		minishell3.c \
+		minishell4.c \
 		pwd.c \
 		redirect1.c \
 		redirect2.c \

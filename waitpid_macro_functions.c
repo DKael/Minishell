@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/27 18:01:57 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 18:03:10 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 21:53:43 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_bool	ft_wifexited(int status)
 {
-	if  (((*(int *)&(status)) & 0177) == 0)
+	if (((*(int *)&(status)) & 0177) == 0)
 		return (TRUE);
 	else
 		return (FALSE);
