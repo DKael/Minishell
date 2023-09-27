@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 11:35:22 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 10:21:36 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 13:37:52 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 t_bool	syntax_error_print(char *chr)
 {
-	err_msg_print3("syntax error near unexpected token `", chr, "'\n");
+	err_msg_print3("syntax error near unexpected token `", chr, "\'");
 	return (FALSE);
 }
 

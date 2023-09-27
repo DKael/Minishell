@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:16:43 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 20:00:25 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 16:39:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,10 @@ static	int	read_cmd(t_data *data)
 	data->cmd = readline("minishell$ ");
 	if (data->cmd == T_NULL)
 	{
-		printf("exit\n");
-		
+		printf("\033[1A");
+		printf("\033[10C");
+		printf(" exit\n");
+		exit(g_exit_code % 256);
 	}
 	else if (data->cmd[0] == '\0')
 	{
@@ -29,6 +31,34 @@ static	int	read_cmd(t_data *data)
 	add_history(data->cmd);
 	return (0);
 }
+
+t_bool	ft_wifexited(int status)
+{
+	if  (((*(int *)&(status)) & 0177) == 0)
+		return (TRUE);
+	else
+		return (FALSE);
+}
+
+int	ft_wexitstatus(int status)
+{
+	return (((*(int *)&(status)) >> 8) & 0x000000ff);
+}
+
+t_bool	ft_wifsignaled(int status)
+{
+	if (((*(int *)&(status)) & 0177) != _WSTOPPED
+		&& ((*(int *)&(status)) & 0177) != 0)
+		return (TRUE);
+	else
+		return (FALSE);
+}
+
+int	ft_wtermsig(int status)
+{
+	return (((*(int *)&(status)) & 0177));
+}
+
 
 int	minishell(char **argv, char **envp)
 {
@@ -49,7 +79,7 @@ int	minishell(char **argv, char **envp)
 	int func_type;
 
 	char **argu_lst;
-
+	pid_t	pid_tmp;
 
 	data_init(&data, argv[0], envp);
 	while (1)
@@ -80,7 +110,7 @@ int	minishell(char **argv, char **envp)
 					ptr[0] = data.tkn[idx[0]][idx[1]]->tail.front;
 					tmp_str = ft_strdup((char *)(ptr[0]->contents));
 					if (tmp_str == T_NULL)
-						resource_free_and_exit(&data, 1, "malloc error16");
+						resource_free_and_exit(&data, 1, "malloc error");
 					if (parentheses_heredoc(&info_ptr->heredoc_names, idx, tmp_str) == FALSE)
 						resource_free_and_exit(&data, 1, "here document error");
 					ft_free1((void **)&tmp_str);
@@ -107,7 +137,7 @@ int	minishell(char **argv, char **envp)
 			}
 		}
 
-
+		signal(SIGINT, SIG_IGN);
 		ao_idx = -1;
 		while (++ao_idx < data.ao_cnt)
 		{
@@ -227,9 +257,27 @@ int	minishell(char **argv, char **envp)
 			pp_idx = -1;
 			while (++pp_idx < data.pipe_cnt[ao_idx])
 			{
-				if (data.pid_table[data.pipe_cnt[ao_idx] - 1] == wait(&data.exit_code))
+				pid_tmp = waitpid(-1, &data.w_status, 0);
+				if (ft_wifexited(data.w_status) == TRUE && pid_tmp == data.pid_table[data.pipe_cnt[ao_idx] - 1])
+				{
+					g_exit_code = ft_wexitstatus(data.w_status);
 					set_exit_code(&data);
-					//set_exit_code(&data, (data.exit_code >> 8) & 0xFF);
+				}
+				else if (ft_wifsignaled(data.w_status) == TRUE)
+				{
+					if (ft_wtermsig(data.w_status) == SIGINT)
+					{
+						write(STDERR_FILENO, "\n", 1);
+						g_exit_code = 130;
+						set_exit_code(&data);
+					}
+					else if (ft_wtermsig(data.w_status) == SIGQUIT)
+					{
+						write(STDERR_FILENO, "Quit : 3\n", 9);
+						g_exit_code = 131;
+						set_exit_code(&data);
+					}
+				}
 			}
 			free_2d_array2((void ***)&data.pp);
 			ft_free1((void **)&data.pid_table);
@@ -237,6 +285,7 @@ int	minishell(char **argv, char **envp)
 
 		ft_free1((void **)&data.cmd);
 		free_2d_array((void ***)&data.ao_split, data.ao_cnt);
+		heredoc_unlink(&data);
 		idx[0] = -1;
 		while (++idx[0] < data.ao_cnt)
 			free_2d_dll(&data.tkn[idx[0]], data.pipe_cnt[idx[0]], str_delete_func);

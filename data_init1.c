@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 00:10:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 20:06:09 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 16:40:27 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ extern void		check_oldpwd_exist(t_data *data);
 
 void	data_cycle_init(t_data *data)
 {
+	dont_make_command_str();
+	signal(SIGINT, signal_handler);
 	data->cmd = T_NULL;
 	data->tkn = T_NULL;
 	data->ao_split = T_NULL;
@@ -34,6 +36,9 @@ void	data_init(t_data *data, char *program_name, char **envp)
 {
 	int	idx;
 
+	dont_make_command_str();
+	signal(SIGINT, signal_handler);
+	signal(SIGQUIT, SIG_IGN);
 	data->program_name = program_name;
 	data->envp = envp;
 	set_exit_code(data);

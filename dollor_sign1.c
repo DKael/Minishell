@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 16:58:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:41:12 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 14:00:01 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,29 +108,29 @@ static t_bool	find_minus_one2(t_data *data, char *tkn, int *idx,
 
 static char	*do_expansion(t_dll *tmp_dll, char *tkn, int e_len)
 {
-	char			*tmp;
+	char			*tmp[2];
 	int				idx[3];
 	t_dllnode		*node_ptr;
-	t_dollor_tmp	*dtmp;
 
-	tmp = (char *)ft_calloc(ft_strlen(tkn) + e_len + 1, sizeof(char));
-	if (tmp == T_NULL)
+	tmp[0] = (char *)ft_calloc(ft_strlen(tkn) + e_len + 1, sizeof(char));
+	if (tmp[0] == T_NULL)
 		return (T_NULL);
 	idx[0] = -1;
+	idx[2] = -1;
 	node_ptr = tmp_dll->head.back;
 	while (tkn[++idx[0]] != '\0')
 	{
 		if (tkn[idx[0]] == -1)
 		{
-			dtmp = (t_dollor_tmp *)(node_ptr->contents);
+			tmp[1] = ((t_dollor_tmp *)(node_ptr->contents))->value;
 			idx[1] = -1;
-			while ((dtmp->value)[++idx[1]] != '\0')
-				tmp[++idx[2]] = (dtmp->value)[idx[1]];
-			idx[0] += dtmp->idx_jump;
+			while (tmp[1][++idx[1]] != '\0')
+				tmp[0][++idx[2]] = tmp[1][idx[1]];
+			idx[0] += ((t_dollor_tmp *)(node_ptr->contents))->idx_jump;
 			node_ptr = node_ptr->back;
 		}
 		else
-			tmp[++idx[2]] = tkn[idx[0]];
+			tmp[0][++idx[2]] = tkn[idx[0]];
 	}
-	return (tmp);
+	return (tmp[0]);
 }

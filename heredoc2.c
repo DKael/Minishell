@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 12:17:54 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:50:04 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 14:49:15 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,36 +94,28 @@ static char	*make_name2(char *make_path, char *bf1, char *bf2)
 t_bool	heredoc_make2(char *name, char *del)
 {
 	int		fd;
-	char	*paste_nl;
 
 	fd = open(name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
 		return (FALSE);
-	paste_nl = ft_strjoin(del, "\n");
-	if (paste_nl == T_NULL)
-	{
-		unlink(name);
-		return (FALSE);
-	}
-	heredoc_make3(fd, paste_nl);
+	heredoc_make3(fd, del);
 	return (TRUE);
 }
 
-void	heredoc_make3(int fd, char *paste_nl)
+void	heredoc_make3(int fd, char *del)
 {
 	char	*buffer;
 
 	while (1)
 	{
-		write(1, "> ", 3);
-		buffer = get_next_line(0);
+		buffer = readline("> ");
 		if (buffer == T_NULL
-			|| ft_strcmp(buffer, paste_nl) == 0)
+			|| ft_strcmp(buffer, del) == 0)
 			break ;
 		write(fd, buffer, ft_strlen(buffer));
+		write(fd, "\n", 1);
 		ft_free1((void **)&buffer);
 	}
 	ft_free1((void **)&buffer);
-	ft_free1((void **)&paste_nl);
 	close(fd);
 }

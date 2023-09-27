@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 16:44:12 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 02:32:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 12:04:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ static t_bool	check_special_char_syntax(char **cmd_ptr)
 			return (FALSE);
 		else if (cmd[idx] == '\"' || cmd[idx] == '\'')
 		{
-			ignore_parentheses(cmd, &idx);
+			ignore_quote(cmd, &idx);
 			idx++;
 		}
 		else

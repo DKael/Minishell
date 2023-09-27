@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 16:03:53 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 13:39:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ void	set_exit_code(t_data *data)
 	int	temp;
 
 	g_exit_code %= 1000;
-	data->exit_code = g_exit_code;
 	temp = g_exit_code;
 	idx = 0;
 	if (temp / 100 != 0)

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 11:57:44 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:50:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 14:43:56 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,4 +92,30 @@ static	t_bool	heredoc_move(t_dll *h_names, t_dll *tmp_dll, int *tkn_idx)
 		ptr[0] = ptr[0]->back;
 	}
 	return (TRUE);
+}
+
+void	heredoc_unlink(t_data *data)
+{
+	int			idx1;
+	int			idx2;
+	t_dll		*ptr;
+	t_dllnode	*node_ptr;
+
+	if (data->ao_cnt == 0 || data->pipe_cnt == T_NULL)
+		return ;
+	idx1 = -1;
+	while (++idx1 < data->ao_cnt)
+	{
+		idx2 = -1;
+		while (++idx2 < data->pipe_cnt[idx1])
+		{
+			ptr = &(((t_cmd_info *)((data->tkn[idx1][idx2])->head.contents))->heredoc_names);
+			node_ptr = ptr->head.back;
+			while (node_ptr != &(ptr->tail))
+			{
+				unlink((char *)node_ptr->contents);
+				node_ptr = node_ptr->back;
+			}
+		}
+	}
 }

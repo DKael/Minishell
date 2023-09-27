@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 20:05:17 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 16:29:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ typedef struct s_data
 	t_logic	*logic_table;
 
 	
-	int 	exit_code;
+	int 	w_status;
 	char	exit_code_str[4];
 	
 	t_dll 	envdll;
@@ -181,6 +181,7 @@ t_bool	heredoc_make1_1(t_dll *dll, int *idx, char *del);
 t_bool	heredoc_make1_2(t_dll *dll, t_dllnode *ptr, int *idx, char *del);
 t_bool	heredoc_split(t_dll *dll, char *tkns);
 t_bool	parentheses_heredoc(t_dll *h_names, int *tkn_idx, char *cmd);
+void	heredoc_unlink(t_data *data);
 // make_path.c
 char	*make_path(char *raw_path, int mode);
 // minishell.c
@@ -193,6 +194,13 @@ t_bool	pipe_redirection(t_data *data, int ao_idx, int pp_idx);
 t_bool	basic_redirection_save(t_data *data);
 t_bool	basic_redirection_recover(t_data *data);
 t_bool	opened_fd_close(t_data *data);
+// signal.c
+void	signal_handler(int signum);
+void	signal_handler1(int signum);
+void	dont_make_command_str(void);
+void	make_command_str(void);
+void	signal_exit(t_data *input);
+void	signal_handler_child(int signum);
 // split_cmd*.c
 void	cmd_split_error(t_data *data, char *cmd, char *msg);
 void	split_cmd(t_data *data, char *cmd);

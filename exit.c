@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 10:22:52 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 11:31:28 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 12:54:19 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ static int			only_num(char *str);
 int	ft_exit(t_data *data, char **str)
 {
 	if (str[1] == T_NULL)
+	{
+		write(STDERR_FILENO, "exit\n", ft_strlen("exit\n"));
 		resource_free_and_exit(data, 0, T_NULL);
+	}
 	else if (only_num(str[1]) == 1)
 	{
 		err_msg_print3("exit: ", str[1], ": numeric argument required");

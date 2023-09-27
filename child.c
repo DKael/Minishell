@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/17 16:28:59 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 20:00:43 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 16:42:27 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,9 @@ void child(t_data *data, int ao_idx, int pp_idx)
 	char **envp_lst;
 	int idx;
 
-
+	make_command_str();
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 	tmp = data->tkn[ao_idx][pp_idx];
 	cmd_info = (t_cmd_info *)(tmp->head.contents);
 	if (data->pipe_cnt[ao_idx] > 1)
@@ -96,20 +98,21 @@ void child(t_data *data, int ao_idx, int pp_idx)
 			{
 				free(argu_lst);
 				free(envp_lst);
-				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error6");
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error");
 			}
 			if (execve(cmd_path, argu_lst, envp_lst) == -1)
 			{
 				free(argu_lst);
 				free(envp_lst);
-				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "execve error");
+				err_msg_print2(argu_lst[0], ": command not found");
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, T_NULL);
 			}
 		}
 		else
 		{
 			argu_lst = make_2d_array_from_dll(data->tkn[ao_idx][pp_idx]);
 			if (argu_lst == T_NULL)
-				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error8");
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error");
 			result = execute_builtin_func(idx, argu_lst, data);
 			exit (result);
 		}

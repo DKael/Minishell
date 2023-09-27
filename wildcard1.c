@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 13:27:03 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:54:54 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 12:44:05 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	wildcard(t_dll *dll)
 	if (result != 0)
 		return (result);
 	wildcard_init(ptr, &first_find);
-	while (ptr[0] != &(dll->tail))
+	while (ptr[0] != T_NULL && ptr[0] != &(dll->tail))
 	{
 		if (ft_strstr((char *)ptr[0]->contents, "*") != T_NULL)
 		{
@@ -56,7 +56,6 @@ static void	wildcard_init(t_dllnode **ptr, t_bool *first_find)
 	(*first_find) = FALSE;
 	ptr[1] = T_NULL;
 	ptr[2] = T_NULL;
-	ptr[0] = ptr[0]->back;
 }
 
 static int	wildcard2(t_dll *tmp_dll, t_dllnode **ptr, t_bool *first_find)
