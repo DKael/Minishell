@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:16:43 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 16:39:30 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 18:10:45 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static	int	read_cmd(t_data *data)
 		printf("\033[1A");
 		printf("\033[10C");
 		printf(" exit\n");
-		exit(g_exit_code % 256);
+		exit(data->exit_code % 256);
 	}
 	else if (data->cmd[0] == '\0')
 	{
@@ -31,34 +31,6 @@ static	int	read_cmd(t_data *data)
 	add_history(data->cmd);
 	return (0);
 }
-
-t_bool	ft_wifexited(int status)
-{
-	if  (((*(int *)&(status)) & 0177) == 0)
-		return (TRUE);
-	else
-		return (FALSE);
-}
-
-int	ft_wexitstatus(int status)
-{
-	return (((*(int *)&(status)) >> 8) & 0x000000ff);
-}
-
-t_bool	ft_wifsignaled(int status)
-{
-	if (((*(int *)&(status)) & 0177) != _WSTOPPED
-		&& ((*(int *)&(status)) & 0177) != 0)
-		return (TRUE);
-	else
-		return (FALSE);
-}
-
-int	ft_wtermsig(int status)
-{
-	return (((*(int *)&(status)) & 0177));
-}
-
 
 int	minishell(char **argv, char **envp)
 {
@@ -88,8 +60,7 @@ int	minishell(char **argv, char **envp)
 			continue;
 		if (check_syntax_error(&(data.cmd), 0) == FALSE)
 		{
-			g_exit_code = 258;
-			set_exit_code(&data);
+			set_exit_code(&data, 258);
 			ft_free1((void **)&data.cmd);
 			continue;
 		}
@@ -143,7 +114,7 @@ int	minishell(char **argv, char **envp)
 		{
 			if (ao_idx > 0)
 			{
-				if ((data.logic_table[ao_idx - 1] == AND && g_exit_code != 0) || (data.logic_table[ao_idx - 1] == OR && g_exit_code == 0))
+				if ((data.logic_table[ao_idx - 1] == AND && data.exit_code != 0) || (data.logic_table[ao_idx - 1] == OR && data.exit_code == 0))
 					continue;
 			}
 
@@ -184,7 +155,7 @@ int	minishell(char **argv, char **envp)
 					result = sign_redirection(&data, data.tkn[ao_idx][0]);
 					if (result == 1)
 					{
-						set_exit_code(&data);
+						set_exit_code(&data, 1);
 						break;
 					}
 					else if (result == 2)
@@ -198,7 +169,7 @@ int	minishell(char **argv, char **envp)
 					if (argu_lst == T_NULL)
 						resource_free_and_exit(&data, 1, "malloc error18");
 					result = execute_builtin_func(func_type, argu_lst, &data);
-					set_exit_code(&data);
+					set_exit_code(&data, result);
 					free(argu_lst);
 
 					opened_fd_close(&data);
@@ -259,23 +230,18 @@ int	minishell(char **argv, char **envp)
 			{
 				pid_tmp = waitpid(-1, &data.w_status, 0);
 				if (ft_wifexited(data.w_status) == TRUE && pid_tmp == data.pid_table[data.pipe_cnt[ao_idx] - 1])
-				{
-					g_exit_code = ft_wexitstatus(data.w_status);
-					set_exit_code(&data);
-				}
+					set_exit_code(&data, ft_wexitstatus(data.w_status));
 				else if (ft_wifsignaled(data.w_status) == TRUE)
 				{
 					if (ft_wtermsig(data.w_status) == SIGINT)
 					{
 						write(STDERR_FILENO, "\n", 1);
-						g_exit_code = 130;
-						set_exit_code(&data);
+						set_exit_code(&data, 130);
 					}
 					else if (ft_wtermsig(data.w_status) == SIGQUIT)
 					{
 						write(STDERR_FILENO, "Quit : 3\n", 9);
-						g_exit_code = 131;
-						set_exit_code(&data);
+						set_exit_code(&data, 131);
 					}
 				}
 			}

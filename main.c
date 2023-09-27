@@ -6,13 +6,11 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 13:42:02 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 17:47:40 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	g_exit_code = 0;
 
 int	main(int argc, char **argv, char **envp)
 {

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 00:10:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 16:40:27 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 17:47:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ void	data_init(t_data *data, char *program_name, char **envp)
 	signal(SIGQUIT, SIG_IGN);
 	data->program_name = program_name;
 	data->envp = envp;
-	set_exit_code(data);
+	data->w_status = 0;
+	set_exit_code(data, 0);
 	data->old_stdin = 253;
 	data->old_stdout = 254;
 	data->old_stderr = 255;

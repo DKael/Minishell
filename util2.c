@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:20:18 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 13:09:02 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 16:46:40 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ void	resource_free_and_exit(t_data *data, int exit_code, char *msg)
 		ptr = ptr->back;
 	}
 	opened_fd_close(data);
+	make_command_str();
 	exit(exit_code);
 }
 

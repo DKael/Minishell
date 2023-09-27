@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/27 13:40:28 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/27 18:03:43 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -56,6 +56,7 @@ SRCS =	main.c \
 		util2.c \
 		util3.c \
 		util4.c \
+		waitpid_macro_functions.c \
 		wildcard1.c \
 		wildcard2.c \
 		wildcard3.c \

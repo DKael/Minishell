@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/03 17:43:07 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 13:39:34 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 17:43:01 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,14 @@ void	ignore_parentheses(char *cmd, int *idx)
 	}
 }
 
-void	set_exit_code(t_data *data)
+void	set_exit_code(t_data *data, int input_exit_code)
 {
 	int	idx;
 	int	temp;
 
-	g_exit_code %= 1000;
-	temp = g_exit_code;
+	input_exit_code %= 1000;
+	data->exit_code = input_exit_code;
+	temp = input_exit_code;
 	idx = 0;
 	if (temp / 100 != 0)
 		data->exit_code_str[idx++] = (temp / 100) + '0';

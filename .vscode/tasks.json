@@ -51,6 +51,7 @@
                 "util2.c",
                 "util3.c",
                 "util4.c",
+                "waitpid_macro_functions.c",
                 "wildcard1.c",
                 "wildcard2.c",
                 "wildcard3.c",

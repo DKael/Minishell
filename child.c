@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/17 16:28:59 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 16:42:27 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 18:16:26 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ void child(t_data *data, int ao_idx, int pp_idx)
 			{
 				split_path = ft_split(raw_path, ':');
 				if (split_path == T_NULL)
-					on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error4");
+					on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error");
 			}
 			else
 				split_path = T_NULL;
@@ -77,7 +77,7 @@ void child(t_data *data, int ao_idx, int pp_idx)
 			if (cmd_path == (char *)-1)
 			{
 				free_2d_array2((void ***)&split_path);
-				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error5");
+				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error");
 			}
 			if (cmd_path == T_NULL && split_path != T_NULL)
 			{
@@ -96,15 +96,17 @@ void child(t_data *data, int ao_idx, int pp_idx)
 			envp_lst = make_2d_envp_from_dll(&data->envdll);
 			if (argu_lst == T_NULL || envp_lst == T_NULL)
 			{
+				free(cmd_path);
 				free(argu_lst);
 				free(envp_lst);
 				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, "malloc error");
 			}
 			if (execve(cmd_path, argu_lst, envp_lst) == -1)
 			{
+				err_msg_print2(cmd_path, ": command not found");
+				free(cmd_path);
 				free(argu_lst);
 				free(envp_lst);
-				err_msg_print2(argu_lst[0], ": command not found");
 				on_execution_part_err(data, data->pipe_cnt[ao_idx], 1, T_NULL);
 			}
 		}
@@ -169,8 +171,15 @@ char **make_2d_envp_from_dll(t_dll *dll)
 
 char *get_cmd_path(char **path, char *cmd)
 {
+	char	*result;
+
 	if (access(cmd, X_OK) == 0)
-		return (cmd);
+	{
+		result = ft_strdup(cmd);
+		if (result == T_NULL)
+			return ((char *)-1);
+		return (result);
+	}
 	if (path == T_NULL)
 		return (T_NULL);
 	return (get_cmd_path2(path, cmd));

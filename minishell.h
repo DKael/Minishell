@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 16:29:50 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 18:02:59 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,6 @@
 # include "libdll/double_linked_list.h"
 # include "libgnl/get_next_line.h"
 # include "libsort/quick_sort.h" 
-
-extern int g_exit_code;
 
 #if !defined(TRUE) && !defined(FALSE)
 #define TRUE 1
@@ -119,8 +117,8 @@ typedef struct s_data
 	pid_t *pid_table;
 	t_logic	*logic_table;
 
-	
-	int 	w_status;
+	int		w_status;
+	int		exit_code;
 	char	exit_code_str[4];
 	
 	t_dll 	envdll;
@@ -196,11 +194,8 @@ t_bool	basic_redirection_recover(t_data *data);
 t_bool	opened_fd_close(t_data *data);
 // signal.c
 void	signal_handler(int signum);
-void	signal_handler1(int signum);
 void	dont_make_command_str(void);
 void	make_command_str(void);
-void	signal_exit(t_data *input);
-void	signal_handler_child(int signum);
 // split_cmd*.c
 void	cmd_split_error(t_data *data, char *cmd, char *msg);
 void	split_cmd(t_data *data, char *cmd);
@@ -219,7 +214,7 @@ int		ft_unset(t_dll *env, t_dll *s_env, char **args);
 //util*.c
 void	ignore_quote(char *cmd, int *idx);
 void	ignore_parentheses(char *cmd, int *idx);
-void	set_exit_code(t_data *data);
+void	set_exit_code(t_data *data, int input_exit_code);
 void	close_pipes(t_data *data, int num);
 void	convert_minus_value_to_whitespace(char *cmd);
 void	resource_free_and_exit(t_data *data, int exit_code, char *msg);
@@ -233,6 +228,11 @@ void	*ft_free1(void **ptr);
 t_bool	ft_free2(void **ptr, t_bool flag);
 int		ft_free3(void **ptr, int return_num);
 void	*free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
+// waitpid_macro_functions.c
+t_bool	ft_wifexited(int status);
+int		ft_wexitstatus(int status);
+t_bool	ft_wifsignaled(int status);
+int		ft_wtermsig(int status);
 // wildcard.c
 int	wildcard(t_dll *dll);
 
