@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:20:18 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 21:57:04 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 23:41:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ void	on_execution_part_err(t_data *data, int pp_make_cnt,
 	resource_free_and_exit(data, exit_code, msg);
 }
 
-void	child_resource_free_and_exit(t_data *data, int exit_code, char *msg)
+void	c_resource_free_and_exit(t_data *data, int exit_code, char *msg)
 {
 	int			idx;
 	t_dllnode	*ptr;
@@ -76,33 +76,22 @@ void	child_resource_free_and_exit(t_data *data, int exit_code, char *msg)
 	exit(exit_code);
 }
 
-void	chile_on_execution_part_err(t_data *data, int pp_make_cnt,
-	int exit_code, char *msg)
+void	child_free(t_cdata *cdata)
 {
-	close_pipes(data, pp_make_cnt);
-	free_2d_array2((void ***)&data->pp);
-	ft_free1((void **)&data->pid_table);
-	child_resource_free_and_exit(data, exit_code, msg);
+	ft_free1((void **)&cdata->raw_path);
+	free_2d_array2((void ***)&cdata->split_path);
+	ft_free1((void **)&cdata->cmd_path);
+	ft_free1((void **)&cdata->cmd);
+	free(cdata->argu_lst);
+	free(cdata->envp_lst);
 }
 
-void	total_heredoc_cnt_chk(char *cmd)
+void	child_exit(t_data *data, t_cdata *cdata,
+	int exit_code, char *msg)
 {
-	int	idx;
-	int	heredoc_cnt;
-
-	heredoc_cnt = 0;
-	idx = -1;
-	while (cmd[++idx] != '\0')
-	{
-		if (cmd[idx] == '<' && cmd[idx + 1] == '<')
-		{
-			heredoc_cnt++;
-			if (heredoc_cnt > 16)
-			{
-				free(cmd);
-				printf("minishell: maximum here-document count exceeded\n");
-				exit(2);
-			}
-		}
-	}
+	close_pipes(data, cdata->pipe_cnt);
+	child_free(cdata);
+	free_2d_array2((void ***)&data->pp);
+	ft_free1((void **)&data->pid_table);
+	c_resource_free_and_exit(data, exit_code, msg);
 }

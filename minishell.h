@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 21:55:10 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 23:39:13 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,19 @@ typedef struct s_cmd_info
 	t_bool	cmd_flag;
 }	t_cmd_info;
 
+typedef struct s_cdata
+{
+	t_dll		*tkns;
+	t_cmd_info	*cmd_info;
+	int			pipe_cnt;
+	char		*raw_path;
+	char		**split_path;
+	char		*cmd_path;
+	char		*cmd;
+	char		**argu_lst;
+	char		**envp_lst;
+}	t_cdata;
+
 typedef struct s_data
 {
 	t_dll	***tkn;
@@ -125,7 +138,6 @@ typedef struct s_data
 	int		old_stderr;
 	int		opened_fd[MAX_FD];
 	char	wd[MAX_PATH_LEN];
-
 }	t_data;
 
 // cd*.c
@@ -138,8 +150,6 @@ t_bool	check_syntax_error(char **cmd, int mode);
 t_bool	case_lts_gts(char *cmd, int *idx);
 // child.c
 void	child(t_data *data, int ao_idx, int pp_idx);
-char	**make_2d_array_from_dll(t_dll *dll);
-char	**make_2d_envp_from_dll(t_dll *dll);
 // data_init.c
 void	data_cycle_init(t_data *data);
 void	data_init(t_data *data, char *program_name, char **envp);
@@ -218,24 +228,35 @@ int		srt_compare(void *input_lst, int idx1, int idx2);
 void	srt_swap(void *input_lst, int idx1, int idx2);
 // unset.c
 int		ft_unset(t_dll *env, t_dll *s_env, char **args);
-//util*.c
+//util1.c
 void	ignore_quote(char *cmd, int *idx);
 void	ignore_parentheses(char *cmd, int *idx);
 void	set_exit_code(t_data *data, int input_exit_code);
 void	close_pipes(t_data *data, int num);
 void	convert_minus_value_to_whitespace(char *cmd);
+// util2.c
 void	resource_free_and_exit(t_data *data, int exit_code, char *msg);
 void	on_execution_part_err(t_data *data, int pp_make_cnt,
 			int exit_code, char *msg);
-void	total_heredoc_cnt_chk(char *cmd);
-int		get_file_info(char *name, t_file_info *info, int mode);
+void	c_resource_free_and_exit(t_data *data,
+			int exit_code, char *msg);
+void	child_free(t_cdata *cdata);
+void	child_exit(t_data *data, t_cdata *cdata,
+			int exit_code, char *msg);
+// util3.c
 void	*free_2d_array(void ***arr_ptr, int num);
 void	*free_2d_array2(void ***arr_ptr);
 void	*ft_free1(void **ptr);
 t_bool	ft_free2(void **ptr, t_bool flag);
 int		ft_free3(void **ptr, int return_num);
+// util4.c
 void	*free_2d_dll(t_dll ***dll_ptr, int num, void (*del)(void *));
+int		get_file_info(char *name, t_file_info *info, int mode);
 void	end_one_cycle(t_data *data);
+char	**make_2d_array_from_dll(t_dll *dll);
+char	**make_2d_envp_from_dll(t_dll *dll);
+// util5.c
+void	total_heredoc_cnt_chk(char *cmd);
 // waitpid_macro_functions.c
 t_bool	ft_wifexited(int status);
 int		ft_wexitstatus(int status);

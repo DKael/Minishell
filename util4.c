@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 18:10:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 21:57:32 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 23:37:24 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,51 @@ int	get_file_info(char *name, t_file_info *info, int mode)
 	else
 		info->type = ETC;
 	return (0);
+}
+
+char	**make_2d_envp_from_dll(t_dll *dll)
+{
+	char		**tmp;
+	char		*tmp2;
+	int			idx;
+	t_dllnode	*node_ptr;
+	t_envval	*ptr;
+
+	tmp = (char **)ft_calloc(dll->size + 1, sizeof(char *));
+	if (tmp == T_NULL)
+		return (T_NULL);
+	node_ptr = dll->head.back;
+	idx = -1;
+	while (node_ptr != &(dll->tail))
+	{
+		ptr = (t_envval *)node_ptr->contents;
+		if (ptr->value != T_NULL)
+			tmp2 = ft_strjoin2(ptr->name, ptr->value, "=");
+		else
+			tmp2 = ft_strdup(ptr->name);
+		if (tmp2 == T_NULL)
+			return (free_2d_array2((void ***)&tmp));
+		tmp[++idx] = tmp2;
+		node_ptr = node_ptr->back;
+	}
+	return (tmp);
+}
+
+char	**make_2d_array_from_dll(t_dll *dll)
+{
+	char		**tmp;
+	int			idx;
+	t_dllnode	*node_ptr;
+
+	tmp = (char **)ft_calloc(dll->size + 1, sizeof(char *));
+	if (tmp == T_NULL)
+		return (T_NULL);
+	node_ptr = dll->head.back;
+	idx = -1;
+	while (node_ptr != &(dll->tail))
+	{
+		tmp[++idx] = (char *)node_ptr->contents;
+		node_ptr = node_ptr->back;
+	}
+	return (tmp);
 }
