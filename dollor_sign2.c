@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 11:15:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/28 14:28:41 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 15:07:00 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static char	*get_dollor_parameter2(char *cmd, int *idx)
 	idx_chk = (*idx) + 1;
 	while (cmd[++(*idx)] != '\0' && cmd[(*idx)] != '{'
 		&& cmd[(*idx)] != '\"' && cmd[(*idx)] != '\''
-		&& ft_isblank(cmd[(*idx)]) == FALSE && cmd[(*idx)] != '$')
+		&& ft_isblank(cmd[(*idx)]) == FALSE && cmd[(*idx)] != -1)
 		;
 	result = (char *)ft_strndup(&cmd[idx_chk], (*idx) - idx_chk);
 	(*idx)--;
