@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 10:22:52 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 12:54:19 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 15:34:05 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ int	ft_exit(t_data *data, char **str)
 	}
 	if (str[2])
 	{
-		err_msg_print1("exit: too many arguments\n");
+		write(STDERR_FILENO, "exit\n", 5);
+		err_msg_print1("exit: too many arguments");
 		return (1);
 	}
 	if (str[1])

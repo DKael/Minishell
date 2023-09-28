@@ -1,23 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   util5_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/29 19:25:38 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/28 14:38:47 by hyungdki         ###   ########.fr       */
+/*   Created: 2023/09/27 23:20:42 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/09/28 15:59:46 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "minishell_bonus.h"
 
-int	main(int argc, char **argv, char **envp)
+void	total_heredoc_cnt_chk(char *cmd)
 {
-	if (argc != 1)
+	int	idx;
+	int	heredoc_cnt;
+
+	heredoc_cnt = 0;
+	idx = -1;
+	while (cmd[++idx] != '\0')
 	{
-		err_msg_print1("don't support file read or need any other inputs");
-		return (1);
+		if (cmd[idx] == '<' && cmd[idx + 1] == '<')
+		{
+			heredoc_cnt++;
+			if (heredoc_cnt > 16)
+			{
+				free(cmd);
+				printf("minishell: maximum here-document count exceeded\n");
+				exit(2);
+			}
+		}
 	}
-	return (minishell(argv, envp));
 }

@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   minishell_bonus.h                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/28 15:01:13 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 16:07:17 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-# define MINISHELL_H
+#ifndef MINISHELL_BONUS_H
+# define MINISHELL_BONUS_H
 
 # include <stdio.h>
 # include <unistd.h>
@@ -28,10 +28,10 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <dirent.h>
-# include "libft/libft.h"
-# include "libdll/double_linked_list.h"
-# include "libgnl/get_next_line.h"
-# include "libsort/quick_sort.h" 
+# include "../libft/libft.h"
+# include "../libdll/double_linked_list.h"
+# include "../libgnl/get_next_line.h"
+# include "../libsort/quick_sort.h" 
 
 # if !defined(TRUE) && !defined(FALSE)
 #  define TRUE 1
