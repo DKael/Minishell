@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/24 21:40:27 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 20:12:30 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 14:33:11 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ static int	do_export(t_dll *dll, t_dll *s_env, char *str, t_envval *env)
 	t_dllnode	*ptr[3];
 
 	work = 0;
-	if (ft_isalpha(str[0]) == FALSE)
+	if (ft_isalpha(str[0]) == FALSE && str[0] != '_')
 	{
 		err_msg_print3("export: ", str, ": not a valid identifier");
 		envval_delete_func(env);

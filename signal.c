@@ -6,13 +6,14 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/24 22:24:13 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 18:01:28 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 14:30:24 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//signal ^C받았을때 1값을 뱉음
+int	g_exit_code = 0;
+
 void	signal_handler(int signum)
 {
 	if (signum == SIGINT)
@@ -21,6 +22,7 @@ void	signal_handler(int signum)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
+		g_exit_code = 1;
 	}
 }
 

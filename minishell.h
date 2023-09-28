@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/29 19:25:47 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/28 00:38:23 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 14:30:03 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@
 
 typedef int			t_bool;
 typedef struct stat	t_stat;
+
+extern int			g_exit_code;
 
 typedef struct s_dir
 {
@@ -122,7 +124,6 @@ typedef struct s_data
 	char	*cmd;
 	char	*program_name;
 	char	**ao_split;
-	char	**envp;
 	int		ao_cnt;
 	int		*pipe_cnt;
 	int		**pp;
@@ -213,6 +214,7 @@ int		check_sign_redirection_result(t_data *data, int result);
 void	signal_handler(int signum);
 void	dont_make_command_str(void);
 void	make_command_str(void);
+void	signal_data_connect(t_data *input);
 // split_cmd*.c
 void	cmd_split_error(t_data *data, char *cmd, char *msg);
 void	split_cmd(t_data *data, char *cmd);
