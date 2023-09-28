@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 18:00:41 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/28 15:59:51 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 17:35:44 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,6 @@ static int	do_convert4(char *buffer, int *s_chk, t_dir	*dir_data, char *part)
 		return (ft_free3((void **)&part, 2));
 	dir_data->dir = opendir(buffer);
 	if (dir_data->dir == T_NULL)
-		return (ft_free3((void **)&part, -2));
+		return (ft_free3((void **)&part, 0));
 	return (1);
 }
