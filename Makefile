@@ -6,31 +6,68 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/24 13:39:47 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/28 11:46:19 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS =	main.c \
-		check_syntax_error1.c \
-		check_syntax_error2.c \
+		cd_util.c \
+		cd1.c \
+		cd2.c \
+		check_syntax_error_and_or.c \
+		check_syntax_error_dollor_braces.c \
+		check_syntax_error_lts_gts.c \
+		check_syntax_error_parentheses1.c \
+		check_syntax_error_parentheses2.c \
+		check_syntax_error_parentheses3.c \
+		check_syntax_error_parentheses4.c \
+		check_syntax_error.c \
+		child_parentheses1.c \
+		child_parentheses2.c \
+		child1.c \
+		child2.c \
+		data_init1.c \
+		data_init2.c \
+		delete_functions.c \
+		dll_argument_functions.c \
+		dollor_sign1.c \
+		dollor_sign2.c \
+		echo.c \
+		env.c \
+		error.c \
+		execute_builtin.c \
+		exit.c \
+		export.c \
+		heredoc1.c \
+		heredoc2.c \
+		heredoc3.c \
+		make_path.c \
+		minishell1.c \
+		minishell2.c \
+		minishell3.c \
+		minishell4.c \
+		pwd.c \
+		redirect1.c \
+		redirect2.c \
+		redirect3.c \
+		signal.c \
+		split_cmd1.c \
+		split_cmd2.c \
+		split_cmd3.c \
+		split_cmd4.c \
+		split_cmd5.c \
+		srt_functions.c \
+		unset.c \
 		util1.c \
 		util2.c \
 		util3.c \
-		split_cmd.c \
-		error.c \
-		dollor_sign.c \
-		heredoc.c \
-		child.c \
-		quick_sort.c \
-		redirect.c \
-		exit.c \
-		echo.c \
-		pwd.c \
-		env.c \
-		unset.c \
-		export.c \
-		cd.c \
-		wildcard.c
+		util4.c \
+		util5.c \
+		waitpid_macro_functions.c \
+		wildcard1.c \
+		wildcard2.c \
+		wildcard3.c \
+		wildcard4.c \
 		
 OBJS = 	${SRCS:.c=.o}
 
@@ -44,14 +81,18 @@ NAME = minishell
 
 INCLUDE = -I.
 
-LIBDLL_DIR = dll
-LIBGNL_DIR = gnl
+LIBDLL_DIR = libdll
+LIBFT_DIR = libft
+LIBGNL_DIR = libgnl
+LIBSORT_DIR = libsort
 
-LDFLAGS = -lreadline -L./${LIBDLL_DIR} -L./${LIBGNL_DIR} -ldll -lgnl
+LDFLAGS = -lreadline -L./${LIBDLL_DIR} -L./${LIBGNL_DIR} -L./${LIBFT_DIR} -L./${LIBSORT_DIR} -ldll -lgnl -lft -lsort
 
 ${NAME} : ${TOTAL_OBJS}
 	@make -C ${LIBDLL_DIR} all
 	@make -C ${LIBGNL_DIR} all
+	@make -C ${LIBFT_DIR} all
+	@make -C ${LIBSORT_DIR} all
 	${CC} ${CFLAGS} ${TOTAL_OBJS} -g ${INCLUDE} ${LDFLAGS} -o $@
 
 %.o :%.c
@@ -62,6 +103,8 @@ all : ${NAME}
 clean:
 	@make -C ${LIBDLL_DIR} fclean
 	@make -C ${LIBGNL_DIR} fclean
+	@make -C ${LIBFT_DIR} fclean
+	@make -C ${LIBSORT_DIR} fclean
 	rm -f ${OBJS}
 
 fclean:

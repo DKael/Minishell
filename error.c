@@ -6,15 +6,15 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/10 11:35:22 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 18:04:06 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/27 13:37:52 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_bool syntax_error_print(char *chr)
+t_bool	syntax_error_print(char *chr)
 {
-	printf("minishell: syntax error near unexpected token `%s'\n", chr);
+	err_msg_print3("syntax error near unexpected token `", chr, "\'");
 	return (FALSE);
 }
 
@@ -26,7 +26,6 @@ void	err_msg_print1(char *m1)
 		write(STDERR_FILENO, m1, ft_strlen(m1));
 		write(STDERR_FILENO, "\n", 1);
 	}
-	
 }
 
 void	err_msg_print2(char *m1, char *m2)
@@ -52,9 +51,11 @@ void	err_msg_print3(char *m1, char *m2, char *m3)
 	}
 }
 
-void message_exit(const char *msg, int exit_code)
+void	message_exit(const char *msg, int exit_code)
 {
 	exit_code = exit_code % 256;
-	write(2, msg, ft_strlen(msg));
+	if (exit_code < 0)
+		exit_code += 256;
+	write(STDERR_FILENO, msg, ft_strlen(msg));
 	exit(exit_code);
 }

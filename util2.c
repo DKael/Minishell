@@ -5,208 +5,91 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/12 11:31:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/23 16:58:03 by hyungdki         ###   ########.fr       */
+/*   Created: 2023/09/25 14:20:18 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/09/28 09:34:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static char	*case_pos(int n, int digit);
-static char	*case_neg(int n, int digit);
-
-char	*ft_itoa(int n)
+void	resource_free_and_exit(t_data *data, int exit_code, char *msg)
 {
-	int		digit;
-	int		temp_n;
-	char	*result;
+	int			idx;
+	t_dllnode	*ptr;
 
-	if (n == 0)
+	if (msg != T_NULL)
+		err_msg_print1(msg);
+	ft_free1((void **)&data->cmd);
+	free_2d_array((void ***)&data->ao_split, data->ao_cnt);
+	idx = -1;
+	while (++idx < data->ao_cnt)
+		free_2d_dll(&data->tkn[idx], data->pipe_cnt[idx], str_delete_func);
+	ft_free1((void **)&data->tkn);
+	ft_free1((void **)&data->pipe_cnt);
+	ft_free1((void **)&data->logic_table);
+	dll_clear(&data->envdll, envval_delete_func);
+	ptr = data->sorted_envdll.head.back;
+	while (ptr != &(data->sorted_envdll.tail))
 	{
-		result = (char *)malloc(sizeof(char) * 2);
-		if (result == T_NULL)
-			return (T_NULL);
-		result[0] = '0';
-		result[1] = '\0';
-		return (result);
+		free(ptr);
+		ptr = ptr->back;
 	}
-	temp_n = n;
-	digit = 0;
-	while (temp_n != 0)
-	{
-		digit++;
-		temp_n /= 10;
-	}
-	if (n > 0)
-		return (case_pos(n, digit));
-	else
-		return (case_neg(n, digit));
+	opened_fd_close(data);
+	heredoc_unlink(data);
+	make_command_str();
+	exit(exit_code);
 }
 
-static char	*case_pos(int n, int digit)
+void	on_execution_part_err(t_data *data, int pp_make_cnt,
+	int exit_code, char *msg)
 {
-	char	*result;
-
-	result = (char *)malloc(sizeof(char) * (digit + 1));
-	if (result == T_NULL)
-		return (T_NULL);
-	result[digit--] = '\0';
-	while (n != 0)
-	{
-		result[digit--] = (n % 10) + '0';
-		n /= 10;
-	}
-	return (result);
+	close_pipes(data, pp_make_cnt);
+	free_2d_array2((void ***)&data->pp);
+	ft_free1((void **)&data->pid_table);
+	resource_free_and_exit(data, exit_code, msg);
 }
 
-static char	*case_neg(int n, int digit)
+void	c_resource_free_and_exit(t_data *data, int exit_code, char *msg)
 {
-	char	*result;
+	int			idx;
+	t_dllnode	*ptr;
 
-	result = (char *)malloc(sizeof(char) * (digit + 2));
-	if (result == T_NULL)
-		return (T_NULL);
-	result[0] = '-';
-	result[digit + 1] = '\0';
-	while (n != 0)
+	if (msg != T_NULL)
+		err_msg_print1(msg);
+	ft_free1((void **)&data->cmd);
+	free_2d_array((void ***)&data->ao_split, data->ao_cnt);
+	idx = -1;
+	while (++idx < data->ao_cnt)
+		free_2d_dll(&data->tkn[idx], data->pipe_cnt[idx], str_delete_func);
+	ft_free1((void **)&data->tkn);
+	ft_free1((void **)&data->pipe_cnt);
+	ft_free1((void **)&data->logic_table);
+	dll_clear(&data->envdll, envval_delete_func);
+	ptr = data->sorted_envdll.head.back;
+	while (ptr != &(data->sorted_envdll.tail))
 	{
-		result[digit--] = (-1) * (n % 10) + '0';
-		n /= 10;
+		free(ptr);
+		ptr = ptr->back;
 	}
-	return (result);
+	opened_fd_close(data);
+	make_command_str();
+	exit(exit_code);
 }
 
-char	*ft_strdup(char *src)
+void	child_free(t_cdata *cdata)
 {
-	size_t	src_length;
-	size_t	index;
-	char	*replica;
-
-	src_length = ft_strlen(src);
-	replica = (char *)malloc(sizeof(char) * (src_length + 1));
-	if (replica == T_NULL)
-		return (T_NULL);
-	index = 0;
-	while (src[index] != '\0')
-	{
-		replica[index] = src[index];
-		index++;
-	}
-	replica[index] = '\0';
-	return (replica);
+	free_2d_array2((void ***)&cdata->split_path);
+	ft_free1((void **)&cdata->cmd_path);
+	free(cdata->argu_lst);
+	free(cdata->envp_lst);
 }
 
-long long	ft_atoll(const char *str)
+void	child_exit(t_data *data, t_cdata *cdata,
+	int exit_code, char *msg)
 {
-	long long	sign;
-	long long	nb;
-	int	idx;
-
-	nb = 0;
-	sign = 1;
-	idx = 0;
-	while ((9 <= str[idx] && str[idx] <= 13) || str[idx] == ' ')
-		idx++;
-	if (str[idx] == '+' || str[idx] == '-')
-		if (str[idx++] == '-')
-			sign = -1;
-	while (str[idx] >= '0' && str[idx] <= '9')
-	{
-		if (nb > 922337203685477580
-			|| (nb == 922337203685477580 && str[idx] - '0' > 7 + ((1 - sign) / 2)))
-		{
-			if (sign == -1)
-				return (-9223372036854775807 - 1);
-			else
-				return (9223372036854775807);
-		}
-		nb = nb * 10 + (str[idx++] - '0');
-	}
-	return (nb * sign);
-}
-
-char	*ft_strstr(char *str, char *to_find)
-{
-	int	str_index;
-	int	find_index;
-
-	if (to_find[0] == '\0')
-		return (str);
-	str_index = 0;
-	while (str[str_index] != '\0')
-	{
-		if (str[str_index] == to_find[0])
-		{
-			find_index = 1;
-			while (to_find[find_index] != '\0')
-			{
-				if (str[str_index + find_index] != to_find[find_index])
-					break ;
-				find_index++;
-			}
-			if (to_find[find_index] == '\0')
-				return (&str[str_index]);
-		}
-		str_index++;
-	}
-	return (T_NULL);
-}
-
-size_t	ft_strlcpy(char *dst, const char *src, size_t dsize)
-{
-	size_t	index;
-	size_t	index1;
-
-	index = 0;
-	index1 = -1;
-	while (src[index] != '\0')
-		index++;
-	if (index >= dsize)
-	{
-		while (++index1 + 1 < dsize)
-			dst[index1] = src[index1];
-	}
-	else
-	{
-		while (src[++index1] != '\0')
-			dst[index1] = src[index1];
-	}
-	if (dsize != 0)
-		dst[index1] = '\0';
-	return (index);
-}
-
-char	*ft_strcpy(char *dest, char *src)
-{
-	int	index;
-
-	index = 0;
-	while (src[index] != '\0')
-	{
-		dest[index] = src[index];
-		index++;
-	}
-	dest[index] = '\0';
-	return (dest);
-}
-
-char	*ft_strncpy(char *dest, char *src, unsigned int n)
-{
-	unsigned int	index;
-
-	index = 0;
-	while (index < n && src[index] != '\0')
-	{
-		dest[index] = src[index];
-		index++;
-	}
-	if (index < n)
-	{
-		while (index < n)
-		{
-			dest[index] = '\0';
-			index++;
-		}
-	}
-	return (dest);
+	close_pipes(data, cdata->pipe_cnt);
+	child_free(cdata);
+	free_2d_array2((void ***)&data->pp);
+	ft_free1((void **)&data->pid_table);
+	c_resource_free_and_exit(data, exit_code, msg);
 }

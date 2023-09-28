@@ -1,9 +1,55 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/24 21:40:27 by hyungdki          #+#    #+#             */
+/*   Updated: 2023/09/25 20:12:30 by hyungdki         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
+static t_envval	*make_envval_from_str(char *str);
+static t_bool	find_env(t_dll *dll, t_dllnode	**ptr, t_envval *env,
+					int *work);
+static int		do_export(t_dll *dll, t_dll *s_env, char *str,
+					t_envval *env);
+static int		add_new(t_dllnode **ptr, t_dll *env, t_dll *s_env,
+					t_envval *var);
 
-t_envval *make_envval_from_str(char *str)
+int	ft_export(t_dll *env, t_dll *s_env, char **args)
 {
-	int	idx;
+	int			i;
+	int			flag;
+	int			result;
+	t_envval	*tmp;
+
+	if (args[1] == T_NULL)
+	{
+		dll_print(s_env, dll_export_print_func);
+		return (0);
+	}
+	flag = 0;
+	i = 0;
+	while (args[++i])
+	{
+		tmp = make_envval_from_str(args[i]);
+		if (tmp == T_NULL)
+			return (-1);
+		result = do_export(env, s_env, args[i], tmp);
+		if (result == -1)
+			return (-1);
+		flag += result;
+	}
+	return (flag > 0);
+}
+
+static t_envval	*make_envval_from_str(char *str)
+{
+	int			idx;
 	t_envval	*tmp;
 
 	tmp = (t_envval *)ft_calloc(1, sizeof(t_envval));
@@ -27,38 +73,33 @@ t_envval *make_envval_from_str(char *str)
 	return (tmp);
 }
 
-int	check_start_char_export(char *str)
+static int	do_export(t_dll *dll, t_dll *s_env, char *str, t_envval *env)
 {
-	if (!(str[0] >= 'a' && str[0] <= 'z') && !(str[0] >= 'A' && str[0] <= 'Z'))
+	int			work;
+	t_dllnode	*ptr[3];
+
+	work = 0;
+	if (ft_isalpha(str[0]) == FALSE)
 	{
 		err_msg_print3("export: ", str, ": not a valid identifier");
-		return (1);
-	}
-	return(0);
-}
-
-int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
-{
-	int	flag;
-	int	work;
-	t_dllnode	*dllnode;
-	t_dllnode	*dllnode1;
-	t_envval	*tmp;
-	t_dllnode	*ptr;
-
-	flag = 0;
-	work = 0;
-	
-	if (check_start_char_export(str) == 1)
-	{
 		envval_delete_func(env);
 		return (1);
 	}
-		
-	dllnode = dll->head.back;
-	while (dllnode != &(dll->tail))
+	if (find_env(dll, ptr, env, &work) == FALSE)
+		return (add_new(ptr, dll, s_env, env));
+	else if (work == 0)
+		envval_delete_func(env);
+	return (0);
+}
+
+static t_bool	find_env(t_dll *dll, t_dllnode	**ptr, t_envval *env, int *work)
+{
+	t_envval	*tmp;
+
+	ptr[0] = dll->head.back;
+	while (ptr[0] != &(dll->tail))
 	{
-		tmp = dllnode->contents;
+		tmp = ptr[0]->contents;
 		if (ft_strcmp(tmp->name, env->name) == 0)
 		{
 			if (env->value != T_NULL)
@@ -67,62 +108,38 @@ int	do_export(t_dll *dll, t_dll *sorted_env, char *str, t_envval *env)
 				tmp->value = env->value;
 				free(env->name);
 				free(env);
-				work++;
+				(*work)++;
 			}
-			break ;
+			return (TRUE);
 		}
-		dllnode = dllnode->back;
+		ptr[0] = ptr[0]->back;
 	}
-	if (dllnode == &(dll->tail))
-	{
-		ptr = dll_new_node((void *)env);
-		if (ptr == T_NULL)
-			return (-1);
-		dll_add_tail(dll, ptr);
-		dllnode1 = sorted_env->head.back;
-		while (dllnode1 != &(sorted_env->tail))
-		{
-			if (ft_strcmp((char *)env->name, (((t_envval *)(((t_dllnode*)(dllnode1->contents))->contents))->name)) < 0)
-			{
-				if (dll_content_add2(sorted_env, (void *)ptr, dllnode1, 1) == FALSE)
-					return (-1);
-				else
-					break;
-			}
-			dllnode1 = dllnode1->back;
-		}
-		if (dllnode1 == &(sorted_env->tail))
-			if (dll_content_add2(sorted_env, (void *)ptr, dllnode1, 1) == FALSE)
-				return (-1);
-	}
-	else if (work == 0)
-		envval_delete_func(env);
-	return (flag);
+	return (FALSE);
 }
 
-int	ft_export(t_dll *env, t_dll *s_env, char **args)
+static int	add_new(t_dllnode **ptr, t_dll *env, t_dll *s_env, t_envval *var)
 {
-	int	i;
-	int	flag;
-	int	result;
-	t_envval *tmp;
+	char	*t;
 
-	if (args[1] == T_NULL)
+	ptr[2] = dll_new_node((void *)var);
+	if (ptr[2] == T_NULL)
+		return (-1);
+	dll_add_tail(env, ptr[2]);
+	ptr[1] = s_env->head.back;
+	while (ptr[1] != &(s_env->tail))
 	{
-		dll_print(s_env, dll_export_print_func);
-		return (0);
+		t = ((t_envval *)(((t_dllnode *)(ptr[1]->contents))->contents))->name;
+		if (ft_strcmp((char *)var->name, t) < 0)
+		{
+			if (dll_content_add2(s_env, (void *)ptr[2], ptr[1], 1) == FALSE)
+				return (-1);
+			else
+				break ;
+		}
+		ptr[1] = ptr[1]->back;
 	}
-	flag = 0;
-	i = 0;
-	while (args[++i])
-	{
-		tmp = make_envval_from_str(args[i]);
-		if (tmp == T_NULL)
+	if (ptr[1] == &(s_env->tail))
+		if (dll_content_add2(s_env, (void *)ptr[2], ptr[1], 1) == FALSE)
 			return (-1);
-		result = do_export(env, s_env, args[i], tmp);
-		if (result == -1)
-			return (-1);
-		flag += result;
-	}
-	return (flag > 0);
+	return (0);
 }
