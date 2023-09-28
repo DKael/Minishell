@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/12 11:28:21 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:34:32 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 11:53:50 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,11 @@ t_bool	check_parentheses_syntax(char *cmd)
 	idx = -1;
 	while (cmd[++idx] != '\0')
 	{
-		if ((cmd[idx] == '(')
-			&& meet_open_parentheses(cmd, &idx, &parentheses_flag) == FALSE)
-			return (FALSE);
+		if (cmd[idx] == '(')
+		{
+			if (meet_open_parentheses(cmd, &idx, &parentheses_flag) == FALSE)
+				return (FALSE);
+		}
 		else if (parentheses_flag == FALSE && (cmd[idx] == '\"'
 				|| cmd[idx] == '\''))
 			ignore_quote(cmd, &idx);

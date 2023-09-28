@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:20:18 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 23:41:30 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 09:34:34 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,10 +78,8 @@ void	c_resource_free_and_exit(t_data *data, int exit_code, char *msg)
 
 void	child_free(t_cdata *cdata)
 {
-	ft_free1((void **)&cdata->raw_path);
 	free_2d_array2((void ***)&cdata->split_path);
 	ft_free1((void **)&cdata->cmd_path);
-	ft_free1((void **)&cdata->cmd);
 	free(cdata->argu_lst);
 	free(cdata->envp_lst);
 }

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:59:00 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:52:46 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 11:46:48 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,13 @@ static int	case_in_redirect2(char *file_name, char *abs_file_name, int tmp_fd)
 	t_file_info	f_info;
 	int			tmp;
 
-	tmp = get_file_info(abs_file_name, &f_info, 0);
+	tmp = get_file_info(abs_file_name, &f_info, 1);
 	if (tmp != 0)
+	{
+		if (tmp == 1)
+			err_msg_print2(file_name, ": No such file or directory");
 		return (ft_free3((void **)&abs_file_name, tmp));
+	}
 	if ((f_info.mode & 0400) != 0400)
 	{
 		err_msg_print2(file_name, ": Permission denied");

@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/27 23:32:06 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 23:38:00 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 00:40:47 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@ void	child_execute_builtin(t_data *data, t_cdata *cdata, int func_type)
 
 	cdata->argu_lst = make_2d_array_from_dll(cdata->tkns);
 	if (cdata->argu_lst == T_NULL)
-		child_exit(data, cdata->pipe_cnt, 1, "malloc error");
+		child_exit(data, cdata, 1, "malloc error");
 	result = execute_builtin_func(func_type, cdata->argu_lst, data);
-	child_exit(data, cdata->pipe_cnt, result, T_NULL);
+	child_exit(data, cdata, result, T_NULL);
 }
 
 char	*get_cmd_path(char **path, char *cmd)

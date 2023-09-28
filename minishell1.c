@@ -6,18 +6,17 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 14:16:43 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 22:07:57 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 01:25:31 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	minishell2(t_data *data, int ao_idx);
+static void	minishell2(t_data *data, int ao_idx);
 
 int	minishell(char **argv, char **envp)
 {
 	t_data	data;
-	int		result;
 	int		ao_idx;
 
 	data_init(&data, argv[0], envp);
@@ -32,38 +31,28 @@ int	minishell(char **argv, char **envp)
 		{
 			if (check_next_ao_cmd(&data, ao_idx) == 1)
 				continue ;
-			result = minishell2(&data, ao_idx);
-			if (result == 2)
-				break ;
-			else if (result == 1)
-				continue ;
+			minishell2(&data, ao_idx);
 		}
 		end_one_cycle(&data);
 	}
 }
 
-// printf("\n\n----------------------<7>----------------------\n\n");
+// printf("\n\n----------------------<leak check>----------------------\n\n");
 // system("leaks minishell");
-// printf("\n\n----------------------<7>----------------------\n\n");
+// printf("\n\n----------------------<leak check>----------------------\n\n");
 
-static int	minishell2(t_data *data, int ao_idx)
+static void	minishell2(t_data *data, int ao_idx)
 {
-	int	result;
-
 	dollor_sign_check(data, ao_idx);
 	wildcard_check(data, ao_idx);
-	result = case_no_pipe_check_isbuiltin(data, ao_idx);
-	if (result == 2)
-		return (2);
-	else if (result == 1)
-		return (1);
+	if (case_no_pipe_check_isbuiltin(data, ao_idx) == 1)
+		return ;
 	make_pipe(data, ao_idx);
 	make_child(data, ao_idx);
 	close_pipes(data, data->pipe_cnt[ao_idx]);
 	wait_for_child(data, ao_idx);
 	free_2d_array2((void ***)&data->pp);
 	ft_free1((void **)&data->pid_table);
-	return (0);
 }
 
 int	read_cmd(t_data *data)

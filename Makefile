@@ -6,7 +6,7 @@
 #    By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/05/03 20:30:42 by hyungdki          #+#    #+#              #
-#    Updated: 2023/09/27 23:37:49 by hyungdki         ###   ########.fr        #
+#    Updated: 2023/09/28 11:46:19 by hyungdki         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,6 +22,8 @@ SRCS =	main.c \
 		check_syntax_error_parentheses3.c \
 		check_syntax_error_parentheses4.c \
 		check_syntax_error.c \
+		child_parentheses1.c \
+		child_parentheses2.c \
 		child1.c \
 		child2.c \
 		data_init1.c \

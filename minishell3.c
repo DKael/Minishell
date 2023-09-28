@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/27 21:34:50 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 21:55:38 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 01:23:31 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ static int	case_no_pipe_execute_builtin(t_data *data, int ao_idx, int *tmp)
 		resource_free_and_exit(data, 1, "redirection error");
 	tmp[3] = sign_redirection(data, data->tkn[ao_idx][0]);
 	if (check_sign_redirection_result(data, tmp[3]) == 1)
-		return (2);
+		return (1);
 	argu_lst = make_2d_array_from_dll(data->tkn[ao_idx][0]);
 	if (argu_lst == T_NULL)
 		resource_free_and_exit(data, 1, "malloc error");
