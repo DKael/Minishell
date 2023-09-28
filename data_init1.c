@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 00:10:25 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/27 17:47:34 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 14:27:30 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ extern t_envval	*make_envval(t_data *data, char *envp, int idx);
 static void		make_envdll(t_data *data, char **envp);
 static void		make_sorted_envdll(t_data *data);
 static void		make_sorted_envdll2(t_data *data, t_srt *tmp);
-extern void		check_oldpwd_exist(t_data *data);
+extern void		check_pwd_oldpwd_exist(t_data *data);
 
 void	data_cycle_init(t_data *data)
 {
@@ -40,7 +40,6 @@ void	data_init(t_data *data, char *program_name, char **envp)
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, SIG_IGN);
 	data->program_name = program_name;
-	data->envp = envp;
 	data->w_status = 0;
 	set_exit_code(data, 0);
 	data->old_stdin = 253;
@@ -130,5 +129,5 @@ static void	make_sorted_envdll2(t_data *data, t_srt *tmp)
 		}
 	}
 	ft_free1((void **)&tmp);
-	check_oldpwd_exist(data);
+	check_pwd_oldpwd_exist(data);
 }

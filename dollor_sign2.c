@@ -6,7 +6,7 @@
 /*   By: hyungdki <hyungdki@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/25 11:15:11 by hyungdki          #+#    #+#             */
-/*   Updated: 2023/09/25 19:41:24 by hyungdki         ###   ########.fr       */
+/*   Updated: 2023/09/28 14:28:41 by hyungdki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ char	*ft_getenv(t_data *data, const char *name)
 	t_dllnode	*ptr;
 
 	if (name[0] == '?' && name[1] == '\0')
+	{
+		set_exit_code(data, g_exit_code);
 		return (data->exit_code_str);
+	}
 	ptr = data->envdll.head.back;
 	while (ptr != &(data->envdll.tail))
 	{
