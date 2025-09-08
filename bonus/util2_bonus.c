@@ -29,7 +29,7 @@ void	resource_free_and_exit(t_data *data, int exit_code, char *msg)
 	ft_free1((void **)&data->logic_table);
 	dll_clear(&data->envdll, envval_delete_func);
 	ptr = data->sorted_envdll.head.back;
-	while (ptr != &(data->sorted_envdll.tail))
+	while (ptr != T_NULL && ptr != &(data->sorted_envdll.tail))
 	{
 		free(ptr);
 		ptr = ptr->back;

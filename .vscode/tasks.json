@@ -1,0 +1,58 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc 활성 파일 빌드",
+            "command": "/usr/bin/gcc",
+            "args": [
+                "-fdiagnostics-color=always",
+                "cd_util_bonus.c",                          "heredoc3_bonus.c",
+"cd1_bonus.c",                          
+"cd2_bonus.c",                              "make_path_bonus.c",
+"check_syntax_error_and_or_bonus.c",        "minishell1_bonus.c",
+"check_syntax_error_bonus.c",               "minishell2_bonus.c",
+"check_syntax_error_dollor_braces_bonus.c", "minishell3_bonus.c",
+"check_syntax_error_lts_gts_bonus.c",       "minishell4_bonus.c",
+"check_syntax_error_parentheses1_bonus.c",  "pwd_bonus.c",
+"check_syntax_error_parentheses2_bonus.c",  "redirect1_bonus.c",
+"check_syntax_error_parentheses3_bonus.c",  "redirect2_bonus.c",
+"check_syntax_error_parentheses4_bonus.c",  "redirect3_bonus.c",
+"child_parentheses1_bonus.c",               "signal_bonus.c",
+"child_parentheses2_bonus.c",               "split_cmd1_bonus.c",
+"child1_bonus.c",                           "split_cmd2_bonus.c",
+"child2_bonus.c",                           "split_cmd3_bonus.c",
+"data_init1_bonus.c",                       "split_cmd4_bonus.c",
+"data_init2_bonus.c",                       "split_cmd5_bonus.c",
+"delete_functions_bonus.c",                 "srt_functions_bonus.c",
+"dll_argument_functions_bonus.c",           "unset_bonus.c",
+"dollor_sign1_bonus.c",                     "util1_bonus.c",
+"dollor_sign2_bonus.c",                     "util2_bonus.c",
+"echo_bonus.c",                             "util3_bonus.c",
+"env_bonus.c",                              "util4_bonus.c",
+"error_bonus.c",                            "util5_bonus.c",
+"execute_builtin_bonus.c",                  "waitpid_macro_functions_bonus.c",
+"exit_bonus.c",                             "wildcard1_bonus.c",
+"export_bonus.c",                           "wildcard2_bonus.c",
+"heredoc1_bonus.c",                         "wildcard3_bonus.c",
+"heredoc2_bonus.c",                         "wildcard4_bonus.c",
+                "-lreadline", "-L./", "-ldll", "-lgnl", "-lft", "-lsort",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "디버거에서 생성된 작업입니다."
+        }
+    ],
+    "version": "2.0.0"
+}
