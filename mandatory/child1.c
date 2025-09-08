@@ -63,9 +63,7 @@ static void	child_redirection(t_cdata *cdata, t_data *data,
 	int ao_idx, int pp_idx)
 {
 	int	result;
-	int	tmp;
 
-	tmp = cdata->pipe_cnt;
 	if (data->pipe_cnt[ao_idx] > 1
 		&& pipe_redirection(data, ao_idx, pp_idx) == FALSE)
 		child_exit(data, cdata, 1, "redirection error");
