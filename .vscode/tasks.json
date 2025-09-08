@@ -35,6 +35,7 @@
 "export_bonus.c",                           "wildcard2_bonus.c",
 "heredoc1_bonus.c",                         "wildcard3_bonus.c",
 "heredoc2_bonus.c",                         "wildcard4_bonus.c",
+"-Wall", "-Wextra", "-Werror",
                 "-lreadline", "-L./", "-ldll", "-lgnl", "-lft", "-lsort",
                 "-g",
                 "${file}",

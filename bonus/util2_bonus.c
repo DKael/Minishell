@@ -16,6 +16,7 @@ void	resource_free_and_exit(t_data *data, int exit_code, char *msg)
 {
 	int			idx;
 	t_dllnode	*ptr;
+	t_dllnode	*tmp;
 
 	if (msg != T_NULL)
 		err_msg_print1(msg);
@@ -29,10 +30,11 @@ void	resource_free_and_exit(t_data *data, int exit_code, char *msg)
 	ft_free1((void **)&data->logic_table);
 	dll_clear(&data->envdll, envval_delete_func);
 	ptr = data->sorted_envdll.head.back;
-	while (ptr != T_NULL && ptr != &(data->sorted_envdll.tail))
+	while (ptr != &(data->sorted_envdll.tail))
 	{
-		free(ptr);
+		tmp = ptr;
 		ptr = ptr->back;
+		free(tmp);
 	}
 	opened_fd_close(data);
 	heredoc_unlink(data);
@@ -53,6 +55,7 @@ void	c_resource_free_and_exit(t_data *data, int exit_code, char *msg)
 {
 	int			idx;
 	t_dllnode	*ptr;
+	t_dllnode	*tmp;
 
 	if (msg != T_NULL)
 		err_msg_print1(msg);
@@ -68,8 +71,9 @@ void	c_resource_free_and_exit(t_data *data, int exit_code, char *msg)
 	ptr = data->sorted_envdll.head.back;
 	while (ptr != &(data->sorted_envdll.tail))
 	{
-		free(ptr);
+		tmp = ptr;
 		ptr = ptr->back;
+		free(tmp);
 	}
 	opened_fd_close(data);
 	make_command_str();
