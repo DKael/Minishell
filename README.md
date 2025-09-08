@@ -90,7 +90,7 @@ fail
 	•	cd .. / cd /tmp / cd ~
 	•	존재하지 않는 디렉토리: cd /notexist
 
-https://github.com/user-attachments/assets/7d666119-c7e9-4d5f-a675-d6581731e2c0
+https://github.com/user-attachments/assets/102279c2-a62b-4c5c-b5c6-8aeef1fb63d0
 
 ---
 
