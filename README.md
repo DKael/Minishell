@@ -152,6 +152,13 @@ https://github.com/user-attachments/assets/5aaacb99-3fba-41d6-82f2-e779f221b05e
 ## 7️⃣ 기술 스택
 	•	언어: C
 	•	운영체제/환경: Unix/Linux
-	•	시스템 콜: fork, execve, pipe, dup2, waitpid, signal, getcwd, chdir
+	•	시스템 콜: read, write, open, close, access, fork, wait/waitpid/wait3/wait4, kill, exit, getcwd, chdir, stat/lstat/fstat, unlink, execve, dup, dup2
 	•	빌드 도구: GNU Make
 	•	협업 도구: Git
+
+ ## 8️⃣ Reference
+ 	•	https://www.die.net/
+  	•	https://www.gnu.org/software/bash/manual/html_node/index.html#SEC_Contents
+    •	https://tldp.org/LDP/abs/html/index.html
+    •	https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html
+    •	https://man7.org/linux/man-pages/index.html
