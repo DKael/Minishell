@@ -168,7 +168,7 @@ https://github.com/user-attachments/assets/5aaacb99-3fba-41d6-82f2-e779f221b05e
 	•	언어: C
   	•	운영체제/환경: Unix/Linux
  	•	빌드 도구: GNU Make
-  	•	협업 도구: Git
+  	•	버전관리 도구: Git
  	•	Coding Conventions: Norminette
 	•	시스템 콜: read, write, open, close, access, fork, wait/waitpid/wait3/wait4, kill, exit, getcwd, chdir, stat/lstat/fstat, unlink, execve, dup, dup2
 
